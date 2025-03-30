@@ -9,3 +9,7 @@
 | ![Triangle Tiling](./assets/triangles.png) |
 | :----------------------------------------: |
 |             _Triangle Tiling_              |
+
+| ![Hexagon Tiling](./assets/hexagons.png) |
+| :--------------------------------------: |
+|             _Hexagon Tiling_             |

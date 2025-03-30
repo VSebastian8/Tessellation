@@ -13,4 +13,4 @@ main =
         , width "800"
         , height "800"
         ]
-        (triangles 100 100)
+        (hexagons 100 100)

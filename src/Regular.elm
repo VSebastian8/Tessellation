@@ -1,4 +1,4 @@
-module Regular exposing (squares, triangles)
+module Regular exposing (hexagons, squares, triangles)
 
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -109,5 +109,52 @@ triangles n m =
                                 _ ->
                                     upTriangle 30 c p
                         )
+            )
+        |> List.concat
+
+
+{-| Hexagon svg shape.
+-}
+hexagon : Float -> Color -> Point -> Svg msg
+hexagon length color { x, y } =
+    let
+        height =
+            length * 2
+
+        width =
+            length * sqrt 3
+
+        -- Hexagon points (clockwise from top point)
+        pointsHex =
+            [ ( x, y - height / 2 ) -- Top center
+            , ( x + width / 2, y - length / 2 ) -- Upper right
+            , ( x + width / 2, y + length / 2 ) -- Lower right
+            , ( x, y + height / 2 ) -- Bottom center
+            , ( x - width / 2, y + length / 2 ) -- Lower left
+            , ( x - width / 2, y - length / 2 ) -- Upper left
+            ]
+                |> List.map (\( px, py ) -> String.fromFloat px ++ "," ++ String.fromFloat py)
+                |> String.join " "
+    in
+    polygon
+        [ points pointsHex
+        , fill (theme.getColor color)
+        , stroke theme.strokeColor
+        , strokeWidth "2"
+        ]
+        []
+
+
+{-| Regular Tiling of the plane with the `hexagon` shape.
+-}
+hexagons : Int -> Int -> List (Svg msg)
+hexagons n m =
+    List.range 1 m
+        |> List.map
+            (\y ->
+                List.range 1 n
+                    |> List.map (\x -> ( { x = 20.0 * sqrt 3 * toFloat x + 10.0 * sqrt 3 * toFloat (modBy 2 (y + 1)), y = 30.0 * toFloat y }, mix3Color (x // 2 + y // 2) ))
+                    |> List.map
+                        (\( p, c ) -> hexagon 20 c p)
             )
         |> List.concat
