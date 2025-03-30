@@ -1,5 +1,6 @@
 module Regular exposing (hexagons, squares, triangles)
 
+import ColorTheme exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Util exposing (..)
@@ -29,7 +30,7 @@ squares n m =
         |> List.map
             (\y ->
                 List.range 1 n
-                    |> List.map (\x -> ( { x = 20.0 * toFloat x, y = 20.0 * toFloat y }, mix2Color (x // 2 + y // 2) ))
+                    |> List.map (\x -> ( { x = 20.0 * toFloat x, y = 20.0 * toFloat y }, mix4Color (y + x) ))
                     |> List.map (\( p, c ) -> square 20 c p)
             )
         |> List.concat
@@ -99,7 +100,7 @@ triangles n m =
         |> List.map
             (\y ->
                 List.range 1 n
-                    |> List.map (\x -> ( { x = 30.0 * toFloat x + 15.0 * toFloat (modBy 2 (y + 1)), y = (sqrt 3 * 15.0) * toFloat (y // 2) }, mix2Color y ))
+                    |> List.map (\x -> ( { x = 30.0 * toFloat x + 15.0 * toFloat (modBy 2 (y + 1)), y = (sqrt 3 * 15.0) * toFloat (y // 2) }, mix4Color y ))
                     |> List.map
                         (\( p, c ) ->
                             case modBy 2 y of
@@ -153,7 +154,7 @@ hexagons n m =
         |> List.map
             (\y ->
                 List.range 1 n
-                    |> List.map (\x -> ( { x = 20.0 * sqrt 3 * toFloat x + 10.0 * sqrt 3 * toFloat (modBy 2 (y + 1)), y = 30.0 * toFloat y }, mix3Color (x // 2 + y // 2) ))
+                    |> List.map (\x -> ( { x = 20.0 * sqrt 3 * toFloat x + 10.0 * sqrt 3 * toFloat (modBy 2 (y + 1)), y = 30.0 * toFloat y }, mix3Color (x // 3 + 1 + (modBy 10 y // 5)) ))
                     |> List.map
                         (\( p, c ) -> hexagon 20 c p)
             )
