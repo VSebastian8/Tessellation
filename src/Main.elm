@@ -10,12 +10,6 @@ import Svg exposing (svg)
 import Svg.Attributes exposing (height, viewBox, width)
 
 
-
--- flower : Polygon
--- flower =
---     { lengths = [ 10, 10, 10, 20, 20 ], angles = [ 120, 120, 120, 120, 60 ], rotation = 60 }
-
-
 main : Html msg
 main =
     div
@@ -30,7 +24,7 @@ main =
             , width "800"
             , height "800"
             ]
-            (truncatedHexagonalTiling
+            (truncatedSquareTiling
                 100
                 100
                 { x = 0, y = 0 }
