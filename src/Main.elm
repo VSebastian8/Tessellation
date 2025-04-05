@@ -5,13 +5,15 @@ import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Polygon exposing (..)
 import Regular exposing (..)
+import Semiregular exposing (..)
 import Svg exposing (svg)
 import Svg.Attributes exposing (height, viewBox, width)
 
 
-equilateral : Polygon
-equilateral =
-    { lengths = [ 10, 10, 10, 20, 20 ], angles = [ 120, 120, 120, 120, 60 ], rotation = 60 }
+
+-- flower : Polygon
+-- flower =
+--     { lengths = [ 10, 10, 10, 20, 20 ], angles = [ 120, 120, 120, 120, 60 ], rotation = 60 }
 
 
 main : Html msg
@@ -28,5 +30,9 @@ main =
             , width "800"
             , height "800"
             ]
-            [ polygonSvg equilateral 10 Secondary { x = 200, y = 200 } ]
+            (truncatedHexagonalTiling
+                100
+                100
+                { x = 0, y = 0 }
+            )
         ]

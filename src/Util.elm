@@ -7,6 +7,16 @@ type alias Point =
     { x : Float, y : Float }
 
 
+add : Point -> Point -> Point
+add p q =
+    { x = p.x + q.x, y = p.y + q.y }
+
+
+sub : Point -> Point -> Point
+sub p q =
+    { x = p.x - q.x, y = p.y - q.y }
+
+
 mix2Color : Int -> Color
 mix2Color n =
     case modBy 2 n of

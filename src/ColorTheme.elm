@@ -52,6 +52,26 @@ aquaTheme =
     }
 
 
+honeyTheme : Theme
+honeyTheme =
+    { strokeColor = "#CE7C00"
+    , getColor =
+        \color ->
+            case color of
+                Primary ->
+                    "#FF9A0A"
+
+                Secondary ->
+                    "#FECB09"
+
+                Ternary ->
+                    "#FEED0D"
+
+                Quart ->
+                    "#CE7C00"
+    }
+
+
 theme : Theme
 theme =
-    amethystTheme
+    honeyTheme

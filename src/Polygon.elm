@@ -21,8 +21,8 @@ startAt { lengths, angles, rotation } n =
     }
 
 
-rotate : Polygon -> Float -> Polygon
-rotate { lengths, angles } a =
+rotatePoly : Polygon -> Float -> Polygon
+rotatePoly { lengths, angles } a =
     { lengths = lengths
     , angles = angles
     , rotation = a
@@ -72,3 +72,19 @@ polygonSvg poly size color point =
         , strokeWidth "2"
         ]
         []
+
+
+getPoint : Polygon -> Float -> Int -> Point
+getPoint poly size index =
+    let
+        n =
+            List.length poly.lengths
+    in
+    case
+        polygonPoints poly size |> List.drop (modBy n (n + index)) |> List.head
+    of
+        Nothing ->
+            { x = 0, y = 0 }
+
+        Just point ->
+            point
