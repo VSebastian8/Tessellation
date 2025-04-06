@@ -3,7 +3,7 @@ module Main exposing (main)
 import Browser
 import ColorTheme exposing (Color(..), Theme, amethystTheme, aquaTheme, honeyTheme)
 import Html exposing (..)
-import Html.Attributes exposing (attribute, checked, href, name, style, target, type_)
+import Html.Attributes exposing (checked, href, id, name, style, target, type_)
 import Html.Events exposing (onInput)
 import Regular exposing (..)
 import Semiregular exposing (..)
@@ -88,32 +88,15 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div
-        [ style "display" "grid"
-        , style "grid-template-columns" "300px 1fr 300px"
-        , style "grid-template-rows" "auto auto 1fr"
-        , style "height" "100vh"
-        , style "padding" "20px"
-        , style "gap" "20px"
-        , style "box-sizing" "border-box"
-        ]
+        [ id "container" ]
         [ -- Left Top Panel
           div
-            [ style "grid-column" "1"
-            , style "grid-row" "1"
-            , style "width" "250px"
-            , style "height" "auto"
-            , style "padding" "20px"
-            , style "background" "white"
-            , style "border" "1px solid #e0e0e0"
-            , style "border-radius" "8px"
-            , style "margin-top" "50px"
-            , style "box-shadow" "0 2px 8px rgba(0,0,0,0.1)"
-            , attribute "data-test-id" "left-top-panel"
-            ]
+            [ id "tilingContainer" ]
             [ h2 [] [ text "Tiling:" ]
             , div [ style "margin-bottom" "15px" ]
                 [ tilingRadio Square "Square" model
                 , tilingRadio Triangular "Triangular" model
+                , tilingRadio Hexagonal "Hexagonal" model
                 , tilingRadio TruncatedHexagonal "Truncated Hexagonal" model
                 , tilingRadio TriHexagonal "Trihexagonal" model
                 , tilingRadio TruncatedSquare "Truncated Square" model
@@ -126,17 +109,7 @@ view model =
             ]
         , -- Left Middle Panel
           div
-            [ style "grid-column" "1"
-            , style "grid-row" "2"
-            , style "width" "250px"
-            , style "height" "auto"
-            , style "padding" "20px"
-            , style "background" "white"
-            , style "border" "1px solid #e0e0e0"
-            , style "border-radius" "8px"
-            , style "box-shadow" "0 2px 8px rgba(0,0,0,0.1)"
-            , attribute "data-test-id" "left-bottom-panel"
-            ]
+            [ id "themeContainer" ]
             [ h2 [] [ text "Theme:" ]
             , div [ style "margin-bottom" "15px" ]
                 [ themeRadio Amethyst "Amethyst" model
@@ -146,17 +119,7 @@ view model =
             ]
         , -- Left Bottom Panel
           div
-            [ style "grid-column" "1"
-            , style "grid-row" "3"
-            , style "width" "250px"
-            , style "height" "100px"
-            , style "padding" "20px"
-            , style "background" "white"
-            , style "border" "1px solid #e0e0e0"
-            , style "border-radius" "8px"
-            , style "box-shadow" "0 2px 8px rgba(0,0,0,0.1)"
-            , attribute "data-test-id" "left-bottom-panel"
-            ]
+            [ id "githubContainer" ]
             [ h2 [] [ text "Github:" ]
             , a
                 [ href "https://github.com/VSebastian8/Tessellation"
@@ -168,13 +131,7 @@ view model =
             ]
         , -- Center Content
           div
-            [ style "grid-column" "2"
-            , style "grid-row" "1 / 4" -- Span all rows
-            , style "display" "flex"
-            , style "justify-content" "center"
-            , style "align-items" "center"
-            , attribute "data-test-id" "center-content"
-            ]
+            [ id "svgContainer" ]
             [ svg
                 [ viewBox "0 0 800 800"
                 , width "800"
@@ -185,8 +142,8 @@ view model =
                         model.selectedTheme
                     )
                     50
-                    50
-                    { x = -50, y = -50 }
+                    80
+                    { x = -100, y = -200 }
                 )
             ]
         ]
@@ -196,7 +153,7 @@ tilingRadio : Tiling -> String -> Model -> Html Msg
 tilingRadio tilingValue labelText model =
     label
         [ style "display" "block"
-        , style "margin" "10px 0"
+        , style "margin" "1vh 0"
         ]
         [ input
             [ type_ "radio"

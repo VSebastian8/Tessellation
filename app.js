@@ -5199,6 +5199,7 @@ var $author$project$Main$update = F2(
 	});
 var $author$project$Main$Amethyst = {$: 'Amethyst'};
 var $author$project$Main$ElongatedTriangular = {$: 'ElongatedTriangular'};
+var $author$project$Main$Hexagonal = {$: 'Hexagonal'};
 var $author$project$Main$Honey = {$: 'Honey'};
 var $author$project$Main$SnubSquare = {$: 'SnubSquare'};
 var $author$project$Main$SnubTriHexagonal = {$: 'SnubTriHexagonal'};
@@ -5209,14 +5210,6 @@ var $author$project$Main$TruncatedHexagonal = {$: 'TruncatedHexagonal'};
 var $author$project$Main$TruncatedSquare = {$: 'TruncatedSquare'};
 var $author$project$Main$TruncatedTriHexagonal = {$: 'TruncatedTriHexagonal'};
 var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$virtual_dom$VirtualDom$attribute = F2(
-	function (key, value) {
-		return A2(
-			_VirtualDom_attribute,
-			_VirtualDom_noOnOrFormAction(key),
-			_VirtualDom_noJavaScriptOrHtmlUri(value));
-	});
-var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $author$project$ColorTheme$Primary = {$: 'Primary'};
 var $author$project$ColorTheme$Secondary = {$: 'Secondary'};
@@ -6368,6 +6361,7 @@ var $elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
@@ -6463,7 +6457,7 @@ var $author$project$Main$tilingRadio = F3(
 			_List_fromArray(
 				[
 					A2($elm$html$Html$Attributes$style, 'display', 'block'),
-					A2($elm$html$Html$Attributes$style, 'margin', '10px 0')
+					A2($elm$html$Html$Attributes$style, 'margin', '1vh 0')
 				]),
 			_List_fromArray(
 				[
@@ -6492,13 +6486,7 @@ var $author$project$Main$view = function (model) {
 		$elm$html$Html$div,
 		_List_fromArray(
 			[
-				A2($elm$html$Html$Attributes$style, 'display', 'grid'),
-				A2($elm$html$Html$Attributes$style, 'grid-template-columns', '300px 1fr 300px'),
-				A2($elm$html$Html$Attributes$style, 'grid-template-rows', 'auto auto 1fr'),
-				A2($elm$html$Html$Attributes$style, 'height', '100vh'),
-				A2($elm$html$Html$Attributes$style, 'padding', '20px'),
-				A2($elm$html$Html$Attributes$style, 'gap', '20px'),
-				A2($elm$html$Html$Attributes$style, 'box-sizing', 'border-box')
+				$elm$html$Html$Attributes$id('container')
 			]),
 		_List_fromArray(
 			[
@@ -6506,17 +6494,7 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
-						A2($elm$html$Html$Attributes$style, 'grid-row', '1'),
-						A2($elm$html$Html$Attributes$style, 'width', '250px'),
-						A2($elm$html$Html$Attributes$style, 'height', 'auto'),
-						A2($elm$html$Html$Attributes$style, 'padding', '20px'),
-						A2($elm$html$Html$Attributes$style, 'background', 'white'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid #e0e0e0'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-						A2($elm$html$Html$Attributes$style, 'margin-top', '50px'),
-						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.1)'),
-						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'left-top-panel')
+						$elm$html$Html$Attributes$id('tilingContainer')
 					]),
 				_List_fromArray(
 					[
@@ -6537,6 +6515,7 @@ var $author$project$Main$view = function (model) {
 							[
 								A3($author$project$Main$tilingRadio, $author$project$Main$Square, 'Square', model),
 								A3($author$project$Main$tilingRadio, $author$project$Main$Triangular, 'Triangular', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$Hexagonal, 'Hexagonal', model),
 								A3($author$project$Main$tilingRadio, $author$project$Main$TruncatedHexagonal, 'Truncated Hexagonal', model),
 								A3($author$project$Main$tilingRadio, $author$project$Main$TriHexagonal, 'Trihexagonal', model),
 								A3($author$project$Main$tilingRadio, $author$project$Main$TruncatedSquare, 'Truncated Square', model),
@@ -6551,16 +6530,7 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
-						A2($elm$html$Html$Attributes$style, 'grid-row', '2'),
-						A2($elm$html$Html$Attributes$style, 'width', '250px'),
-						A2($elm$html$Html$Attributes$style, 'height', 'auto'),
-						A2($elm$html$Html$Attributes$style, 'padding', '20px'),
-						A2($elm$html$Html$Attributes$style, 'background', 'white'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid #e0e0e0'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.1)'),
-						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'left-bottom-panel')
+						$elm$html$Html$Attributes$id('themeContainer')
 					]),
 				_List_fromArray(
 					[
@@ -6588,16 +6558,7 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
-						A2($elm$html$Html$Attributes$style, 'grid-row', '3'),
-						A2($elm$html$Html$Attributes$style, 'width', '250px'),
-						A2($elm$html$Html$Attributes$style, 'height', '100px'),
-						A2($elm$html$Html$Attributes$style, 'padding', '20px'),
-						A2($elm$html$Html$Attributes$style, 'background', 'white'),
-						A2($elm$html$Html$Attributes$style, 'border', '1px solid #e0e0e0'),
-						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
-						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.1)'),
-						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'left-bottom-panel')
+						$elm$html$Html$Attributes$id('githubContainer')
 					]),
 				_List_fromArray(
 					[
@@ -6626,12 +6587,7 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2($elm$html$Html$Attributes$style, 'grid-column', '2'),
-						A2($elm$html$Html$Attributes$style, 'grid-row', '1 / 4'),
-						A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-						A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-						A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'center-content')
+						$elm$html$Html$Attributes$id('svgContainer')
 					]),
 				_List_fromArray(
 					[
@@ -6648,8 +6604,8 @@ var $author$project$Main$view = function (model) {
 							model.selectedTiling,
 							$author$project$Main$getTheme(model.selectedTheme),
 							50,
-							50,
-							{x: -50, y: -50}))
+							80,
+							{x: -100, y: -200}))
 					]))
 			]));
 };

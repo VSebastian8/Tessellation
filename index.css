@@ -1,0 +1,78 @@
+#container {
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;
+    height: 100vh;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    gap: 2vh;
+    box-sizing: border-box;
+    grid-template-areas:
+        "left-top center _"
+        "left-middle center _"
+        "left-bottom center _";
+}
+
+@media screen and (max-width: 800px) {
+    #container {
+        grid-template-columns: 1fr 1fr !important;
+        grid-template-areas: 
+                "left-top left-middle"
+                "left-top left-bottom"
+                "center center" !important;
+    }
+
+    #themeContainer {
+     margin-top: 50px;
+    }
+
+    #svgContainer {
+        height: fit-content;
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#tilingContainer {
+    grid-area: left-top;
+    width: 250px;
+    height: auto;
+    padding: 20px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    margin-top: 50px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    
+}
+
+#themeContainer {
+    grid-area: left-middle;
+    width: 250px;
+    height: auto;
+    padding:20px;
+    background :white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#githubContainer {
+    grid-area: left-bottom;
+    width: 250px;
+    height: 100px;
+    padding: 20px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#svgContainer {
+    grid-area: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
