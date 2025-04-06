@@ -1,57 +1,20 @@
-module Semiregular exposing (..)
+module Semiregular exposing (triHexagonalTiling, truncatedHexagonalTiling, truncatedSquareTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
+import Shapes exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Util exposing (..)
 
 
-equilateral : Polygon
-equilateral =
-    { lengths = [ 1, 1, 1 ]
-    , angles = [ 60, 60, 60 ]
-    , rotation = 0
-    }
+{-| Truncating the corners of the hexagon (adding triangles at each corner)
 
+  - Type: semiregular
+  - Corners: **3.12.12**
+  - Symmetry: hexagonal
 
-square : Polygon
-square =
-    { lengths = [ 1, 1, 1, 1 ]
-    , angles = [ 90, 90, 90, 90 ]
-    , rotation = 45
-    }
-
-
-hexagon : Polygon
-hexagon =
-    { lengths = [ 1, 1, 1, 1, 1, 1 ]
-    , angles = [ 120, 120, 120, 120, 120, 120 ]
-    , rotation = 0
-    }
-
-
-octagon : Polygon
-octagon =
-    { lengths = [ 1, 1, 1, 1, 1, 1, 1, 1 ]
-    , angles = [ 135, 135, 135, 135, 135, 135, 135, 135 ]
-    , rotation = 0
-    }
-
-
-dodecagon : Polygon
-dodecagon =
-    { lengths = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ]
-    , angles = [ 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150 ]
-    , rotation = 30
-    }
-
-
-flowerPentagon : Polygon
-flowerPentagon =
-    { lengths = [ 1, 1, 1, 2, 2 ], angles = [ 120, 120, 120, 120, 60 ], rotation = 60 }
-
-
+-}
 truncatedHexagonalTiling : Int -> Int -> Point -> List (Svg msg)
 truncatedHexagonalTiling n m origin =
     if m <= 0 then
@@ -94,6 +57,13 @@ truncatedHexagonalLine n origin =
         [ polygonSvg dodecagon size Primary origin, polygonSvg equilateral size Secondary (add origin first_trig), polygonSvg (rotatePoly equilateral 60) size Secondary (add origin second_trig) ] ++ truncatedHexagonalLine (n - 1) next_origin
 
 
+{-| Rectification of the hexagon (the original edges vanish)
+
+  - Type: semiregular
+  - Corners: **3.6.3.6**
+  - Symmetry: hexagonal
+
+-}
 triHexagonalTiling : Int -> Int -> Point -> List (Svg msg)
 triHexagonalTiling n m origin =
     if m <= 0 then
@@ -136,6 +106,13 @@ triHexagonalLine n origin =
         [ polygonSvg hexagon size Primary origin, polygonSvg equilateral size Secondary (add origin first_trig), polygonSvg (rotatePoly equilateral 60) size Secondary (add origin second_trig) ] ++ triHexagonalLine (n - 1) next_origin
 
 
+{-| Truncation of the square tiling
+
+  - Type: semiregular
+  - Corners: **4.8.8**
+  - Symmetry: square
+
+-}
 truncatedSquareTiling : Int -> Int -> Point -> List (Svg msg)
 truncatedSquareTiling n m origin =
     if m <= 0 then
@@ -167,6 +144,6 @@ truncatedSquareLine n origin =
 
             next_origin =
                 add (add origin top_square)
-                    (getPoint square size 2)
+                    (getPoint (rotatePoly square 45) size 2)
         in
-        [ polygonSvg octagon size Primary origin, polygonSvg square size Secondary (add origin top_square) ] ++ truncatedSquareLine (n - 1) next_origin
+        [ polygonSvg octagon size Primary origin, polygonSvg (rotatePoly square 45) size Secondary (add origin top_square) ] ++ truncatedSquareLine (n - 1) next_origin

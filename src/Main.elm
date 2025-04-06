@@ -3,7 +3,6 @@ module Main exposing (main)
 import ColorTheme exposing (Color(..))
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
-import Polygon exposing (..)
 import Regular exposing (..)
 import Semiregular exposing (..)
 import Svg exposing (svg)
@@ -24,9 +23,9 @@ main =
             , width "800"
             , height "800"
             ]
-            (truncatedSquareTiling
+            (triHexagonalTiling
                 100
                 100
-                { x = 0, y = 0 }
+                { x = -100, y = -100 }
             )
         ]

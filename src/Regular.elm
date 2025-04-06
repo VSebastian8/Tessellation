@@ -1,161 +1,102 @@
-module Regular exposing (hexagons, squares, triangles)
+module Regular exposing (hexagonalTiling, squareTiling, triangularTiling)
 
 import ColorTheme exposing (..)
+import Polygon exposing (polygonSvg, rotatePoly)
+import Shapes exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Util exposing (..)
 
 
-{-| Square svg shape.
--}
-square : Float -> Color -> Point -> Svg msg
-square length color p =
-    rect
-        [ x (String.fromFloat p.x)
-        , y (String.fromFloat p.y)
-        , width (String.fromFloat length)
-        , height (String.fromFloat length)
-        , fill (theme.getColor color)
-        , stroke theme.strokeColor
-        , strokeWidth "2"
-        ]
-        []
-
-
 {-| Regular Tiling of the plane with the `square` shape.
+
+  - Type: regular
+  - Corners: **4.4.4.4**
+  - Symmetry: square
+
 -}
-squares : Int -> Int -> List (Svg msg)
-squares n m =
+squareTiling : Int -> Int -> Point -> List (Svg msg)
+squareTiling n m origin =
+    let
+        size =
+            30.0
+    in
     List.range 1 m
         |> List.map
             (\y ->
                 List.range 1 n
-                    |> List.map (\x -> ( { x = 20.0 * toFloat x, y = 20.0 * toFloat y }, mix4Color (y + x) ))
-                    |> List.map (\( p, c ) -> square 20 c p)
+                    |> List.map (\x -> ( add origin { x = size * toFloat x, y = size * toFloat y }, mix3Color (y + x) ))
+                    |> List.map (\( p, c ) -> polygonSvg square size c p)
             )
         |> List.concat
 
 
-{-| Square triangle shape pointing up.
--}
-upTriangle : Float -> Color -> Point -> Svg msg
-upTriangle length color p =
-    polygon
-        [ points
-            (String.fromFloat (p.x + length / 100 * 50)
-                ++ " "
-                ++ String.fromFloat
-                    (p.y + length / 100)
-                ++ ", "
-                ++ String.fromFloat (p.x + length)
-                ++ " "
-                ++ String.fromFloat
-                    (p.y + length / 100 * 85)
-                ++ ", "
-                ++ String.fromFloat p.x
-                ++ " "
-                ++ String.fromFloat
-                    (p.y + length / 100 * 85)
-            )
-        , fill (theme.getColor color)
-        , stroke theme.strokeColor
-        , strokeWidth "2"
-        ]
-        []
-
-
-{-| Square triangle shape pointing down.
--}
-downTriangle : Float -> Color -> Point -> Svg msg
-downTriangle length color p =
-    polygon
-        [ points
-            (String.fromFloat (p.x + length / 100 * 50)
-                ++ " "
-                ++ String.fromFloat
-                    (p.y + length / 100 * 85)
-                ++ ", "
-                ++ String.fromFloat (p.x + length)
-                ++ " "
-                ++ String.fromFloat
-                    p.y
-                ++ ", "
-                ++ String.fromFloat p.x
-                ++ " "
-                ++ String.fromFloat
-                    p.y
-            )
-        , fill (theme.getColor color)
-        , stroke theme.strokeColor
-        , strokeWidth "2"
-        ]
-        []
-
-
 {-| Regular Tiling of the plane with the `triangle` shape.
+
+  - Type: regular
+  - Corners: **3.3.3.3.3.3**
+  - Symmetry: hexagonal
+
 -}
-triangles : Int -> Int -> List (Svg msg)
-triangles n m =
+triangularTiling : Int -> Int -> Point -> List (Svg msg)
+triangularTiling n m origin =
+    let
+        size =
+            30.0
+    in
     List.range 1 m
         |> List.map
             (\y ->
                 List.range 1 n
-                    |> List.map (\x -> ( { x = 30.0 * toFloat x + 15.0 * toFloat (modBy 2 (y + 1)), y = (sqrt 3 * 15.0) * toFloat (y // 2) }, mix4Color y ))
+                    |> List.map
+                        (\x ->
+                            ( add origin
+                                { x = size * toFloat x + size / 2 * toFloat (modBy 2 (y + 1))
+                                , y = (sqrt 3 * size / 2) * toFloat (y // 2)
+                                }
+                            , mix4Color y
+                            )
+                        )
                     |> List.map
                         (\( p, c ) ->
                             case modBy 2 y of
                                 0 ->
-                                    downTriangle 30 c p
+                                    polygonSvg equilateral size c p
 
                                 _ ->
-                                    upTriangle 30 c p
+                                    polygonSvg (rotatePoly equilateral 60) size c p
                         )
             )
         |> List.concat
 
 
-{-| Hexagon svg shape.
--}
-hexagon : Float -> Color -> Point -> Svg msg
-hexagon length color { x, y } =
-    let
-        height =
-            length * 2
-
-        width =
-            length * sqrt 3
-
-        -- Hexagon points (clockwise from top point)
-        pointsHex =
-            [ ( x, y - height / 2 ) -- Top center
-            , ( x + width / 2, y - length / 2 ) -- Upper right
-            , ( x + width / 2, y + length / 2 ) -- Lower right
-            , ( x, y + height / 2 ) -- Bottom center
-            , ( x - width / 2, y + length / 2 ) -- Lower left
-            , ( x - width / 2, y - length / 2 ) -- Upper left
-            ]
-                |> List.map (\( px, py ) -> String.fromFloat px ++ "," ++ String.fromFloat py)
-                |> String.join " "
-    in
-    polygon
-        [ points pointsHex
-        , fill (theme.getColor color)
-        , stroke theme.strokeColor
-        , strokeWidth "2"
-        ]
-        []
-
-
 {-| Regular Tiling of the plane with the `hexagon` shape.
+
+  - Type: regular
+  - Corners: **6.6.6**
+  - Symmetry: hexagonal
+
 -}
-hexagons : Int -> Int -> List (Svg msg)
-hexagons n m =
+hexagonalTiling : Int -> Int -> Point -> List (Svg msg)
+hexagonalTiling n m origin =
+    let
+        size =
+            30.0
+    in
     List.range 1 m
         |> List.map
             (\y ->
                 List.range 1 n
-                    |> List.map (\x -> ( { x = 20.0 * sqrt 3 * toFloat x + 10.0 * sqrt 3 * toFloat (modBy 2 (y + 1)), y = 30.0 * toFloat y }, mix3Color (x // 3 + 1 + (modBy 10 y // 5)) ))
                     |> List.map
-                        (\( p, c ) -> hexagon 20 c p)
+                        (\x ->
+                            ( add origin
+                                { x = size * sqrt 3 * toFloat x + size / 2 * sqrt 3 * toFloat (modBy 2 (y + 1))
+                                , y = size * 3 / 2 * toFloat y
+                                }
+                            , mix2Color y
+                            )
+                        )
+                    |> List.map
+                        (\( p, c ) -> polygonSvg (rotatePoly hexagon 30) size c p)
             )
         |> List.concat

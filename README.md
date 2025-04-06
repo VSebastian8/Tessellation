@@ -8,19 +8,25 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 
 ## Regular Tilings
 
-|                                                                             |                                                                                    |                                                                                 |
-| :-------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
-| <img src="./assets/regular/squares.png" width="200" alt="Alt1"><br>_Square_ | <img src="./assets/regular/triangles.png" width="200" alt="Alt2"><br> _Triangular_ | <img src="./assets/regular/hexagons.png" width="200" alt="Alt3"><br>_Hexagonal_ |
+|                                                      |                                                        |                                                       |
+| :--------------------------------------------------: | :----------------------------------------------------: | :---------------------------------------------------: |
+| <img src="./assets/regular/squares.png" width="200"> | <img src="./assets/regular/triangles.png" width="200"> | <img src="./assets/regular/hexagons.png" width="200"> |
+|                       _Square_                       |                      _Triangular_                      |                      _Hexagonal_                      |
 
 ## Semiregular Tilings
 
-|                                                                                                         |                                                                                             |                                                                                                   |
-| :-----------------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: |
-| <img src="./assets/semiregular/truncatedHexagonal.png" width="200" alt="Alt1"><br>_Truncated Hexagonal_ | <img src="./assets/semiregular/triHexagonal.png" width="200" alt="Alt2"><br> _Trihexagonal_ | <img src="./assets/semiregular/truncatedSquare.png" width="200" alt="Alt3"><br>_Truncated Square_ |
+|                                                                     |                                                               |                                                                  |
+| :-----------------------------------------------------------------: | :-----------------------------------------------------------: | :--------------------------------------------------------------: |
+| <img src="./assets/semiregular/truncatedHexagonal.png" width="200"> | <img src="./assets/semiregular/triHexagonal.png" width="200"> | <img src="./assets/semiregular/truncatedSquare.png" width="200"> |
+|                        _Truncated Hexagonal_                        |                        _Trihexagonal_                         |                        _Truncated Square_                        |
 
 ## Experiments
 
-|                                                                                                              |                                                                                            |                                                                                                   |
-| :----------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------------: |
-|         <img src="./assets/experiments/hexagonBlock.png" width="200" alt="Alt1"><br>_Blocky Pattern_         | <img src="./assets/experiments/hexagonDiagonal.png" width="200" alt="Alt2"><br> _Diagonal_ | <img src="./assets/experiments/hexagonVertical.png" width="200" alt="Alt3"><br>_Vertical Pattern_ |
-| <img src="./assets/experiments/randomAperiodic.png" width="200" alt="Alt1"><br>_Accidental Aperiodic Tiling_ |
+|                                                                    |                                                                    |                                                                  |
+| :----------------------------------------------------------------: | :----------------------------------------------------------------: | :--------------------------------------------------------------: |
+|   <img src="./assets/experiments/hexagonBlock.png" width="200">    |  <img src="./assets/experiments/hexagonDiagonal.png" width="200">  | <img src="./assets/experiments/hexagonVertical.png" width="200"> |
+|                          _Blocky Pattern_                          |                         _Diagonal Pattern_                         |                        _Vertical Pattern_                        |
+| <img src="./assets/experiments/pythagoreanTiling.png" width="200"> |  <img src="./assets/experiments/huggingSquares.png" width="200">   | <img src="./assets/experiments/trianglePattern.png" width="200"> |
+|                        _Pythagorean Tiling_                        |                         _Hugging Squares_                          |                      _Triangles and Rhombi_                      |
+|   <img src="./assets/experiments/hexagonStars.png" width="200">    | <img src="./assets/experiments/shiftedDodecagons.png" width="200"> |
+|                          _Hexagon Stars_                           |                        _Shifted Dodecagons_                        |
