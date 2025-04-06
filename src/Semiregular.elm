@@ -1,4 +1,4 @@
-module Semiregular exposing (rhombiTriHexagonalTiling, triHexagonalTiling, truncatedHexagonalTiling, truncatedSquareTiling, truncatedTriHexagonalTiling)
+module Semiregular exposing (elongatedTriangular, rhombiTriHexagonalTiling, snubSquareTiling, snubTriHexagonalTiling, triHexagonalTiling, truncatedHexagonalTiling, truncatedSquareTiling, truncatedTriHexagonalTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -313,3 +313,192 @@ truncTriHexaShape origin size =
     , polygonSvg (rotatePoly hexagon 30) size Secondary (add origin hex1)
     , polygonSvg (rotatePoly hexagon -30) size Secondary (add origin hex2)
     ]
+
+
+{-| Half truncation of the truncated square tiling
+
+  - Type: semiregular
+  - Corners: **3.3.4.3.4**
+  - Symmetry: crosshatch
+
+-}
+snubSquareTiling : Int -> Int -> Point -> List (Svg msg)
+snubSquareTiling n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            square_diag =
+                sub (getPoint (rotatePoly square 30) size 2) (getPoint (rotatePoly square 30) size 0)
+
+            next_origin =
+                if modBy 2 m == 0 then
+                    add origin (add square_diag { x = -2 * square_diag.x, y = size })
+
+                else
+                    add origin (add square_diag { x = 0, y = size })
+        in
+        snubSquareLine n origin size ++ snubSquareTiling n (m - 1) next_origin
+
+
+snubSquareLine : Int -> Point -> Float -> List (Svg msg)
+snubSquareLine n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            triangle_slant =
+                sub (getPoint (rotatePoly equilateral 90) size 2) (getPoint (rotatePoly equilateral 90) size 0)
+
+            next_origin =
+                { x = origin.x + 2 * triangle_slant.x + size, y = origin.y }
+        in
+        snubSquareShape origin size ++ snubSquareLine (n - 1) next_origin size
+
+
+snubSquareShape : Point -> Float -> List (Svg msg)
+snubSquareShape origin size =
+    let
+        first =
+            add origin (getPoint (rotatePoly equilateral 90) size 2)
+
+        second =
+            add first { x = size, y = 0 }
+    in
+    [ polygonSvg (rotatePoly equilateral 90) size Primary origin
+    , polygonSvg (rotatePoly square 30) size Secondary origin
+    , polygonSvg equilateral size Primary first
+    , polygonSvg (rotatePoly equilateral 60) size Primary first
+    , polygonSvg (rotatePoly equilateral 30) size Primary second
+    , polygonSvg (rotatePoly square -30) size Secondary second
+    ]
+
+
+{-| Half truncation of the trihexagonal tiling
+
+  - Type: semiregular
+  - Corners: **3.3.3.3.6**
+  - Symmetry: hex twist
+
+-}
+snubTriHexagonalTiling : Int -> Int -> Point -> List (Svg msg)
+snubTriHexagonalTiling n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            next_origin =
+                add origin
+                    (case modBy 3 m of
+                        0 ->
+                            sub (getPoint hexagon size -1) { x = 2 * size, y = 0 }
+
+                        1 ->
+                            add (getPoint hexagon size 2) { x = 3 * size, y = 0 }
+
+                        _ ->
+                            sub (getPoint hexagon size -1) { x = 2 * size, y = 0 }
+                    )
+        in
+        snubTriHexagonalLine n origin size ++ snubTriHexagonalTiling n (m - 1) next_origin
+
+
+snubTriHexagonalLine : Int -> Point -> Float -> List (Svg msg)
+snubTriHexagonalLine n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                { x = origin.x + 7 * size, y = origin.y }
+        in
+        snubTriHexagonalShape origin size ++ snubTriHexagonalLine (n - 1) next_origin size
+
+
+snubTriHexagonalShape : Point -> Float -> List (Svg msg)
+snubTriHexagonalShape origin size =
+    let
+        first =
+            add origin (getPoint hexagon size 3)
+
+        second =
+            add origin (getPoint hexagon size 4)
+
+        third =
+            add origin (getPoint hexagon size 5)
+    in
+    [ polygonSvg hexagon size Primary origin
+    , polygonSvg (rotatePoly equilateral 60) size Secondary first
+    , polygonSvg equilateral size Secondary first
+    , polygonSvg (rotatePoly equilateral -60) size Secondary first
+    , polygonSvg equilateral size Secondary second
+    , polygonSvg (rotatePoly equilateral -60) size Secondary second
+    , polygonSvg (rotatePoly equilateral -120) size Secondary second
+    , polygonSvg (rotatePoly equilateral -60) size Secondary third
+    , polygonSvg (rotatePoly equilateral -120) size Secondary third
+    ]
+
+
+{-| Only non Wythoffian semiregular tiling
+
+  - Type: semiregular
+  - Corners: **3.3.3.4.4**
+  - Symmetry: running bond
+
+-}
+elongatedTriangular : Int -> Int -> Point -> List (Svg msg)
+elongatedTriangular n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            squareLine =
+                List.range 1 n |> List.map (\i -> polygonSvg square size Secondary { x = origin.x + toFloat i * size, y = origin.y })
+
+            triangleLine =
+                List.range 1 n
+                    |> List.concatMap
+                        (\i ->
+                            [ polygonSvg (rotatePoly equilateral -60) size Primary { x = origin.x + toFloat i * size, y = origin.y }
+                            , polygonSvg equilateral size Ternary { x = origin.x + toFloat i * size, y = origin.y }
+                            ]
+                        )
+
+            selectedLine =
+                if modBy 2 m == 0 then
+                    squareLine
+
+                else
+                    triangleLine
+
+            next_origin =
+                add origin
+                    (case modBy 4 m of
+                        0 ->
+                            { x = 0, y = size }
+
+                        1 ->
+                            getPoint (rotatePoly equilateral -60) size 1
+
+                        2 ->
+                            { x = 0, y = size }
+
+                        _ ->
+                            getPoint (rotatePoly equilateral -60) size -1
+                    )
+        in
+        selectedLine ++ elongatedTriangular n (m - 1) next_origin

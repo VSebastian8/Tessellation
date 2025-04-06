@@ -23,7 +23,7 @@ main =
             , width "800"
             , height "800"
             ]
-            (truncatedTriHexagonalTiling
+            (elongatedTriangular
                 100
                 100
                 { x = -100, y = -100 }

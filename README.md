@@ -15,12 +15,14 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 
 ## Semiregular Tilings
 
-|                                                                     |                                                                        |                                                                  |
-| :-----------------------------------------------------------------: | :--------------------------------------------------------------------: | :--------------------------------------------------------------: |
-| <img src="./assets/semiregular/truncatedHexagonal.png" width="200"> |     <img src="./assets/semiregular/triHexagonal.png" width="200">      | <img src="./assets/semiregular/truncatedSquare.png" width="200"> |
-|                        _Truncated Hexagonal_                        |                             _Trihexagonal_                             |                        _Truncated Square_                        |
-| <img src="./assets/semiregular/rhombiTriHexagonal.png" width="200"> | <img src="./assets/semiregular/truncatedTriHexagonal.png" width="200"> |
-|                        _Rhombitrihexagonal_                         |                        _Truncated Trihexagonal_                        |
+|                                                                     |                                                                         |                                                                      |
+| :-----------------------------------------------------------------: | :---------------------------------------------------------------------: | :------------------------------------------------------------------: |
+| <img src="./assets/semiregular/truncatedHexagonal.png" width="200"> |      <img src="./assets/semiregular/triHexagonal.png" width="200">      |   <img src="./assets/semiregular/truncatedSquare.png" width="200">   |
+|                        _Truncated Hexagonal_                        |                             _Trihexagonal_                              |                          _Truncated Square_                          |
+| <img src="./assets/semiregular/rhombiTriHexagonal.png" width="200"> | <img src="./assets/semiregular/truncatedTriHexagonal.png" width="200">  |     <img src="./assets/semiregular/snubSquare.png" width="200">      |
+|                        _Rhombitrihexagonal_                         |                        _Truncated Trihexagonal_                         |                            _Snub Square_                             |
+|  <img src="./assets/semiregular/snubTriHexagonal.png" width="200">  | <img src="./assets/semiregular/snubTriHexagonalMirror.png" width="200"> | <img src="./assets/semiregular/elongatedTriangular.png" width="200"> |
+|                         _Snub Trihexagonal_                         |                      _Mirrored Snub Trihexagonal_                       |                        _Elongated Triangular_                        |
 
 ## Experiments
 
