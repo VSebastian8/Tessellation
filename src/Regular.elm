@@ -15,8 +15,8 @@ import Util exposing (..)
   - Symmetry: square
 
 -}
-squareTiling : Int -> Int -> Point -> List (Svg msg)
-squareTiling n m origin =
+squareTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+squareTiling theme n m origin =
     let
         size =
             30.0
@@ -26,7 +26,7 @@ squareTiling n m origin =
             (\y ->
                 List.range 1 n
                     |> List.map (\x -> ( add origin { x = size * toFloat x, y = size * toFloat y }, mix3Color (y + x) ))
-                    |> List.map (\( p, c ) -> polygonSvg square size c p)
+                    |> List.map (\( point, color ) -> polygonSvg square size theme color point)
             )
         |> List.concat
 
@@ -38,11 +38,11 @@ squareTiling n m origin =
   - Symmetry: hexagonal
 
 -}
-triangularTiling : Int -> Int -> Point -> List (Svg msg)
-triangularTiling n m origin =
+triangularTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+triangularTiling theme n m origin =
     let
         size =
-            30.0
+            40.0
     in
     List.range 1 m
         |> List.map
@@ -58,13 +58,13 @@ triangularTiling n m origin =
                             )
                         )
                     |> List.map
-                        (\( p, c ) ->
+                        (\( point, color ) ->
                             case modBy 2 y of
                                 0 ->
-                                    polygonSvg equilateral size c p
+                                    polygonSvg equilateral size theme color point
 
                                 _ ->
-                                    polygonSvg (rotatePoly equilateral 60) size c p
+                                    polygonSvg (rotatePoly equilateral 60) size theme color point
                         )
             )
         |> List.concat
@@ -77,8 +77,8 @@ triangularTiling n m origin =
   - Symmetry: hexagonal
 
 -}
-hexagonalTiling : Int -> Int -> Point -> List (Svg msg)
-hexagonalTiling n m origin =
+hexagonalTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+hexagonalTiling theme n m origin =
     let
         size =
             30.0
@@ -97,6 +97,6 @@ hexagonalTiling n m origin =
                             )
                         )
                     |> List.map
-                        (\( p, c ) -> polygonSvg (rotatePoly hexagon 30) size c p)
+                        (\( point, color ) -> polygonSvg (rotatePoly hexagon 30) size theme color point)
             )
         |> List.concat

@@ -57,8 +57,8 @@ startPoint points p =
     points |> List.map (\q -> { x = q.x + p.x, y = q.y + p.y })
 
 
-polygonSvg : Polygon -> Float -> Color -> Point -> Svg msg
-polygonSvg poly size color point =
+polygonSvg : Polygon -> Float -> Theme -> Color -> Point -> Svg msg
+polygonSvg poly size theme color point =
     let
         svgPoints =
             startPoint (polygonPoints poly size) point

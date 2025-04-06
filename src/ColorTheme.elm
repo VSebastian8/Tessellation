@@ -70,8 +70,3 @@ honeyTheme =
                 Quart ->
                     "#CE7C00"
     }
-
-
-theme : Theme
-theme =
-    honeyTheme

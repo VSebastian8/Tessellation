@@ -80,6 +80,271 @@ function A9(fun, a, b, c, d, e, f, g, h, i) {
 console.warn('Compiled in DEV mode. Follow the advice at https://elm-lang.org/0.19.1/optimize for better performance and smaller assets.');
 
 
+// EQUALITY
+
+function _Utils_eq(x, y)
+{
+	for (
+		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
+		isEqual && (pair = stack.pop());
+		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
+		)
+	{}
+
+	return isEqual;
+}
+
+function _Utils_eqHelp(x, y, depth, stack)
+{
+	if (x === y)
+	{
+		return true;
+	}
+
+	if (typeof x !== 'object' || x === null || y === null)
+	{
+		typeof x === 'function' && _Debug_crash(5);
+		return false;
+	}
+
+	if (depth > 100)
+	{
+		stack.push(_Utils_Tuple2(x,y));
+		return true;
+	}
+
+	/**/
+	if (x.$ === 'Set_elm_builtin')
+	{
+		x = $elm$core$Set$toList(x);
+		y = $elm$core$Set$toList(y);
+	}
+	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	/**_UNUSED/
+	if (x.$ < 0)
+	{
+		x = $elm$core$Dict$toList(x);
+		y = $elm$core$Dict$toList(y);
+	}
+	//*/
+
+	for (var key in x)
+	{
+		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+var _Utils_equal = F2(_Utils_eq);
+var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
+
+
+
+// COMPARISONS
+
+// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
+// the particular integer values assigned to LT, EQ, and GT.
+
+function _Utils_cmp(x, y, ord)
+{
+	if (typeof x !== 'object')
+	{
+		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
+	}
+
+	/**/
+	if (x instanceof String)
+	{
+		var a = x.valueOf();
+		var b = y.valueOf();
+		return a === b ? 0 : a < b ? -1 : 1;
+	}
+	//*/
+
+	/**_UNUSED/
+	if (typeof x.$ === 'undefined')
+	//*/
+	/**/
+	if (x.$[0] === '#')
+	//*/
+	{
+		return (ord = _Utils_cmp(x.a, y.a))
+			? ord
+			: (ord = _Utils_cmp(x.b, y.b))
+				? ord
+				: _Utils_cmp(x.c, y.c);
+	}
+
+	// traverse conses until end of a list or a mismatch
+	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
+	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
+}
+
+var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
+var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
+var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
+var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
+
+var _Utils_compare = F2(function(x, y)
+{
+	var n = _Utils_cmp(x, y);
+	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
+});
+
+
+// COMMON VALUES
+
+var _Utils_Tuple0_UNUSED = 0;
+var _Utils_Tuple0 = { $: '#0' };
+
+function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
+function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
+
+function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
+function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
+
+function _Utils_chr_UNUSED(c) { return c; }
+function _Utils_chr(c) { return new String(c); }
+
+
+// RECORDS
+
+function _Utils_update(oldRecord, updatedFields)
+{
+	var newRecord = {};
+
+	for (var key in oldRecord)
+	{
+		newRecord[key] = oldRecord[key];
+	}
+
+	for (var key in updatedFields)
+	{
+		newRecord[key] = updatedFields[key];
+	}
+
+	return newRecord;
+}
+
+
+// APPEND
+
+var _Utils_append = F2(_Utils_ap);
+
+function _Utils_ap(xs, ys)
+{
+	// append Strings
+	if (typeof xs === 'string')
+	{
+		return xs + ys;
+	}
+
+	// append Lists
+	if (!xs.b)
+	{
+		return ys;
+	}
+	var root = _List_Cons(xs.a, ys);
+	xs = xs.b
+	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		curr = curr.b = _List_Cons(xs.a, ys);
+	}
+	return root;
+}
+
+
+
+var _List_Nil_UNUSED = { $: 0 };
+var _List_Nil = { $: '[]' };
+
+function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
+function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
+
+
+var _List_cons = F2(_List_Cons);
+
+function _List_fromArray(arr)
+{
+	var out = _List_Nil;
+	for (var i = arr.length; i--; )
+	{
+		out = _List_Cons(arr[i], out);
+	}
+	return out;
+}
+
+function _List_toArray(xs)
+{
+	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
+	{
+		out.push(xs.a);
+	}
+	return out;
+}
+
+var _List_map2 = F3(function(f, xs, ys)
+{
+	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
+	{
+		arr.push(A2(f, xs.a, ys.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map3 = F4(function(f, xs, ys, zs)
+{
+	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A3(f, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map4 = F5(function(f, ws, xs, ys, zs)
+{
+	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
+{
+	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
+	{
+		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
+	}
+	return _List_fromArray(arr);
+});
+
+var _List_sortBy = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		return _Utils_cmp(f(a), f(b));
+	}));
+});
+
+var _List_sortWith = F2(function(f, xs)
+{
+	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
+		var ord = A2(f, a, b);
+		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
+	}));
+});
+
+
+
 var _JsArray_empty = [];
 
 function _JsArray_singleton(value)
@@ -525,271 +790,6 @@ function _Debug_regionToString(region)
 	}
 	return 'on lines ' + region.start.line + ' through ' + region.end.line;
 }
-
-
-
-// EQUALITY
-
-function _Utils_eq(x, y)
-{
-	for (
-		var pair, stack = [], isEqual = _Utils_eqHelp(x, y, 0, stack);
-		isEqual && (pair = stack.pop());
-		isEqual = _Utils_eqHelp(pair.a, pair.b, 0, stack)
-		)
-	{}
-
-	return isEqual;
-}
-
-function _Utils_eqHelp(x, y, depth, stack)
-{
-	if (x === y)
-	{
-		return true;
-	}
-
-	if (typeof x !== 'object' || x === null || y === null)
-	{
-		typeof x === 'function' && _Debug_crash(5);
-		return false;
-	}
-
-	if (depth > 100)
-	{
-		stack.push(_Utils_Tuple2(x,y));
-		return true;
-	}
-
-	/**/
-	if (x.$ === 'Set_elm_builtin')
-	{
-		x = $elm$core$Set$toList(x);
-		y = $elm$core$Set$toList(y);
-	}
-	if (x.$ === 'RBNode_elm_builtin' || x.$ === 'RBEmpty_elm_builtin')
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	/**_UNUSED/
-	if (x.$ < 0)
-	{
-		x = $elm$core$Dict$toList(x);
-		y = $elm$core$Dict$toList(y);
-	}
-	//*/
-
-	for (var key in x)
-	{
-		if (!_Utils_eqHelp(x[key], y[key], depth + 1, stack))
-		{
-			return false;
-		}
-	}
-	return true;
-}
-
-var _Utils_equal = F2(_Utils_eq);
-var _Utils_notEqual = F2(function(a, b) { return !_Utils_eq(a,b); });
-
-
-
-// COMPARISONS
-
-// Code in Generate/JavaScript.hs, Basics.js, and List.js depends on
-// the particular integer values assigned to LT, EQ, and GT.
-
-function _Utils_cmp(x, y, ord)
-{
-	if (typeof x !== 'object')
-	{
-		return x === y ? /*EQ*/ 0 : x < y ? /*LT*/ -1 : /*GT*/ 1;
-	}
-
-	/**/
-	if (x instanceof String)
-	{
-		var a = x.valueOf();
-		var b = y.valueOf();
-		return a === b ? 0 : a < b ? -1 : 1;
-	}
-	//*/
-
-	/**_UNUSED/
-	if (typeof x.$ === 'undefined')
-	//*/
-	/**/
-	if (x.$[0] === '#')
-	//*/
-	{
-		return (ord = _Utils_cmp(x.a, y.a))
-			? ord
-			: (ord = _Utils_cmp(x.b, y.b))
-				? ord
-				: _Utils_cmp(x.c, y.c);
-	}
-
-	// traverse conses until end of a list or a mismatch
-	for (; x.b && y.b && !(ord = _Utils_cmp(x.a, y.a)); x = x.b, y = y.b) {} // WHILE_CONSES
-	return ord || (x.b ? /*GT*/ 1 : y.b ? /*LT*/ -1 : /*EQ*/ 0);
-}
-
-var _Utils_lt = F2(function(a, b) { return _Utils_cmp(a, b) < 0; });
-var _Utils_le = F2(function(a, b) { return _Utils_cmp(a, b) < 1; });
-var _Utils_gt = F2(function(a, b) { return _Utils_cmp(a, b) > 0; });
-var _Utils_ge = F2(function(a, b) { return _Utils_cmp(a, b) >= 0; });
-
-var _Utils_compare = F2(function(x, y)
-{
-	var n = _Utils_cmp(x, y);
-	return n < 0 ? $elm$core$Basics$LT : n ? $elm$core$Basics$GT : $elm$core$Basics$EQ;
-});
-
-
-// COMMON VALUES
-
-var _Utils_Tuple0_UNUSED = 0;
-var _Utils_Tuple0 = { $: '#0' };
-
-function _Utils_Tuple2_UNUSED(a, b) { return { a: a, b: b }; }
-function _Utils_Tuple2(a, b) { return { $: '#2', a: a, b: b }; }
-
-function _Utils_Tuple3_UNUSED(a, b, c) { return { a: a, b: b, c: c }; }
-function _Utils_Tuple3(a, b, c) { return { $: '#3', a: a, b: b, c: c }; }
-
-function _Utils_chr_UNUSED(c) { return c; }
-function _Utils_chr(c) { return new String(c); }
-
-
-// RECORDS
-
-function _Utils_update(oldRecord, updatedFields)
-{
-	var newRecord = {};
-
-	for (var key in oldRecord)
-	{
-		newRecord[key] = oldRecord[key];
-	}
-
-	for (var key in updatedFields)
-	{
-		newRecord[key] = updatedFields[key];
-	}
-
-	return newRecord;
-}
-
-
-// APPEND
-
-var _Utils_append = F2(_Utils_ap);
-
-function _Utils_ap(xs, ys)
-{
-	// append Strings
-	if (typeof xs === 'string')
-	{
-		return xs + ys;
-	}
-
-	// append Lists
-	if (!xs.b)
-	{
-		return ys;
-	}
-	var root = _List_Cons(xs.a, ys);
-	xs = xs.b
-	for (var curr = root; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		curr = curr.b = _List_Cons(xs.a, ys);
-	}
-	return root;
-}
-
-
-
-var _List_Nil_UNUSED = { $: 0 };
-var _List_Nil = { $: '[]' };
-
-function _List_Cons_UNUSED(hd, tl) { return { $: 1, a: hd, b: tl }; }
-function _List_Cons(hd, tl) { return { $: '::', a: hd, b: tl }; }
-
-
-var _List_cons = F2(_List_Cons);
-
-function _List_fromArray(arr)
-{
-	var out = _List_Nil;
-	for (var i = arr.length; i--; )
-	{
-		out = _List_Cons(arr[i], out);
-	}
-	return out;
-}
-
-function _List_toArray(xs)
-{
-	for (var out = []; xs.b; xs = xs.b) // WHILE_CONS
-	{
-		out.push(xs.a);
-	}
-	return out;
-}
-
-var _List_map2 = F3(function(f, xs, ys)
-{
-	for (var arr = []; xs.b && ys.b; xs = xs.b, ys = ys.b) // WHILE_CONSES
-	{
-		arr.push(A2(f, xs.a, ys.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map3 = F4(function(f, xs, ys, zs)
-{
-	for (var arr = []; xs.b && ys.b && zs.b; xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A3(f, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map4 = F5(function(f, ws, xs, ys, zs)
-{
-	for (var arr = []; ws.b && xs.b && ys.b && zs.b; ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A4(f, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_map5 = F6(function(f, vs, ws, xs, ys, zs)
-{
-	for (var arr = []; vs.b && ws.b && xs.b && ys.b && zs.b; vs = vs.b, ws = ws.b, xs = xs.b, ys = ys.b, zs = zs.b) // WHILE_CONSES
-	{
-		arr.push(A5(f, vs.a, ws.a, xs.a, ys.a, zs.a));
-	}
-	return _List_fromArray(arr);
-});
-
-var _List_sortBy = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		return _Utils_cmp(f(a), f(b));
-	}));
-});
-
-var _List_sortWith = F2(function(f, xs)
-{
-	return _List_fromArray(_List_toArray(xs).sort(function(a, b) {
-		var ord = A2(f, a, b);
-		return ord === $elm$core$Basics$EQ ? 0 : ord === $elm$core$Basics$LT ? -1 : 1;
-	}));
-});
 
 
 
@@ -3929,31 +3929,454 @@ function _VirtualDom_dekey(keyedNode)
 		b: keyedNode.b
 	};
 }
-var $elm$core$List$cons = _List_cons;
-var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
-var $elm$core$Array$foldr = F3(
-	function (func, baseCase, _v0) {
-		var tree = _v0.c;
-		var tail = _v0.d;
-		var helper = F2(
-			function (node, acc) {
-				if (node.$ === 'SubTree') {
-					var subTree = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
-				} else {
-					var values = node.a;
-					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
+
+
+
+
+// ELEMENT
+
+
+var _Debugger_element;
+
+var _Browser_element = _Debugger_element || F4(function(impl, flagDecoder, debugMetadata, args)
+{
+	return _Platform_initialize(
+		flagDecoder,
+		args,
+		impl.init,
+		impl.update,
+		impl.subscriptions,
+		function(sendToApp, initialModel) {
+			var view = impl.view;
+			/**_UNUSED/
+			var domNode = args['node'];
+			//*/
+			/**/
+			var domNode = args && args['node'] ? args['node'] : _Debug_crash(0);
+			//*/
+			var currNode = _VirtualDom_virtualize(domNode);
+
+			return _Browser_makeAnimator(initialModel, function(model)
+			{
+				var nextNode = view(model);
+				var patches = _VirtualDom_diff(currNode, nextNode);
+				domNode = _VirtualDom_applyPatches(domNode, currNode, patches, sendToApp);
+				currNode = nextNode;
+			});
+		}
+	);
+});
+
+
+
+// DOCUMENT
+
+
+var _Debugger_document;
+
+var _Browser_document = _Debugger_document || F4(function(impl, flagDecoder, debugMetadata, args)
+{
+	return _Platform_initialize(
+		flagDecoder,
+		args,
+		impl.init,
+		impl.update,
+		impl.subscriptions,
+		function(sendToApp, initialModel) {
+			var divertHrefToApp = impl.setup && impl.setup(sendToApp)
+			var view = impl.view;
+			var title = _VirtualDom_doc.title;
+			var bodyNode = _VirtualDom_doc.body;
+			var currNode = _VirtualDom_virtualize(bodyNode);
+			return _Browser_makeAnimator(initialModel, function(model)
+			{
+				_VirtualDom_divertHrefToApp = divertHrefToApp;
+				var doc = view(model);
+				var nextNode = _VirtualDom_node('body')(_List_Nil)(doc.body);
+				var patches = _VirtualDom_diff(currNode, nextNode);
+				bodyNode = _VirtualDom_applyPatches(bodyNode, currNode, patches, sendToApp);
+				currNode = nextNode;
+				_VirtualDom_divertHrefToApp = 0;
+				(title !== doc.title) && (_VirtualDom_doc.title = title = doc.title);
+			});
+		}
+	);
+});
+
+
+
+// ANIMATION
+
+
+var _Browser_cancelAnimationFrame =
+	typeof cancelAnimationFrame !== 'undefined'
+		? cancelAnimationFrame
+		: function(id) { clearTimeout(id); };
+
+var _Browser_requestAnimationFrame =
+	typeof requestAnimationFrame !== 'undefined'
+		? requestAnimationFrame
+		: function(callback) { return setTimeout(callback, 1000 / 60); };
+
+
+function _Browser_makeAnimator(model, draw)
+{
+	draw(model);
+
+	var state = 0;
+
+	function updateIfNeeded()
+	{
+		state = state === 1
+			? 0
+			: ( _Browser_requestAnimationFrame(updateIfNeeded), draw(model), 1 );
+	}
+
+	return function(nextModel, isSync)
+	{
+		model = nextModel;
+
+		isSync
+			? ( draw(model),
+				state === 2 && (state = 1)
+				)
+			: ( state === 0 && _Browser_requestAnimationFrame(updateIfNeeded),
+				state = 2
+				);
+	};
+}
+
+
+
+// APPLICATION
+
+
+function _Browser_application(impl)
+{
+	var onUrlChange = impl.onUrlChange;
+	var onUrlRequest = impl.onUrlRequest;
+	var key = function() { key.a(onUrlChange(_Browser_getUrl())); };
+
+	return _Browser_document({
+		setup: function(sendToApp)
+		{
+			key.a = sendToApp;
+			_Browser_window.addEventListener('popstate', key);
+			_Browser_window.navigator.userAgent.indexOf('Trident') < 0 || _Browser_window.addEventListener('hashchange', key);
+
+			return F2(function(domNode, event)
+			{
+				if (!event.ctrlKey && !event.metaKey && !event.shiftKey && event.button < 1 && !domNode.target && !domNode.hasAttribute('download'))
+				{
+					event.preventDefault();
+					var href = domNode.href;
+					var curr = _Browser_getUrl();
+					var next = $elm$url$Url$fromString(href).a;
+					sendToApp(onUrlRequest(
+						(next
+							&& curr.protocol === next.protocol
+							&& curr.host === next.host
+							&& curr.port_.a === next.port_.a
+						)
+							? $elm$browser$Browser$Internal(next)
+							: $elm$browser$Browser$External(href)
+					));
 				}
 			});
-		return A3(
-			$elm$core$Elm$JsArray$foldr,
-			helper,
-			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
-			tree);
+		},
+		init: function(flags)
+		{
+			return A3(impl.init, flags, _Browser_getUrl(), key);
+		},
+		view: impl.view,
+		update: impl.update,
+		subscriptions: impl.subscriptions
 	});
-var $elm$core$Array$toList = function (array) {
-	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
-};
+}
+
+function _Browser_getUrl()
+{
+	return $elm$url$Url$fromString(_VirtualDom_doc.location.href).a || _Debug_crash(1);
+}
+
+var _Browser_go = F2(function(key, n)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function() {
+		n && history.go(n);
+		key();
+	}));
+});
+
+var _Browser_pushUrl = F2(function(key, url)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function() {
+		history.pushState({}, '', url);
+		key();
+	}));
+});
+
+var _Browser_replaceUrl = F2(function(key, url)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function() {
+		history.replaceState({}, '', url);
+		key();
+	}));
+});
+
+
+
+// GLOBAL EVENTS
+
+
+var _Browser_fakeNode = { addEventListener: function() {}, removeEventListener: function() {} };
+var _Browser_doc = typeof document !== 'undefined' ? document : _Browser_fakeNode;
+var _Browser_window = typeof window !== 'undefined' ? window : _Browser_fakeNode;
+
+var _Browser_on = F3(function(node, eventName, sendToSelf)
+{
+	return _Scheduler_spawn(_Scheduler_binding(function(callback)
+	{
+		function handler(event)	{ _Scheduler_rawSpawn(sendToSelf(event)); }
+		node.addEventListener(eventName, handler, _VirtualDom_passiveSupported && { passive: true });
+		return function() { node.removeEventListener(eventName, handler); };
+	}));
+});
+
+var _Browser_decodeEvent = F2(function(decoder, event)
+{
+	var result = _Json_runHelp(decoder, event);
+	return $elm$core$Result$isOk(result) ? $elm$core$Maybe$Just(result.a) : $elm$core$Maybe$Nothing;
+});
+
+
+
+// PAGE VISIBILITY
+
+
+function _Browser_visibilityInfo()
+{
+	return (typeof _VirtualDom_doc.hidden !== 'undefined')
+		? { hidden: 'hidden', change: 'visibilitychange' }
+		:
+	(typeof _VirtualDom_doc.mozHidden !== 'undefined')
+		? { hidden: 'mozHidden', change: 'mozvisibilitychange' }
+		:
+	(typeof _VirtualDom_doc.msHidden !== 'undefined')
+		? { hidden: 'msHidden', change: 'msvisibilitychange' }
+		:
+	(typeof _VirtualDom_doc.webkitHidden !== 'undefined')
+		? { hidden: 'webkitHidden', change: 'webkitvisibilitychange' }
+		: { hidden: 'hidden', change: 'visibilitychange' };
+}
+
+
+
+// ANIMATION FRAMES
+
+
+function _Browser_rAF()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		var id = _Browser_requestAnimationFrame(function() {
+			callback(_Scheduler_succeed(Date.now()));
+		});
+
+		return function() {
+			_Browser_cancelAnimationFrame(id);
+		};
+	});
+}
+
+
+function _Browser_now()
+{
+	return _Scheduler_binding(function(callback)
+	{
+		callback(_Scheduler_succeed(Date.now()));
+	});
+}
+
+
+
+// DOM STUFF
+
+
+function _Browser_withNode(id, doStuff)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_Browser_requestAnimationFrame(function() {
+			var node = document.getElementById(id);
+			callback(node
+				? _Scheduler_succeed(doStuff(node))
+				: _Scheduler_fail($elm$browser$Browser$Dom$NotFound(id))
+			);
+		});
+	});
+}
+
+
+function _Browser_withWindow(doStuff)
+{
+	return _Scheduler_binding(function(callback)
+	{
+		_Browser_requestAnimationFrame(function() {
+			callback(_Scheduler_succeed(doStuff()));
+		});
+	});
+}
+
+
+// FOCUS and BLUR
+
+
+var _Browser_call = F2(function(functionName, id)
+{
+	return _Browser_withNode(id, function(node) {
+		node[functionName]();
+		return _Utils_Tuple0;
+	});
+});
+
+
+
+// WINDOW VIEWPORT
+
+
+function _Browser_getViewport()
+{
+	return {
+		scene: _Browser_getScene(),
+		viewport: {
+			x: _Browser_window.pageXOffset,
+			y: _Browser_window.pageYOffset,
+			width: _Browser_doc.documentElement.clientWidth,
+			height: _Browser_doc.documentElement.clientHeight
+		}
+	};
+}
+
+function _Browser_getScene()
+{
+	var body = _Browser_doc.body;
+	var elem = _Browser_doc.documentElement;
+	return {
+		width: Math.max(body.scrollWidth, body.offsetWidth, elem.scrollWidth, elem.offsetWidth, elem.clientWidth),
+		height: Math.max(body.scrollHeight, body.offsetHeight, elem.scrollHeight, elem.offsetHeight, elem.clientHeight)
+	};
+}
+
+var _Browser_setViewport = F2(function(x, y)
+{
+	return _Browser_withWindow(function()
+	{
+		_Browser_window.scroll(x, y);
+		return _Utils_Tuple0;
+	});
+});
+
+
+
+// ELEMENT VIEWPORT
+
+
+function _Browser_getViewportOf(id)
+{
+	return _Browser_withNode(id, function(node)
+	{
+		return {
+			scene: {
+				width: node.scrollWidth,
+				height: node.scrollHeight
+			},
+			viewport: {
+				x: node.scrollLeft,
+				y: node.scrollTop,
+				width: node.clientWidth,
+				height: node.clientHeight
+			}
+		};
+	});
+}
+
+
+var _Browser_setViewportOf = F3(function(id, x, y)
+{
+	return _Browser_withNode(id, function(node)
+	{
+		node.scrollLeft = x;
+		node.scrollTop = y;
+		return _Utils_Tuple0;
+	});
+});
+
+
+
+// ELEMENT
+
+
+function _Browser_getElement(id)
+{
+	return _Browser_withNode(id, function(node)
+	{
+		var rect = node.getBoundingClientRect();
+		var x = _Browser_window.pageXOffset;
+		var y = _Browser_window.pageYOffset;
+		return {
+			scene: _Browser_getScene(),
+			viewport: {
+				x: x,
+				y: y,
+				width: _Browser_doc.documentElement.clientWidth,
+				height: _Browser_doc.documentElement.clientHeight
+			},
+			element: {
+				x: x + rect.left,
+				y: y + rect.top,
+				width: rect.width,
+				height: rect.height
+			}
+		};
+	});
+}
+
+
+
+// LOAD and RELOAD
+
+
+function _Browser_reload(skipCache)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function(callback)
+	{
+		_VirtualDom_doc.location.reload(skipCache);
+	}));
+}
+
+function _Browser_load(url)
+{
+	return A2($elm$core$Task$perform, $elm$core$Basics$never, _Scheduler_binding(function(callback)
+	{
+		try
+		{
+			_Browser_window.location = url;
+		}
+		catch(err)
+		{
+			// Only Firefox can throw a NS_ERROR_MALFORMED_URI exception here.
+			// Other browsers reload the page, so let's be consistent about that.
+			_VirtualDom_doc.location.reload(false);
+		}
+	}));
+}
+var $author$project$Main$Aqua = {$: 'Aqua'};
+var $author$project$Main$RhombiTriHexagonal = {$: 'RhombiTriHexagonal'};
+var $author$project$Main$init = {selectedTheme: $author$project$Main$Aqua, selectedTiling: $author$project$Main$RhombiTriHexagonal};
+var $elm$core$Basics$EQ = {$: 'EQ'};
+var $elm$core$Basics$GT = {$: 'GT'};
+var $elm$core$Basics$LT = {$: 'LT'};
+var $elm$core$List$cons = _List_cons;
 var $elm$core$Dict$foldr = F3(
 	function (func, acc, t) {
 		foldr:
@@ -4006,9 +4429,30 @@ var $elm$core$Set$toList = function (_v0) {
 	var dict = _v0.a;
 	return $elm$core$Dict$keys(dict);
 };
-var $elm$core$Basics$EQ = {$: 'EQ'};
-var $elm$core$Basics$GT = {$: 'GT'};
-var $elm$core$Basics$LT = {$: 'LT'};
+var $elm$core$Elm$JsArray$foldr = _JsArray_foldr;
+var $elm$core$Array$foldr = F3(
+	function (func, baseCase, _v0) {
+		var tree = _v0.c;
+		var tail = _v0.d;
+		var helper = F2(
+			function (node, acc) {
+				if (node.$ === 'SubTree') {
+					var subTree = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, helper, acc, subTree);
+				} else {
+					var values = node.a;
+					return A3($elm$core$Elm$JsArray$foldr, func, acc, values);
+				}
+			});
+		return A3(
+			$elm$core$Elm$JsArray$foldr,
+			helper,
+			A3($elm$core$Elm$JsArray$foldr, func, baseCase, tail),
+			tree);
+	});
+var $elm$core$Array$toList = function (array) {
+	return A3($elm$core$Array$foldr, $elm$core$List$cons, _List_Nil, array);
+};
 var $elm$core$Result$Err = function (a) {
 	return {$: 'Err', a: a};
 };
@@ -4419,54 +4863,161 @@ var $elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
-var $author$project$Util$add = F2(
-	function (p, q) {
-		return {x: p.x + q.x, y: p.y + q.y};
-	});
-var $author$project$Semiregular$dodecagon = {
-	angles: _List_fromArray(
-		[150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150]),
-	lengths: _List_fromArray(
-		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
-	rotation: 30
+var $elm$browser$Browser$External = function (a) {
+	return {$: 'External', a: a};
 };
-var $elm$core$List$drop = F2(
-	function (n, list) {
-		drop:
-		while (true) {
-			if (n <= 0) {
-				return list;
+var $elm$browser$Browser$Internal = function (a) {
+	return {$: 'Internal', a: a};
+};
+var $elm$core$Basics$identity = function (x) {
+	return x;
+};
+var $elm$browser$Browser$Dom$NotFound = function (a) {
+	return {$: 'NotFound', a: a};
+};
+var $elm$url$Url$Http = {$: 'Http'};
+var $elm$url$Url$Https = {$: 'Https'};
+var $elm$url$Url$Url = F6(
+	function (protocol, host, port_, path, query, fragment) {
+		return {fragment: fragment, host: host, path: path, port_: port_, protocol: protocol, query: query};
+	});
+var $elm$core$String$contains = _String_contains;
+var $elm$core$String$length = _String_length;
+var $elm$core$String$slice = _String_slice;
+var $elm$core$String$dropLeft = F2(
+	function (n, string) {
+		return (n < 1) ? string : A3(
+			$elm$core$String$slice,
+			n,
+			$elm$core$String$length(string),
+			string);
+	});
+var $elm$core$String$indexes = _String_indexes;
+var $elm$core$String$isEmpty = function (string) {
+	return string === '';
+};
+var $elm$core$String$left = F2(
+	function (n, string) {
+		return (n < 1) ? '' : A3($elm$core$String$slice, 0, n, string);
+	});
+var $elm$core$String$toInt = _String_toInt;
+var $elm$url$Url$chompBeforePath = F5(
+	function (protocol, path, params, frag, str) {
+		if ($elm$core$String$isEmpty(str) || A2($elm$core$String$contains, '@', str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, ':', str);
+			if (!_v0.b) {
+				return $elm$core$Maybe$Just(
+					A6($elm$url$Url$Url, protocol, str, $elm$core$Maybe$Nothing, path, params, frag));
 			} else {
-				if (!list.b) {
-					return list;
+				if (!_v0.b.b) {
+					var i = _v0.a;
+					var _v1 = $elm$core$String$toInt(
+						A2($elm$core$String$dropLeft, i + 1, str));
+					if (_v1.$ === 'Nothing') {
+						return $elm$core$Maybe$Nothing;
+					} else {
+						var port_ = _v1;
+						return $elm$core$Maybe$Just(
+							A6(
+								$elm$url$Url$Url,
+								protocol,
+								A2($elm$core$String$left, i, str),
+								port_,
+								path,
+								params,
+								frag));
+					}
 				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs;
-					n = $temp$n;
-					list = $temp$list;
-					continue drop;
+					return $elm$core$Maybe$Nothing;
 				}
 			}
 		}
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
+var $elm$url$Url$chompBeforeQuery = F4(
+	function (protocol, params, frag, str) {
+		if ($elm$core$String$isEmpty(str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, '/', str);
+			if (!_v0.b) {
+				return A5($elm$url$Url$chompBeforePath, protocol, '/', params, frag, str);
+			} else {
+				var i = _v0.a;
+				return A5(
+					$elm$url$Url$chompBeforePath,
+					protocol,
+					A2($elm$core$String$dropLeft, i, str),
+					params,
+					frag,
+					A2($elm$core$String$left, i, str));
+			}
+		}
+	});
+var $elm$url$Url$chompBeforeFragment = F3(
+	function (protocol, frag, str) {
+		if ($elm$core$String$isEmpty(str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, '?', str);
+			if (!_v0.b) {
+				return A4($elm$url$Url$chompBeforeQuery, protocol, $elm$core$Maybe$Nothing, frag, str);
+			} else {
+				var i = _v0.a;
+				return A4(
+					$elm$url$Url$chompBeforeQuery,
+					protocol,
+					$elm$core$Maybe$Just(
+						A2($elm$core$String$dropLeft, i + 1, str)),
+					frag,
+					A2($elm$core$String$left, i, str));
+			}
+		}
+	});
+var $elm$url$Url$chompAfterProtocol = F2(
+	function (protocol, str) {
+		if ($elm$core$String$isEmpty(str)) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var _v0 = A2($elm$core$String$indexes, '#', str);
+			if (!_v0.b) {
+				return A3($elm$url$Url$chompBeforeFragment, protocol, $elm$core$Maybe$Nothing, str);
+			} else {
+				var i = _v0.a;
+				return A3(
+					$elm$url$Url$chompBeforeFragment,
+					protocol,
+					$elm$core$Maybe$Just(
+						A2($elm$core$String$dropLeft, i + 1, str)),
+					A2($elm$core$String$left, i, str));
+			}
+		}
+	});
+var $elm$core$String$startsWith = _String_startsWith;
+var $elm$url$Url$fromString = function (str) {
+	return A2($elm$core$String$startsWith, 'http://', str) ? A2(
+		$elm$url$Url$chompAfterProtocol,
+		$elm$url$Url$Http,
+		A2($elm$core$String$dropLeft, 7, str)) : (A2($elm$core$String$startsWith, 'https://', str) ? A2(
+		$elm$url$Url$chompAfterProtocol,
+		$elm$url$Url$Https,
+		A2($elm$core$String$dropLeft, 8, str)) : $elm$core$Maybe$Nothing);
+};
+var $elm$core$Basics$never = function (_v0) {
+	never:
+	while (true) {
+		var nvr = _v0.a;
+		var $temp$_v0 = nvr;
+		_v0 = $temp$_v0;
+		continue never;
 	}
 };
-var $elm$core$Basics$modBy = _Basics_modBy;
+var $elm$core$Task$Perform = function (a) {
+	return {$: 'Perform', a: a};
+};
+var $elm$core$Task$succeed = _Scheduler_succeed;
+var $elm$core$Task$init = $elm$core$Task$succeed(_Utils_Tuple0);
 var $elm$core$List$foldrHelper = F4(
 	function (fn, acc, ctr, ls) {
 		if (!ls.b) {
@@ -4536,6 +5087,198 @@ var $elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
+var $elm$core$Task$andThen = _Scheduler_andThen;
+var $elm$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			$elm$core$Task$andThen,
+			function (a) {
+				return $elm$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var $elm$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			$elm$core$Task$andThen,
+			function (a) {
+				return A2(
+					$elm$core$Task$andThen,
+					function (b) {
+						return $elm$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var $elm$core$Task$sequence = function (tasks) {
+	return A3(
+		$elm$core$List$foldr,
+		$elm$core$Task$map2($elm$core$List$cons),
+		$elm$core$Task$succeed(_List_Nil),
+		tasks);
+};
+var $elm$core$Platform$sendToApp = _Platform_sendToApp;
+var $elm$core$Task$spawnCmd = F2(
+	function (router, _v0) {
+		var task = _v0.a;
+		return _Scheduler_spawn(
+			A2(
+				$elm$core$Task$andThen,
+				$elm$core$Platform$sendToApp(router),
+				task));
+	});
+var $elm$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			$elm$core$Task$map,
+			function (_v0) {
+				return _Utils_Tuple0;
+			},
+			$elm$core$Task$sequence(
+				A2(
+					$elm$core$List$map,
+					$elm$core$Task$spawnCmd(router),
+					commands)));
+	});
+var $elm$core$Task$onSelfMsg = F3(
+	function (_v0, _v1, _v2) {
+		return $elm$core$Task$succeed(_Utils_Tuple0);
+	});
+var $elm$core$Task$cmdMap = F2(
+	function (tagger, _v0) {
+		var task = _v0.a;
+		return $elm$core$Task$Perform(
+			A2($elm$core$Task$map, tagger, task));
+	});
+_Platform_effectManagers['Task'] = _Platform_createManager($elm$core$Task$init, $elm$core$Task$onEffects, $elm$core$Task$onSelfMsg, $elm$core$Task$cmdMap);
+var $elm$core$Task$command = _Platform_leaf('Task');
+var $elm$core$Task$perform = F2(
+	function (toMessage, task) {
+		return $elm$core$Task$command(
+			$elm$core$Task$Perform(
+				A2($elm$core$Task$map, toMessage, task)));
+	});
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $elm$browser$Browser$sandbox = function (impl) {
+	return _Browser_element(
+		{
+			init: function (_v0) {
+				return _Utils_Tuple2(impl.init, $elm$core$Platform$Cmd$none);
+			},
+			subscriptions: function (_v1) {
+				return $elm$core$Platform$Sub$none;
+			},
+			update: F2(
+				function (msg, model) {
+					return _Utils_Tuple2(
+						A2(impl.update, msg, model),
+						$elm$core$Platform$Cmd$none);
+				}),
+			view: impl.view
+		});
+};
+var $author$project$Main$update = F2(
+	function (msg, model) {
+		if (msg.$ === 'SelectTiling') {
+			var tiling = msg.a;
+			return _Utils_update(
+				model,
+				{selectedTiling: tiling});
+		} else {
+			var theme = msg.a;
+			return _Utils_update(
+				model,
+				{selectedTheme: theme});
+		}
+	});
+var $author$project$Main$Amethyst = {$: 'Amethyst'};
+var $author$project$Main$ElongatedTriangular = {$: 'ElongatedTriangular'};
+var $author$project$Main$Honey = {$: 'Honey'};
+var $author$project$Main$SnubSquare = {$: 'SnubSquare'};
+var $author$project$Main$SnubTriHexagonal = {$: 'SnubTriHexagonal'};
+var $author$project$Main$Square = {$: 'Square'};
+var $author$project$Main$TriHexagonal = {$: 'TriHexagonal'};
+var $author$project$Main$Triangular = {$: 'Triangular'};
+var $author$project$Main$TruncatedHexagonal = {$: 'TruncatedHexagonal'};
+var $author$project$Main$TruncatedSquare = {$: 'TruncatedSquare'};
+var $author$project$Main$TruncatedTriHexagonal = {$: 'TruncatedTriHexagonal'};
+var $elm$html$Html$a = _VirtualDom_node('a');
+var $elm$virtual_dom$VirtualDom$attribute = F2(
+	function (key, value) {
+		return A2(
+			_VirtualDom_attribute,
+			_VirtualDom_noOnOrFormAction(key),
+			_VirtualDom_noJavaScriptOrHtmlUri(value));
+	});
+var $elm$html$Html$Attributes$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm$html$Html$div = _VirtualDom_node('div');
+var $author$project$ColorTheme$Primary = {$: 'Primary'};
+var $author$project$ColorTheme$Secondary = {$: 'Secondary'};
+var $author$project$ColorTheme$Ternary = {$: 'Ternary'};
+var $author$project$Util$add = F2(
+	function (p, q) {
+		return {x: p.x + q.x, y: p.y + q.y};
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $author$project$Shapes$equilateral = {
+	angles: _List_fromArray(
+		[60, 60, 60]),
+	lengths: _List_fromArray(
+		[1, 1, 1]),
+	rotation: 0
+};
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
 		return _Utils_Tuple2(a, b);
@@ -4603,22 +5346,13 @@ var $author$project$Polygon$getPoint = F3(
 			return point;
 		}
 	});
-var $author$project$Util$sub = F2(
-	function (p, q) {
-		return {x: p.x - q.x, y: p.y - q.y};
-	});
-var $author$project$ColorTheme$Primary = {$: 'Primary'};
-var $author$project$ColorTheme$Secondary = {$: 'Secondary'};
-var $author$project$Semiregular$equilateral = {
-	angles: _List_fromArray(
-		[60, 60, 60]),
-	lengths: _List_fromArray(
-		[1, 1, 1]),
-	rotation: 0
+var $elm$core$Basics$negate = function (n) {
+	return -n;
 };
 var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$polygon = $elm$svg$Svg$trustedNode('polygon');
 var $author$project$Polygon$startPoint = F2(
 	function (points, p) {
@@ -4631,24 +5365,8 @@ var $author$project$Polygon$startPoint = F2(
 	});
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $author$project$ColorTheme$honeyTheme = {
-	getColor: function (color) {
-		switch (color.$) {
-			case 'Primary':
-				return '#FF9A0A';
-			case 'Secondary':
-				return '#FECB09';
-			case 'Ternary':
-				return '#FEED0D';
-			default:
-				return '#CE7C00';
-		}
-	},
-	strokeColor: '#CE7C00'
-};
-var $author$project$ColorTheme$theme = $author$project$ColorTheme$honeyTheme;
-var $author$project$Polygon$polygonSvg = F4(
-	function (poly, size, color, point) {
+var $author$project$Polygon$polygonSvg = F5(
+	function (poly, size, theme, color, point) {
 		var svgPoints = A2(
 			$elm$core$String$join,
 			' ',
@@ -4667,8 +5385,8 @@ var $author$project$Polygon$polygonSvg = F4(
 				[
 					$elm$svg$Svg$Attributes$points(svgPoints),
 					$elm$svg$Svg$Attributes$fill(
-					$author$project$ColorTheme$theme.getColor(color)),
-					$elm$svg$Svg$Attributes$stroke($author$project$ColorTheme$theme.strokeColor),
+					theme.getColor(color)),
+					$elm$svg$Svg$Attributes$stroke(theme.strokeColor),
 					$elm$svg$Svg$Attributes$strokeWidth('2')
 				]),
 			_List_Nil);
@@ -4679,86 +5397,1263 @@ var $author$project$Polygon$rotatePoly = F2(
 		var angles = _v0.angles;
 		return {angles: angles, lengths: lengths, rotation: a};
 	});
-var $author$project$Semiregular$truncatedHexagonalLine = F2(
-	function (n, origin) {
+var $author$project$Shapes$square = {
+	angles: _List_fromArray(
+		[90, 90, 90, 90]),
+	lengths: _List_fromArray(
+		[1, 1, 1, 1]),
+	rotation: 0
+};
+var $author$project$Semiregular$elongatedTriangular = F4(
+	function (theme, n, m, origin) {
+		if (m <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 30;
+			var squareLine = A2(
+				$elm$core$List$map,
+				function (i) {
+					return A5(
+						$author$project$Polygon$polygonSvg,
+						$author$project$Shapes$square,
+						size,
+						theme,
+						$author$project$ColorTheme$Secondary,
+						{x: origin.x + (i * size), y: origin.y});
+				},
+				A2($elm$core$List$range, 1, n));
+			var triangleLine = A2(
+				$elm$core$List$concatMap,
+				function (i) {
+					return _List_fromArray(
+						[
+							A5(
+							$author$project$Polygon$polygonSvg,
+							A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
+							size,
+							theme,
+							$author$project$ColorTheme$Primary,
+							{x: origin.x + (i * size), y: origin.y}),
+							A5(
+							$author$project$Polygon$polygonSvg,
+							$author$project$Shapes$equilateral,
+							size,
+							theme,
+							$author$project$ColorTheme$Ternary,
+							{x: origin.x + (i * size), y: origin.y})
+						]);
+				},
+				A2($elm$core$List$range, 1, n));
+			var selectedLine = (!A2($elm$core$Basics$modBy, 2, m)) ? squareLine : triangleLine;
+			var next_origin = A2(
+				$author$project$Util$add,
+				origin,
+				function () {
+					var _v0 = A2($elm$core$Basics$modBy, 4, m);
+					switch (_v0) {
+						case 0:
+							return {x: 0, y: size};
+						case 1:
+							return A3(
+								$author$project$Polygon$getPoint,
+								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
+								size,
+								1);
+						case 2:
+							return {x: 0, y: size};
+						default:
+							return A3(
+								$author$project$Polygon$getPoint,
+								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
+								size,
+								-1);
+					}
+				}());
+			return _Utils_ap(
+				selectedLine,
+				A4($author$project$Semiregular$elongatedTriangular, theme, n, m - 1, next_origin));
+		}
+	});
+var $author$project$Shapes$hexagon = {
+	angles: _List_fromArray(
+		[120, 120, 120, 120, 120, 120]),
+	lengths: _List_fromArray(
+		[1, 1, 1, 1, 1, 1]),
+	rotation: 0
+};
+var $author$project$Util$mix2Color = function (n) {
+	var _v0 = A2($elm$core$Basics$modBy, 2, n);
+	if (!_v0) {
+		return $author$project$ColorTheme$Primary;
+	} else {
+		return $author$project$ColorTheme$Secondary;
+	}
+};
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$Regular$hexagonalTiling = F4(
+	function (theme, n, m, origin) {
+		var size = 30.0;
+		return $elm$core$List$concat(
+			A2(
+				$elm$core$List$map,
+				function (y) {
+					return A2(
+						$elm$core$List$map,
+						function (_v0) {
+							var point = _v0.a;
+							var color = _v0.b;
+							return A5(
+								$author$project$Polygon$polygonSvg,
+								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
+								size,
+								theme,
+								color,
+								point);
+						},
+						A2(
+							$elm$core$List$map,
+							function (x) {
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Util$add,
+										origin,
+										{
+											x: ((size * $elm$core$Basics$sqrt(3)) * x) + (((size / 2) * $elm$core$Basics$sqrt(3)) * A2($elm$core$Basics$modBy, 2, y + 1)),
+											y: ((size * 3) / 2) * y
+										}),
+									$author$project$Util$mix2Color(y));
+							},
+							A2($elm$core$List$range, 1, n)));
+				},
+				A2($elm$core$List$range, 1, m)));
+	});
+var $author$project$Semiregular$rhombiTriHexaShape = F3(
+	function (theme, origin, size) {
+		var trig2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 4);
+		var trig1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3);
+		var square3 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 5);
+		var square2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 4);
+		var square1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2);
+		return _List_fromArray(
+			[
+				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$hexagon, size, theme, $author$project$ColorTheme$Primary, origin),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
+				size,
+				theme,
+				$author$project$ColorTheme$Ternary,
+				A2($author$project$Util$add, origin, square1)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -30),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				A2($author$project$Util$add, origin, trig1)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				$author$project$Shapes$square,
+				size,
+				theme,
+				$author$project$ColorTheme$Ternary,
+				A2($author$project$Util$add, origin, square2)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -90),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				A2($author$project$Util$add, origin, trig2)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
+				size,
+				theme,
+				$author$project$ColorTheme$Ternary,
+				A2($author$project$Util$add, origin, square3))
+			]);
+	});
+var $author$project$Util$sub = F2(
+	function (p, q) {
+		return {x: p.x - q.x, y: p.y - q.y};
+	});
+var $author$project$Semiregular$rhombiTriHexaLine = F4(
+	function (theme, n, origin, size) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var square_slant = {
+				x: A2(
+					$author$project$Util$sub,
+					A3(
+						$author$project$Polygon$getPoint,
+						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
+						size,
+						1),
+					A3(
+						$author$project$Polygon$getPoint,
+						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
+						size,
+						0)).x,
+				y: 0
+			};
+			var hexagon_width = A2(
+				$author$project$Util$sub,
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2),
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1));
+			var next_origin = A2(
+				$author$project$Util$add,
+				origin,
+				A2(
+					$author$project$Util$add,
+					hexagon_width,
+					A2(
+						$author$project$Util$add,
+						square_slant,
+						A2(
+							$author$project$Util$add,
+							{x: size, y: 0},
+							square_slant))));
+			return _Utils_ap(
+				A3($author$project$Semiregular$rhombiTriHexaShape, theme, origin, size),
+				A4($author$project$Semiregular$rhombiTriHexaLine, theme, n - 1, next_origin, size));
+		}
+	});
+var $author$project$Semiregular$rhombiTriHexagonalTiling = F4(
+	function (theme, n, m, origin) {
+		if (m <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 30;
+			var next_point = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+				$author$project$Util$sub,
+				A2(
+					$author$project$Util$add,
+					A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1),
+					A3(
+						$author$project$Polygon$getPoint,
+						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
+						size,
+						-1)),
+				{x: size, y: 0}) : A2(
+				$author$project$Util$add,
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2),
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
+					size,
+					1));
+			var next_origin = A2($author$project$Util$add, origin, next_point);
+			return _Utils_ap(
+				A4($author$project$Semiregular$rhombiTriHexaLine, theme, n, origin, size),
+				A4($author$project$Semiregular$rhombiTriHexagonalTiling, theme, n, m - 1, next_origin));
+		}
+	});
+var $author$project$Semiregular$snubSquareShape = F3(
+	function (theme, origin, size) {
+		var first = A2(
+			$author$project$Util$add,
+			origin,
+			A3(
+				$author$project$Polygon$getPoint,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
+				size,
+				2));
+		var second = A2(
+			$author$project$Util$add,
+			first,
+			{x: size, y: 0});
+		return _List_fromArray(
+			[
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
+				size,
+				theme,
+				$author$project$ColorTheme$Primary,
+				origin),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 30),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				origin),
+				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, $author$project$ColorTheme$Primary, first),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
+				size,
+				theme,
+				$author$project$ColorTheme$Primary,
+				first),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 30),
+				size,
+				theme,
+				$author$project$ColorTheme$Primary,
+				second),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				second)
+			]);
+	});
+var $author$project$Semiregular$snubSquareLine = F4(
+	function (theme, n, origin, size) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var triangle_slant = A2(
+				$author$project$Util$sub,
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
+					size,
+					2),
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
+					size,
+					0));
+			var next_origin = {x: (origin.x + (2 * triangle_slant.x)) + size, y: origin.y};
+			return _Utils_ap(
+				A3($author$project$Semiregular$snubSquareShape, theme, origin, size),
+				A4($author$project$Semiregular$snubSquareLine, theme, n - 1, next_origin, size));
+		}
+	});
+var $author$project$Semiregular$snubSquareTiling = F4(
+	function (theme, n, m, origin) {
+		if (m <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 30;
+			var square_diag = A2(
+				$author$project$Util$sub,
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 30),
+					size,
+					2),
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 30),
+					size,
+					0));
+			var next_origin = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+				$author$project$Util$add,
+				origin,
+				A2(
+					$author$project$Util$add,
+					square_diag,
+					{x: (-2) * square_diag.x, y: size})) : A2(
+				$author$project$Util$add,
+				origin,
+				A2(
+					$author$project$Util$add,
+					square_diag,
+					{x: 0, y: size}));
+			return _Utils_ap(
+				A4($author$project$Semiregular$snubSquareLine, theme, n, origin, size),
+				A4($author$project$Semiregular$snubSquareTiling, theme, n, m - 1, next_origin));
+		}
+	});
+var $author$project$Semiregular$snubTriHexagonalShape = F3(
+	function (theme, origin, size) {
+		var third = A2(
+			$author$project$Util$add,
+			origin,
+			A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 5));
+		var second = A2(
+			$author$project$Util$add,
+			origin,
+			A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 4));
+		var first = A2(
+			$author$project$Util$add,
+			origin,
+			A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3));
+		return _List_fromArray(
+			[
+				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$hexagon, size, theme, $author$project$ColorTheme$Primary, origin),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				first),
+				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, $author$project$ColorTheme$Secondary, first),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				first),
+				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, $author$project$ColorTheme$Secondary, second),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				second),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -120),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				second),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				third),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -120),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				third)
+			]);
+	});
+var $author$project$Semiregular$snubTriHexagonalLine = F4(
+	function (theme, n, origin, size) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var next_origin = {x: origin.x + (7 * size), y: origin.y};
+			return _Utils_ap(
+				A3($author$project$Semiregular$snubTriHexagonalShape, theme, origin, size),
+				A4($author$project$Semiregular$snubTriHexagonalLine, theme, n - 1, next_origin, size));
+		}
+	});
+var $author$project$Semiregular$snubTriHexagonalTiling = F4(
+	function (theme, n, m, origin) {
+		if (m <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 30;
+			var next_origin = A2(
+				$author$project$Util$add,
+				origin,
+				function () {
+					var _v0 = A2($elm$core$Basics$modBy, 3, m);
+					switch (_v0) {
+						case 0:
+							return A2(
+								$author$project$Util$sub,
+								A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1),
+								{x: 2 * size, y: 0});
+						case 1:
+							return A2(
+								$author$project$Util$add,
+								A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2),
+								{x: 3 * size, y: 0});
+						default:
+							return A2(
+								$author$project$Util$sub,
+								A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1),
+								{x: 2 * size, y: 0});
+					}
+				}());
+			return _Utils_ap(
+				A4($author$project$Semiregular$snubTriHexagonalLine, theme, n, origin, size),
+				A4($author$project$Semiregular$snubTriHexagonalTiling, theme, n, m - 1, next_origin));
+		}
+	});
+var $author$project$Util$mix3Color = function (n) {
+	var _v0 = A2($elm$core$Basics$modBy, 3, n);
+	switch (_v0) {
+		case 0:
+			return $author$project$ColorTheme$Primary;
+		case 1:
+			return $author$project$ColorTheme$Secondary;
+		default:
+			return $author$project$ColorTheme$Ternary;
+	}
+};
+var $author$project$Regular$squareTiling = F4(
+	function (theme, n, m, origin) {
+		var size = 30.0;
+		return $elm$core$List$concat(
+			A2(
+				$elm$core$List$map,
+				function (y) {
+					return A2(
+						$elm$core$List$map,
+						function (_v0) {
+							var point = _v0.a;
+							var color = _v0.b;
+							return A5($author$project$Polygon$polygonSvg, $author$project$Shapes$square, size, theme, color, point);
+						},
+						A2(
+							$elm$core$List$map,
+							function (x) {
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Util$add,
+										origin,
+										{x: size * x, y: size * y}),
+									$author$project$Util$mix3Color(y + x));
+							},
+							A2($elm$core$List$range, 1, n)));
+				},
+				A2($elm$core$List$range, 1, m)));
+	});
+var $author$project$Semiregular$triHexagonalLine = F3(
+	function (theme, n, origin) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 30;
+			var second_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3);
+			var first_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 1);
+			var next_origin = A2(
+				$author$project$Util$add,
+				A2($author$project$Util$add, origin, first_trig),
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$equilateral, size, 1));
+			return _Utils_ap(
+				_List_fromArray(
+					[
+						A5($author$project$Polygon$polygonSvg, $author$project$Shapes$hexagon, size, theme, $author$project$ColorTheme$Primary, origin),
+						A5(
+						$author$project$Polygon$polygonSvg,
+						$author$project$Shapes$equilateral,
+						size,
+						theme,
+						$author$project$ColorTheme$Secondary,
+						A2($author$project$Util$add, origin, first_trig)),
+						A5(
+						$author$project$Polygon$polygonSvg,
+						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
+						size,
+						theme,
+						$author$project$ColorTheme$Secondary,
+						A2($author$project$Util$add, origin, second_trig))
+					]),
+				A3($author$project$Semiregular$triHexagonalLine, theme, n - 1, next_origin));
+		}
+	});
+var $author$project$Semiregular$triHexagonalTiling = F4(
+	function (theme, n, m, origin) {
+		if (m <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 30;
+			var hexagon_translate = {x: size * 2, y: 0};
+			var next_origin = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+				$author$project$Util$add,
+				origin,
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3)) : A2(
+				$author$project$Util$sub,
+				A2(
+					$author$project$Util$add,
+					origin,
+					A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3)),
+				hexagon_translate);
+			return _Utils_ap(
+				A3($author$project$Semiregular$triHexagonalLine, theme, n, origin),
+				A4($author$project$Semiregular$triHexagonalTiling, theme, n, m - 1, next_origin));
+		}
+	});
+var $author$project$ColorTheme$Quart = {$: 'Quart'};
+var $author$project$Util$mix4Color = function (n) {
+	var _v0 = A2($elm$core$Basics$modBy, 4, n);
+	switch (_v0) {
+		case 0:
+			return $author$project$ColorTheme$Primary;
+		case 1:
+			return $author$project$ColorTheme$Secondary;
+		case 2:
+			return $author$project$ColorTheme$Ternary;
+		default:
+			return $author$project$ColorTheme$Quart;
+	}
+};
+var $author$project$Regular$triangularTiling = F4(
+	function (theme, n, m, origin) {
+		var size = 40.0;
+		return $elm$core$List$concat(
+			A2(
+				$elm$core$List$map,
+				function (y) {
+					return A2(
+						$elm$core$List$map,
+						function (_v0) {
+							var point = _v0.a;
+							var color = _v0.b;
+							var _v1 = A2($elm$core$Basics$modBy, 2, y);
+							if (!_v1) {
+								return A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, color, point);
+							} else {
+								return A5(
+									$author$project$Polygon$polygonSvg,
+									A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
+									size,
+									theme,
+									color,
+									point);
+							}
+						},
+						A2(
+							$elm$core$List$map,
+							function (x) {
+								return _Utils_Tuple2(
+									A2(
+										$author$project$Util$add,
+										origin,
+										{
+											x: (size * x) + ((size / 2) * A2($elm$core$Basics$modBy, 2, y + 1)),
+											y: (($elm$core$Basics$sqrt(3) * size) / 2) * ((y / 2) | 0)
+										}),
+									$author$project$Util$mix4Color(y));
+							},
+							A2($elm$core$List$range, 1, n)));
+				},
+				A2($elm$core$List$range, 1, m)));
+	});
+var $author$project$Shapes$dodecagon = {
+	angles: _List_fromArray(
+		[150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150]),
+	lengths: _List_fromArray(
+		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
+	rotation: 30
+};
+var $author$project$Semiregular$truncatedHexagonalLine = F3(
+	function (theme, n, origin) {
 		if (n <= 0) {
 			return _List_Nil;
 		} else {
 			var size = 20;
-			var second_trig = A3($author$project$Polygon$getPoint, $author$project$Semiregular$dodecagon, size, 6);
-			var first_trig = A3($author$project$Polygon$getPoint, $author$project$Semiregular$dodecagon, size, 3);
+			var second_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 6);
+			var first_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 3);
 			var next_origin = A2(
 				$author$project$Util$add,
 				A2($author$project$Util$add, origin, first_trig),
-				A3($author$project$Polygon$getPoint, $author$project$Semiregular$equilateral, size, 1));
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$equilateral, size, 1));
 			return _Utils_ap(
 				_List_fromArray(
 					[
-						A4($author$project$Polygon$polygonSvg, $author$project$Semiregular$dodecagon, size, $author$project$ColorTheme$Primary, origin),
-						A4(
+						A5($author$project$Polygon$polygonSvg, $author$project$Shapes$dodecagon, size, theme, $author$project$ColorTheme$Primary, origin),
+						A5(
 						$author$project$Polygon$polygonSvg,
-						$author$project$Semiregular$equilateral,
+						$author$project$Shapes$equilateral,
 						size,
+						theme,
 						$author$project$ColorTheme$Secondary,
 						A2($author$project$Util$add, origin, first_trig)),
-						A4(
+						A5(
 						$author$project$Polygon$polygonSvg,
-						A2($author$project$Polygon$rotatePoly, $author$project$Semiregular$equilateral, 60),
+						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
 						size,
+						theme,
 						$author$project$ColorTheme$Secondary,
 						A2($author$project$Util$add, origin, second_trig))
 					]),
-				A2($author$project$Semiregular$truncatedHexagonalLine, n - 1, next_origin));
+				A3($author$project$Semiregular$truncatedHexagonalLine, theme, n - 1, next_origin));
 		}
 	});
-var $author$project$Semiregular$truncatedHexagonalTiling = F3(
-	function (n, m, origin) {
+var $author$project$Semiregular$truncatedHexagonalTiling = F4(
+	function (theme, n, m, origin) {
 		if (m <= 0) {
 			return _List_Nil;
 		} else {
 			var size = 20;
 			var decagon_width = A2(
 				$author$project$Util$sub,
-				A3($author$project$Polygon$getPoint, $author$project$Semiregular$dodecagon, size, 3),
-				A3($author$project$Polygon$getPoint, $author$project$Semiregular$dodecagon, size, 0));
-			var next_origin = A2(
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 3),
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 0));
+			var next_origin = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+				$author$project$Util$add,
+				origin,
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 7)) : A2(
 				$author$project$Util$sub,
 				A2(
 					$author$project$Util$add,
 					origin,
-					A3($author$project$Polygon$getPoint, $author$project$Semiregular$dodecagon, size, 8)),
+					A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 8)),
 				decagon_width);
 			return _Utils_ap(
-				A2($author$project$Semiregular$truncatedHexagonalLine, n, origin),
-				A3($author$project$Semiregular$truncatedHexagonalTiling, n, m - 1, next_origin));
+				A3($author$project$Semiregular$truncatedHexagonalLine, theme, n, origin),
+				A4($author$project$Semiregular$truncatedHexagonalTiling, theme, n, m - 1, next_origin));
 		}
+	});
+var $author$project$Shapes$octagon = {
+	angles: _List_fromArray(
+		[135, 135, 135, 135, 135, 135, 135, 135]),
+	lengths: _List_fromArray(
+		[1, 1, 1, 1, 1, 1, 1, 1]),
+	rotation: 0
+};
+var $author$project$Semiregular$truncatedSquareLine = F3(
+	function (theme, n, origin) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 20;
+			var top_square = A3($author$project$Polygon$getPoint, $author$project$Shapes$octagon, size, 1);
+			var next_origin = A2(
+				$author$project$Util$add,
+				A2($author$project$Util$add, origin, top_square),
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 45),
+					size,
+					2));
+			return _Utils_ap(
+				_List_fromArray(
+					[
+						A5($author$project$Polygon$polygonSvg, $author$project$Shapes$octagon, size, theme, $author$project$ColorTheme$Primary, origin),
+						A5(
+						$author$project$Polygon$polygonSvg,
+						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 45),
+						size,
+						theme,
+						$author$project$ColorTheme$Secondary,
+						A2($author$project$Util$add, origin, top_square))
+					]),
+				A3($author$project$Semiregular$truncatedSquareLine, theme, n - 1, next_origin));
+		}
+	});
+var $author$project$Semiregular$truncatedSquareTiling = F4(
+	function (theme, n, m, origin) {
+		if (m <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 20;
+			var next_origin = A2(
+				$author$project$Util$add,
+				origin,
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$octagon, size, 5));
+			return _Utils_ap(
+				A3($author$project$Semiregular$truncatedSquareLine, theme, n, origin),
+				A4($author$project$Semiregular$truncatedSquareTiling, theme, n, m - 1, next_origin));
+		}
+	});
+var $author$project$Semiregular$truncTriHexaShape = F3(
+	function (theme, origin, size) {
+		var square3 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 10);
+		var square2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 8);
+		var square1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 6);
+		var hex2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 9);
+		var hex1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 7);
+		return _List_fromArray(
+			[
+				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$dodecagon, size, theme, $author$project$ColorTheme$Primary, origin),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 60),
+				size,
+				theme,
+				$author$project$ColorTheme$Ternary,
+				A2($author$project$Util$add, origin, square1)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				$author$project$Shapes$square,
+				size,
+				theme,
+				$author$project$ColorTheme$Ternary,
+				A2($author$project$Util$add, origin, square2)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
+				size,
+				theme,
+				$author$project$ColorTheme$Ternary,
+				A2($author$project$Util$add, origin, square3)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				A2($author$project$Util$add, origin, hex1)),
+				A5(
+				$author$project$Polygon$polygonSvg,
+				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, -30),
+				size,
+				theme,
+				$author$project$ColorTheme$Secondary,
+				A2($author$project$Util$add, origin, hex2))
+			]);
+	});
+var $author$project$Semiregular$truncTriHexaLine = F4(
+	function (theme, n, origin, size) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var hexagon_width = A2(
+				$author$project$Util$sub,
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
+					size,
+					2),
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
+					size,
+					0));
+			var dodecagon_width = A2(
+				$author$project$Util$sub,
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 4),
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, -1));
+			var next_origin = A2(
+				$author$project$Util$add,
+				origin,
+				A2(
+					$author$project$Util$add,
+					dodecagon_width,
+					A2(
+						$author$project$Util$add,
+						hexagon_width,
+						A2(
+							$author$project$Util$add,
+							hexagon_width,
+							{x: size, y: 0}))));
+			return _Utils_ap(
+				A3($author$project$Semiregular$truncTriHexaShape, theme, origin, size),
+				A4($author$project$Semiregular$truncTriHexaLine, theme, n - 1, next_origin, size));
+		}
+	});
+var $author$project$Semiregular$truncatedTriHexagonalTiling = F4(
+	function (theme, n, m, origin) {
+		if (m <= 0) {
+			return _List_Nil;
+		} else {
+			var size = 20;
+			var hexagon_width = A2(
+				$author$project$Util$sub,
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
+					size,
+					2),
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
+					size,
+					0));
+			var next_point = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+				$author$project$Util$sub,
+				A2(
+					$author$project$Util$add,
+					A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 10),
+					A3(
+						$author$project$Polygon$getPoint,
+						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
+						size,
+						-1)),
+				A2(
+					$author$project$Util$add,
+					hexagon_width,
+					{x: size, y: 0})) : A2(
+				$author$project$Util$add,
+				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 6),
+				A3(
+					$author$project$Polygon$getPoint,
+					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 60),
+					size,
+					2));
+			var next_origin = A2($author$project$Util$add, origin, next_point);
+			return _Utils_ap(
+				A4($author$project$Semiregular$truncTriHexaLine, theme, n, origin, size),
+				A4($author$project$Semiregular$truncatedTriHexagonalTiling, theme, n, m - 1, next_origin));
+		}
+	});
+var $author$project$Main$getTessellation = function (tiling) {
+	switch (tiling.$) {
+		case 'Square':
+			return $author$project$Regular$squareTiling;
+		case 'Triangular':
+			return $author$project$Regular$triangularTiling;
+		case 'Hexagonal':
+			return $author$project$Regular$hexagonalTiling;
+		case 'TruncatedHexagonal':
+			return $author$project$Semiregular$truncatedHexagonalTiling;
+		case 'TriHexagonal':
+			return $author$project$Semiregular$triHexagonalTiling;
+		case 'TruncatedSquare':
+			return $author$project$Semiregular$truncatedSquareTiling;
+		case 'RhombiTriHexagonal':
+			return $author$project$Semiregular$rhombiTriHexagonalTiling;
+		case 'TruncatedTriHexagonal':
+			return $author$project$Semiregular$truncatedTriHexagonalTiling;
+		case 'SnubSquare':
+			return $author$project$Semiregular$snubSquareTiling;
+		case 'SnubTriHexagonal':
+			return $author$project$Semiregular$snubTriHexagonalTiling;
+		default:
+			return $author$project$Semiregular$elongatedTriangular;
+	}
+};
+var $author$project$ColorTheme$amethystTheme = {
+	getColor: function (color) {
+		switch (color.$) {
+			case 'Primary':
+				return '#810EA9';
+			case 'Secondary':
+				return '#BC7AD2';
+			case 'Ternary':
+				return '#51185C';
+			default:
+				return '#E9CDF6';
+		}
+	},
+	strokeColor: 'black'
+};
+var $author$project$ColorTheme$aquaTheme = {
+	getColor: function (color) {
+		switch (color.$) {
+			case 'Primary':
+				return '#F2EFE7';
+			case 'Secondary':
+				return '#9ACBD0';
+			case 'Ternary':
+				return '#48A6A7';
+			default:
+				return '#006A71';
+		}
+	},
+	strokeColor: '#006A71'
+};
+var $author$project$ColorTheme$honeyTheme = {
+	getColor: function (color) {
+		switch (color.$) {
+			case 'Primary':
+				return '#FF9A0A';
+			case 'Secondary':
+				return '#FECB09';
+			case 'Ternary':
+				return '#FEED0D';
+			default:
+				return '#CE7C00';
+		}
+	},
+	strokeColor: '#CE7C00'
+};
+var $author$project$Main$getTheme = function (theme) {
+	switch (theme.$) {
+		case 'Amethyst':
+			return $author$project$ColorTheme$amethystTheme;
+		case 'Aqua':
+			return $author$project$ColorTheme$aquaTheme;
+		default:
+			return $author$project$ColorTheme$honeyTheme;
+	}
+};
+var $elm$html$Html$h2 = _VirtualDom_node('h2');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $elm$html$Html$Attributes$stringProperty = F2(
+	function (key, string) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$string(string));
+	});
+var $elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		$elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$html$Html$Attributes$target = $elm$html$Html$Attributes$stringProperty('target');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$SelectTheme = function (a) {
+	return {$: 'SelectTheme', a: a};
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$html$Html$Attributes$boolProperty = F2(
+	function (key, bool) {
+		return A2(
+			_VirtualDom_property,
+			key,
+			$elm$json$Json$Encode$bool(bool));
+	});
+var $elm$html$Html$Attributes$checked = $elm$html$Html$Attributes$boolProperty('checked');
+var $elm$html$Html$input = _VirtualDom_node('input');
+var $elm$html$Html$label = _VirtualDom_node('label');
+var $elm$html$Html$Attributes$name = $elm$html$Html$Attributes$stringProperty('name');
+var $elm$html$Html$Events$alwaysStop = function (x) {
+	return _Utils_Tuple2(x, true);
+};
+var $elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
+	return {$: 'MayStopPropagation', a: a};
+};
+var $elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var $elm$html$Html$Events$stopPropagationOn = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$MayStopPropagation(decoder));
+	});
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$at = F2(
+	function (fields, decoder) {
+		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $elm$html$Html$Events$targetValue = A2(
+	$elm$json$Json$Decode$at,
+	_List_fromArray(
+		['target', 'value']),
+	$elm$json$Json$Decode$string);
+var $elm$html$Html$Events$onInput = function (tagger) {
+	return A2(
+		$elm$html$Html$Events$stopPropagationOn,
+		'input',
+		A2(
+			$elm$json$Json$Decode$map,
+			$elm$html$Html$Events$alwaysStop,
+			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
+};
+var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
+var $author$project$Main$themeRadio = F3(
+	function (themeValue, labelText, model) {
+		return A2(
+			$elm$html$Html$label,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'block'),
+					A2($elm$html$Html$Attributes$style, 'margin', '10px 0')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('radio'),
+							$elm$html$Html$Attributes$name('theme-selection'),
+							$elm$html$Html$Attributes$checked(
+							_Utils_eq(model.selectedTheme, themeValue)),
+							$elm$html$Html$Events$onInput(
+							function (_v0) {
+								return $author$project$Main$SelectTheme(themeValue);
+							}),
+							A2($elm$html$Html$Attributes$style, 'margin-right', '8px')
+						]),
+					_List_Nil),
+					$elm$html$Html$text(labelText)
+				]));
+	});
+var $author$project$Main$SelectTiling = function (a) {
+	return {$: 'SelectTiling', a: a};
+};
+var $author$project$Main$tilingRadio = F3(
+	function (tilingValue, labelText, model) {
+		return A2(
+			$elm$html$Html$label,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'display', 'block'),
+					A2($elm$html$Html$Attributes$style, 'margin', '10px 0')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$input,
+					_List_fromArray(
+						[
+							$elm$html$Html$Attributes$type_('radio'),
+							$elm$html$Html$Attributes$name('tiling-selection'),
+							$elm$html$Html$Attributes$checked(
+							_Utils_eq(model.selectedTiling, tilingValue)),
+							$elm$html$Html$Events$onInput(
+							function (_v0) {
+								return $author$project$Main$SelectTiling(tilingValue);
+							}),
+							A2($elm$html$Html$Attributes$style, 'margin-right', '8px')
+						]),
+					_List_Nil),
+					$elm$html$Html$text(labelText)
+				]));
 	});
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
-var $author$project$Main$main = A2(
-	$elm$html$Html$div,
-	_List_fromArray(
-		[
-			A2($elm$html$Html$Attributes$style, 'display', 'flex'),
-			A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
-			A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
-			A2($elm$html$Html$Attributes$style, 'height', '100vh'),
-			A2($elm$html$Html$Attributes$style, 'margin', '0')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$elm$svg$Svg$svg,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$viewBox('0 0 800 800'),
-					$elm$svg$Svg$Attributes$width('800'),
-					$elm$svg$Svg$Attributes$height('800')
-				]),
-			A3(
-				$author$project$Semiregular$truncatedHexagonalTiling,
-				100,
-				100,
-				{x: 0, y: 0}))
-		]));
-_Platform_export({'Main':{'init':_VirtualDom_init($author$project$Main$main)(0)(0)}});}(this));
+var $author$project$Main$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'display', 'grid'),
+				A2($elm$html$Html$Attributes$style, 'grid-template-columns', '300px 1fr 300px'),
+				A2($elm$html$Html$Attributes$style, 'grid-template-rows', 'auto auto 1fr'),
+				A2($elm$html$Html$Attributes$style, 'height', '100vh'),
+				A2($elm$html$Html$Attributes$style, 'padding', '20px'),
+				A2($elm$html$Html$Attributes$style, 'gap', '20px'),
+				A2($elm$html$Html$Attributes$style, 'box-sizing', 'border-box')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
+						A2($elm$html$Html$Attributes$style, 'grid-row', '1'),
+						A2($elm$html$Html$Attributes$style, 'width', '250px'),
+						A2($elm$html$Html$Attributes$style, 'height', 'auto'),
+						A2($elm$html$Html$Attributes$style, 'padding', '20px'),
+						A2($elm$html$Html$Attributes$style, 'background', 'white'),
+						A2($elm$html$Html$Attributes$style, 'border', '1px solid #e0e0e0'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+						A2($elm$html$Html$Attributes$style, 'margin-top', '50px'),
+						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.1)'),
+						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'left-top-panel')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Tiling:')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'margin-bottom', '15px')
+							]),
+						_List_fromArray(
+							[
+								A3($author$project$Main$tilingRadio, $author$project$Main$Square, 'Square', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$Triangular, 'Triangular', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$TruncatedHexagonal, 'Truncated Hexagonal', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$TriHexagonal, 'Trihexagonal', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$TruncatedSquare, 'Truncated Square', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$RhombiTriHexagonal, 'Rhombitrihexagonal', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$TruncatedTriHexagonal, 'Truncated Trihexagonal', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$SnubSquare, 'Snub Square', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$SnubTriHexagonal, 'Snub Trihexagonal', model),
+								A3($author$project$Main$tilingRadio, $author$project$Main$ElongatedTriangular, 'Elongated Triangular', model)
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
+						A2($elm$html$Html$Attributes$style, 'grid-row', '2'),
+						A2($elm$html$Html$Attributes$style, 'width', '250px'),
+						A2($elm$html$Html$Attributes$style, 'height', 'auto'),
+						A2($elm$html$Html$Attributes$style, 'padding', '20px'),
+						A2($elm$html$Html$Attributes$style, 'background', 'white'),
+						A2($elm$html$Html$Attributes$style, 'border', '1px solid #e0e0e0'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.1)'),
+						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'left-bottom-panel')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Theme:')
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2($elm$html$Html$Attributes$style, 'margin-bottom', '15px')
+							]),
+						_List_fromArray(
+							[
+								A3($author$project$Main$themeRadio, $author$project$Main$Amethyst, 'Amethyst', model),
+								A3($author$project$Main$themeRadio, $author$project$Main$Aqua, 'Aqua', model),
+								A3($author$project$Main$themeRadio, $author$project$Main$Honey, 'Honey', model)
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'grid-column', '1'),
+						A2($elm$html$Html$Attributes$style, 'grid-row', '3'),
+						A2($elm$html$Html$Attributes$style, 'width', '250px'),
+						A2($elm$html$Html$Attributes$style, 'height', '100px'),
+						A2($elm$html$Html$Attributes$style, 'padding', '20px'),
+						A2($elm$html$Html$Attributes$style, 'background', 'white'),
+						A2($elm$html$Html$Attributes$style, 'border', '1px solid #e0e0e0'),
+						A2($elm$html$Html$Attributes$style, 'border-radius', '8px'),
+						A2($elm$html$Html$Attributes$style, 'box-shadow', '0 2px 8px rgba(0,0,0,0.1)'),
+						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'left-bottom-panel')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h2,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Github:')
+							])),
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href('https://github.com/VSebastian8/Tessellation'),
+								$elm$html$Html$Attributes$target('_blank'),
+								A2($elm$html$Html$Attributes$style, 'color', '#3a7bd5'),
+								A2($elm$html$Html$Attributes$style, 'text-decoration', 'underline')
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('VSebastian8/Tessellation')
+							]))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2($elm$html$Html$Attributes$style, 'grid-column', '2'),
+						A2($elm$html$Html$Attributes$style, 'grid-row', '1 / 4'),
+						A2($elm$html$Html$Attributes$style, 'display', 'flex'),
+						A2($elm$html$Html$Attributes$style, 'justify-content', 'center'),
+						A2($elm$html$Html$Attributes$style, 'align-items', 'center'),
+						A2($elm$html$Html$Attributes$attribute, 'data-test-id', 'center-content')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$svg,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$viewBox('0 0 800 800'),
+								$elm$svg$Svg$Attributes$width('800'),
+								$elm$svg$Svg$Attributes$height('800')
+							]),
+						A5(
+							$author$project$Main$getTessellation,
+							model.selectedTiling,
+							$author$project$Main$getTheme(model.selectedTheme),
+							50,
+							50,
+							{x: -50, y: -50}))
+					]))
+			]));
+};
+var $author$project$Main$main = $elm$browser$Browser$sandbox(
+	{init: $author$project$Main$init, update: $author$project$Main$update, view: $author$project$Main$view});
+_Platform_export({'Main':{'init':$author$project$Main$main(
+	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));
