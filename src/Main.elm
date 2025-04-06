@@ -23,9 +23,9 @@ main =
             , width "800"
             , height "800"
             ]
-            (rhombiTriHexagonalTiling
+            (truncatedTriHexagonalTiling
                 100
                 100
-                { x = -50, y = -50 }
+                { x = -100, y = -100 }
             )
         ]

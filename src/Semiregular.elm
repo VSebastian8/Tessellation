@@ -1,4 +1,4 @@
-module Semiregular exposing (rhombiTriHexagonalTiling, triHexagonalTiling, truncatedHexagonalTiling, truncatedSquareTiling)
+module Semiregular exposing (rhombiTriHexagonalTiling, triHexagonalTiling, truncatedHexagonalTiling, truncatedSquareTiling, truncatedTriHexagonalTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -233,4 +233,83 @@ rhombiTriHexaShape origin size =
     , polygonSvg square size Ternary (add origin square2)
     , polygonSvg (rotatePoly equilateral -90) size Secondary (add origin trig2)
     , polygonSvg (rotatePoly square -60) size Ternary (add origin square3)
+    ]
+
+
+{-| Truncation of the trihexagonal tiling
+
+  - Type: semiregular
+  - Corners: **4.6.12**
+  - Symmetry: hexagonal
+
+-}
+truncatedTriHexagonalTiling : Int -> Int -> Point -> List (Svg msg)
+truncatedTriHexagonalTiling n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                20
+
+            hexagon_width =
+                sub (getPoint (rotatePoly hexagon 30) size 2) (getPoint (rotatePoly hexagon 30) size 0)
+
+            next_point =
+                if modBy 2 m == 0 then
+                    sub (add (getPoint dodecagon size 10) (getPoint (rotatePoly square -60) size -1)) (add hexagon_width { x = size, y = 0 })
+
+                else
+                    add (getPoint dodecagon size 6) (getPoint (rotatePoly square 60) size 2)
+
+            next_origin =
+                add origin next_point
+        in
+        truncTriHexaLine n origin size ++ truncatedTriHexagonalTiling n (m - 1) next_origin
+
+
+truncTriHexaLine : Int -> Point -> Float -> List (Svg msg)
+truncTriHexaLine n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            dodecagon_width =
+                sub (getPoint dodecagon size 4) (getPoint dodecagon size -1)
+
+            hexagon_width =
+                sub (getPoint (rotatePoly hexagon 30) size 2) (getPoint (rotatePoly hexagon 30) size 0)
+
+            next_origin =
+                add origin (add dodecagon_width (add hexagon_width (add hexagon_width { x = size, y = 0 })))
+        in
+        truncTriHexaShape origin size ++ truncTriHexaLine (n - 1) next_origin size
+
+
+truncTriHexaShape : Point -> Float -> List (Svg msg)
+truncTriHexaShape origin size =
+    let
+        square1 =
+            getPoint dodecagon size 6
+
+        square2 =
+            getPoint dodecagon size 8
+
+        square3 =
+            getPoint dodecagon size 10
+
+        hex1 =
+            getPoint dodecagon size 7
+
+        hex2 =
+            getPoint dodecagon size 9
+    in
+    [ polygonSvg dodecagon size Primary origin
+    , polygonSvg (rotatePoly square 60) size Ternary (add origin square1)
+    , polygonSvg square size Ternary (add origin square2)
+    , polygonSvg (rotatePoly square -60) size Ternary (add origin square3)
+    , polygonSvg (rotatePoly hexagon 30) size Secondary (add origin hex1)
+    , polygonSvg (rotatePoly hexagon -30) size Secondary (add origin hex2)
     ]
