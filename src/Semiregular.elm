@@ -1,4 +1,4 @@
-module Semiregular exposing (triHexagonalTiling, truncatedHexagonalTiling, truncatedSquareTiling)
+module Semiregular exposing (rhombiTriHexagonalTiling, triHexagonalTiling, truncatedHexagonalTiling, truncatedSquareTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -29,7 +29,11 @@ truncatedHexagonalTiling n m origin =
                 20
 
             next_origin =
-                sub (add origin (getPoint dodecagon size 8)) decagon_width
+                if modBy 2 m == 0 then
+                    add origin (getPoint dodecagon size 7)
+
+                else
+                    sub (add origin (getPoint dodecagon size 8)) decagon_width
         in
         truncatedHexagonalLine n origin ++ truncatedHexagonalTiling n (m - 1) next_origin
 
@@ -78,7 +82,11 @@ triHexagonalTiling n m origin =
                 { x = size * 2, y = 0 }
 
             next_origin =
-                sub (add origin (getPoint hexagon size 3)) hexagon_translate
+                if modBy 2 m == 0 then
+                    add origin (getPoint hexagon size 3)
+
+                else
+                    sub (add origin (getPoint hexagon size 3)) hexagon_translate
         in
         triHexagonalLine n origin ++ triHexagonalTiling n (m - 1) next_origin
 
@@ -147,3 +155,82 @@ truncatedSquareLine n origin =
                     (getPoint (rotatePoly square 45) size 2)
         in
         [ polygonSvg octagon size Primary origin, polygonSvg (rotatePoly square 45) size Secondary (add origin top_square) ] ++ truncatedSquareLine (n - 1) next_origin
+
+
+{-| Rectification of the trihexagonal tiling
+
+  - Type: semiregular
+  - Corners: **3.4.6.4**
+  - Symmetry: hexagonal
+
+-}
+rhombiTriHexagonalTiling : Int -> Int -> Point -> List (Svg msg)
+rhombiTriHexagonalTiling n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            next_point =
+                if modBy 2 m == 0 then
+                    sub (add (getPoint hexagon size -1) (getPoint (rotatePoly square -60) size -1)) { x = size, y = 0 }
+
+                else
+                    add (getPoint hexagon size 2) (getPoint (rotatePoly square -30) size 1)
+
+            next_origin =
+                add origin next_point
+        in
+        rhombiTriHexaLine n origin size ++ rhombiTriHexagonalTiling n (m - 1) next_origin
+
+
+rhombiTriHexaLine : Int -> Point -> Float -> List (Svg msg)
+rhombiTriHexaLine n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            hexagon_width =
+                sub (getPoint hexagon size 2) (getPoint hexagon size -1)
+
+            square_slant =
+                { x =
+                    (sub (getPoint (rotatePoly square -30) size 1) (getPoint (rotatePoly square -30) size 0)).x
+                , y = 0
+                }
+
+            next_origin =
+                add origin (add hexagon_width (add square_slant (add { x = size, y = 0 } square_slant)))
+        in
+        rhombiTriHexaShape origin size ++ rhombiTriHexaLine (n - 1) next_origin size
+
+
+rhombiTriHexaShape : Point -> Float -> List (Svg msg)
+rhombiTriHexaShape origin size =
+    let
+        square1 =
+            getPoint hexagon size 2
+
+        trig1 =
+            getPoint hexagon size 3
+
+        square2 =
+            getPoint hexagon size 4
+
+        trig2 =
+            getPoint hexagon size 4
+
+        square3 =
+            getPoint hexagon size 5
+    in
+    [ polygonSvg hexagon size Primary origin
+    , polygonSvg (rotatePoly square -30) size Ternary (add origin square1)
+    , polygonSvg (rotatePoly equilateral -30) size Secondary (add origin trig1)
+    , polygonSvg square size Ternary (add origin square2)
+    , polygonSvg (rotatePoly equilateral -90) size Secondary (add origin trig2)
+    , polygonSvg (rotatePoly square -60) size Ternary (add origin square3)
+    ]

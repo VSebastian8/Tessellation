@@ -19,6 +19,8 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 | :-----------------------------------------------------------------: | :-----------------------------------------------------------: | :--------------------------------------------------------------: |
 | <img src="./assets/semiregular/truncatedHexagonal.png" width="200"> | <img src="./assets/semiregular/triHexagonal.png" width="200"> | <img src="./assets/semiregular/truncatedSquare.png" width="200"> |
 |                        _Truncated Hexagonal_                        |                        _Trihexagonal_                         |                        _Truncated Square_                        |
+| <img src="./assets/semiregular/rhombiTriHexagonal.png" width="200"> |
+|                        _Rhombitrihexagonal_                         |
 
 ## Experiments
 
