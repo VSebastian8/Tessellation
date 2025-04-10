@@ -76,3 +76,13 @@ body {
     justify-content: center;
     align-items: center;
 }
+
+.theme {
+    display: block;
+    margin: 10px 0;
+}
+
+.tiling {
+    display: block;
+    margin: 10px 0;
+}

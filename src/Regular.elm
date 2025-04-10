@@ -51,7 +51,7 @@ triangularTiling theme n m origin =
                     |> List.map
                         (\x ->
                             ( add origin
-                                { x = size * toFloat x + size / 2 * toFloat (modBy 2 (y + 1))
+                                { x = size * toFloat x + size / 2 * toFloat (modBy 2 (y + 1)) + size / 2 * toFloat (modBy 2 ((y + 1) // 2))
                                 , y = (sqrt 3 * size / 2) * toFloat (y // 2)
                                 }
                             , mix4Color y

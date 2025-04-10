@@ -8,10 +8,10 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 
 ## Regular Tilings
 
-|                                                      |                                                        |                                                       |
-| :--------------------------------------------------: | :----------------------------------------------------: | :---------------------------------------------------: |
-| <img src="./assets/regular/squares.png" width="200"> | <img src="./assets/regular/triangles.png" width="200"> | <img src="./assets/regular/hexagons.png" width="200"> |
-|                       _Square_                       |                      _Triangular_                      |                      _Hexagonal_                      |
+|                                                      |                                                         |                                                       |
+| :--------------------------------------------------: | :-----------------------------------------------------: | :---------------------------------------------------: |
+| <img src="./assets/regular/squares.png" width="200"> | <img src="./assets/regular/triangular.png" width="200"> | <img src="./assets/regular/hexagons.png" width="200"> |
+|                       _Square_                       |                      _Triangular_                       |                      _Hexagonal_                      |
 
 ## Semiregular Tilings
 

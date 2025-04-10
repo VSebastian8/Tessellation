@@ -7,13 +7,9 @@ import Laves exposing (..)
 import Polygon exposing (..)
 import Regular exposing (..)
 import Semiregular exposing (..)
-import Svg exposing (svg)
+import Svg exposing (Svg, svg)
 import Svg.Attributes exposing (height, viewBox, width)
-
-
-theme : Theme
-theme =
-    forestTheme
+import Util exposing (..)
 
 
 main : Html msg
@@ -31,9 +27,49 @@ main =
             , height "800"
             ]
             (rhombileTiling
-                theme
+                forestTheme
                 20
                 20
                 { x = 150, y = 150 }
             )
         ]
+
+
+{-| Template Tiling
+
+  - Type:
+  - Symmetry:
+
+-}
+templateTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+templateTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            next_origin =
+                origin
+        in
+        templateLine theme n origin size ++ rhombileTiling theme n (m - 1) next_origin
+
+
+templateLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+templateLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                origin
+        in
+        templateShape theme origin size ++ templateLine theme (n - 1) next_origin size
+
+
+templateShape : Theme -> Point -> Float -> List (Svg msg)
+templateShape _ _ _ =
+    []

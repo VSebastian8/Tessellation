@@ -1,9 +1,9 @@
 module Main exposing (main)
 
 import Browser
-import ColorTheme exposing (Color(..), Theme, amethystTheme, aquaTheme, honeyTheme)
+import ColorTheme exposing (Color(..), Theme, amethystTheme, aquaTheme, forestTheme, honeyTheme)
 import Html exposing (..)
-import Html.Attributes exposing (checked, href, id, name, style, target, type_)
+import Html.Attributes exposing (checked, class, href, id, name, style, target, type_)
 import Html.Events exposing (onInput)
 import Regular exposing (..)
 import Semiregular exposing (..)
@@ -53,12 +53,13 @@ type ColorTheme
     = Amethyst
     | Aqua
     | Honey
+    | Forest
 
 
 init : Model
 init =
     { selectedTiling = RhombiTriHexagonal
-    , selectedTheme = Aqua
+    , selectedTheme = Forest
     }
 
 
@@ -115,6 +116,7 @@ view model =
                 [ themeRadio Amethyst "Amethyst" model
                 , themeRadio Aqua "Aqua" model
                 , themeRadio Honey "Honey" model
+                , themeRadio Forest "Forest" model
                 ]
             ]
         , -- Left Bottom Panel
@@ -152,9 +154,7 @@ view model =
 tilingRadio : Tiling -> String -> Model -> Html Msg
 tilingRadio tilingValue labelText model =
     label
-        [ style "display" "block"
-        , style "margin" "1vh 0"
-        ]
+        [ class "tiling" ]
         [ input
             [ type_ "radio"
             , name "tiling-selection"
@@ -170,9 +170,7 @@ tilingRadio tilingValue labelText model =
 themeRadio : ColorTheme -> String -> Model -> Html Msg
 themeRadio themeValue labelText model =
     label
-        [ style "display" "block"
-        , style "margin" "10px 0"
-        ]
+        [ class "theme" ]
         [ input
             [ type_ "radio"
             , name "theme-selection"
@@ -233,3 +231,6 @@ getTheme theme =
 
         Honey ->
             honeyTheme
+
+        Forest ->
+            forestTheme
