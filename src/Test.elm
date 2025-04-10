@@ -26,7 +26,7 @@ main =
             , width "800"
             , height "800"
             ]
-            (rhombileTiling
+            (disdyakisRhombileTiling
                 forestTheme
                 20
                 20
@@ -54,7 +54,7 @@ templateTiling theme n m origin =
             next_origin =
                 origin
         in
-        templateLine theme n origin size ++ rhombileTiling theme n (m - 1) next_origin
+        templateLine theme n origin size ++ templateTiling theme n (m - 1) next_origin
 
 
 templateLine : Theme -> Int -> Point -> Float -> List (Svg msg)

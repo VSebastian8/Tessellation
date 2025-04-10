@@ -1,4 +1,4 @@
-module Laves exposing (rhombileTiling, triakisTriangularTiling)
+module Laves exposing (disdyakisRhombileTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -136,4 +136,107 @@ rhombileShape theme origin size =
     [ polygonSvg (rotatePoly rhombus 30) size theme Secondary origin
     , polygonSvg (rotatePoly rhombus 150) size theme Ternary origin
     , polygonSvg (rotatePoly rhombus -90) size theme Primary origin
+    ]
+
+
+{-| Dual truncation of the square tiling
+
+  - Type: laves
+  - Symmetry: square
+
+-}
+tetrakisSquareTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+tetrakisSquareTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            next_origin =
+                { x = origin.x, y = origin.y + size * 2 * sin (degrees 45) }
+        in
+        tetrakisSquareLine theme n origin size ++ tetrakisSquareTiling theme n (m - 1) next_origin
+
+
+tetrakisSquareLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+tetrakisSquareLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                { x = origin.x + size * 2 * sin (degrees 45), y = origin.y }
+        in
+        tetrakisSquareShape theme origin size ++ tetrakisSquareLine theme (n - 1) next_origin size
+
+
+tetrakisSquareShape : Theme -> Point -> Float -> List (Svg msg)
+tetrakisSquareShape theme origin size =
+    [ polygonSvg (rotatePoly isosceles 45) size theme Primary origin
+    , polygonSvg (rotatePoly isosceles 135) size theme Ternary origin
+    , polygonSvg (rotatePoly isosceles -135) size theme Secondary origin
+    , polygonSvg (rotatePoly isosceles -45) size theme Quart origin
+    ]
+
+
+{-| Dual truncation of the rhombile tiling
+
+  - Type: laves
+  - Symmetry: hexagonal
+
+-}
+disdyakisRhombileTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+disdyakisRhombileTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                40
+
+            slant =
+                if modBy 2 m == 0 then
+                    getPoint (rotatePoly left 330) size 2
+
+                else
+                    getPoint (rotatePoly left 270) size 2
+
+            next_origin =
+                add origin (add slant slant)
+        in
+        disdyakisRhombileLine theme n origin size ++ disdyakisRhombileTiling theme n (m - 1) next_origin
+
+
+disdyakisRhombileLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+disdyakisRhombileLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                { x = origin.x + size * 2 * cos (degrees 30), y = origin.y }
+        in
+        disdyakisRhombileShape theme origin size ++ disdyakisRhombileLine theme (n - 1) next_origin size
+
+
+disdyakisRhombileShape : Theme -> Point -> Float -> List (Svg msg)
+disdyakisRhombileShape theme origin size =
+    [ polygonSvg (startAt right 1) size theme Secondary origin
+    , polygonSvg (rotatePoly left 30) size theme Primary origin
+    , polygonSvg (rotatePoly (startAt right 1) 60) size theme Secondary origin
+    , polygonSvg (rotatePoly left 90) size theme Primary origin
+    , polygonSvg (rotatePoly (startAt right 1) 120) size theme Secondary origin
+    , polygonSvg (rotatePoly left 150) size theme Primary origin
+    , polygonSvg (rotatePoly (startAt right 1) 180) size theme Secondary origin
+    , polygonSvg (rotatePoly left 210) size theme Primary origin
+    , polygonSvg (rotatePoly (startAt right 1) 240) size theme Secondary origin
+    , polygonSvg (rotatePoly left 270) size theme Primary origin
+    , polygonSvg (rotatePoly (startAt right 1) 300) size theme Secondary origin
+    , polygonSvg (rotatePoly left 330) size theme Primary origin
     ]

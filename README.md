@@ -26,10 +26,12 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 
 ## Laves Tilings
 
-|                                                              |                                                     |                                         |
-| :----------------------------------------------------------: | :-------------------------------------------------: | :-------------------------------------: |
-| <img src="./assets/laves/triakisTriangular.png" width="200"> | <img src="./assets/laves/rhombile.png" width="200"> | <img src="./assets/laves/" width="200"> |
-|                     _Triakis Triangular_                     |                     _Rhombile_                      |                   _c_                   |
+|                                                              |                                                     |                                                           |
+| :----------------------------------------------------------: | :-------------------------------------------------: | :-------------------------------------------------------: |
+| <img src="./assets/laves/triakisTriangular.png" width="200"> | <img src="./assets/laves/rhombile.png" width="200"> | <img src="./assets/laves/tetrakisSquare.png" width="200"> |
+|                     _Triakis Triangular_                     |                     _Rhombile_                      |                     _Tetrakis Square_                     |
+| <img src="./assets/laves/disdyakisRhombile.png" width="200"> |       <img src="./assets/laves/" width="200">       |          <img src="./assets/laves/" width="200">          |
+|                     _Disdyakis Rhombile_                     |                         _b_                         |                            _c_                            |
 
 ## Experiments
 
@@ -39,5 +41,5 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 |                          _Blocky Pattern_                          |                         _Diagonal Pattern_                         |                        _Vertical Pattern_                        |
 | <img src="./assets/experiments/pythagoreanTiling.png" width="200"> |  <img src="./assets/experiments/huggingSquares.png" width="200">   | <img src="./assets/experiments/trianglePattern.png" width="200"> |
 |                        _Pythagorean Tiling_                        |                         _Hugging Squares_                          |                      _Triangles and Rhombi_                      |
-|   <img src="./assets/experiments/hexagonStars.png" width="200">    | <img src="./assets/experiments/shiftedDodecagons.png" width="200"> |
-|                          _Hexagon Stars_                           |                        _Shifted Dodecagons_                        |
+|   <img src="./assets/experiments/hexagonStars.png" width="200">    | <img src="./assets/experiments/shiftedDodecagons.png" width="200"> |  <img src="./assets/experiments/disdyakisMess.png" width="200">  |
+|                          _Hexagon Stars_                           |                        _Shifted Dodecagons_                        |                         _Disdyakis Mess_                         |

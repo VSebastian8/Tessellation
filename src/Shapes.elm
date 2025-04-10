@@ -56,3 +56,24 @@ obtuseIso =
 rhombus : Polygon
 rhombus =
     { lengths = [ 1, 1, 1, 1 ], angles = [ 60, 120, 60, 120 ], rotation = 0 }
+
+
+isosceles : Polygon
+isosceles =
+    { lengths = [ 1, 2 * cos (degrees 45), 1 ], angles = [ 45, 45, 90 ], rotation = 0 }
+
+
+right : Polygon
+right =
+    { lengths = [ 1, cos (degrees 30), cos (degrees 60) ]
+    , angles = [ 30, 90, 60 ]
+    , rotation = 0
+    }
+
+
+left : Polygon
+left =
+    { lengths = [ 1, cos (degrees 60), cos (degrees 30) ]
+    , angles = [ 60, 90, 30 ]
+    , rotation = 0
+    }
