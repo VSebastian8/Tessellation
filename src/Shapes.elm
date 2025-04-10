@@ -43,11 +43,6 @@ dodecagon =
     }
 
 
-flowerPentagon : Polygon
-flowerPentagon =
-    { lengths = [ 1, 1, 1, 2, 2 ], angles = [ 120, 120, 120, 120, 60 ], rotation = 60 }
-
-
 obtuseIso : Polygon
 obtuseIso =
     { lengths = [ 1, 2 * cos (degrees 30), 1 ], angles = [ 30, 30, 120 ], rotation = 0 }
@@ -75,5 +70,21 @@ left : Polygon
 left =
     { lengths = [ 1, cos (degrees 60), cos (degrees 30) ]
     , angles = [ 60, 90, 30 ]
+    , rotation = 0
+    }
+
+
+kite : Polygon
+kite =
+    { lengths = [ cos (degrees 30), cos (degrees 60), cos (degrees 60), cos (degrees 30) ]
+    , angles = [ 90, 120, 90, 60 ]
+    , rotation = 0
+    }
+
+
+floret : Polygon
+floret =
+    { lengths = [ 1 + 2 * cos (degrees 60), 1, 1, 1, 1 + 2 * cos (degrees 60) ]
+    , angles = [ 120, 120, 120, 120, 60 ]
     , rotation = 0
     }

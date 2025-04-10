@@ -26,7 +26,7 @@ main =
             , width "800"
             , height "800"
             ]
-            (disdyakisRhombileTiling
+            (floretPentagonalTiling
                 forestTheme
                 20
                 20

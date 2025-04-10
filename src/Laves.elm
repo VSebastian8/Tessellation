@@ -1,4 +1,4 @@
-module Laves exposing (disdyakisRhombileTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
+module Laves exposing (deltoidalTriHexagonalTiling, disdyakisRhombileTiling, floretPentagonalTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -239,4 +239,119 @@ disdyakisRhombileShape theme origin size =
     , polygonSvg (rotatePoly left 270) size theme Primary origin
     , polygonSvg (rotatePoly (startAt right 1) 300) size theme Secondary origin
     , polygonSvg (rotatePoly left 330) size theme Primary origin
+    ]
+
+
+{-| Dual rectification of the rhombile tiling
+
+  - Type: laves
+  - Symmetry: hexagonal
+
+-}
+deltoidalTriHexagonalTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+deltoidalTriHexagonalTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            next_origin =
+                add origin
+                    { x = size * cos (degrees 30) * toFloat (1 - modBy 2 m * 2)
+                    , y = size + size * cos (degrees 60)
+                    }
+        in
+        deltoidalTriHexagonalLine theme n origin size ++ deltoidalTriHexagonalTiling theme n (m - 1) next_origin
+
+
+deltoidalTriHexagonalLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+deltoidalTriHexagonalLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                { x = origin.x + size * 2 * cos (degrees 30), y = origin.y }
+        in
+        deltoidalTriHexagonalShape theme origin size ++ deltoidalTriHexagonalLine theme (n - 1) next_origin size
+
+
+deltoidalTriHexagonalShape : Theme -> Point -> Float -> List (Svg msg)
+deltoidalTriHexagonalShape theme origin size =
+    [ polygonSvg kite size theme Ternary origin
+    , polygonSvg (rotatePoly kite 60) size theme Secondary origin
+    , polygonSvg (rotatePoly kite 120) size theme Primary origin
+    , polygonSvg (rotatePoly kite 180) size theme Ternary origin
+    , polygonSvg (rotatePoly kite 240) size theme Secondary origin
+    , polygonSvg (rotatePoly kite 300) size theme Primary origin
+    ]
+
+
+{-| Half truncation of the disdyakis trihexagonal tiling
+
+  - Type: laves
+  - Symmetry: hex twist
+
+-}
+floretPentagonalTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+floretPentagonalTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                10
+
+            straight =
+                (getPoint floret size 1).x
+
+            up =
+                (getPoint floret size 2).x - straight
+
+            next_origin =
+                add origin
+                    (case modBy 3 m of
+                        0 ->
+                            add (getPoint (rotatePoly floret -120) size 2) (getPoint (rotatePoly floret -120) size 1)
+
+                        _ ->
+                            add (getPoint (rotatePoly floret -60) size 2) (getPoint (rotatePoly floret -60) size 1)
+                    )
+        in
+        floretPentagonalLine theme n origin size ++ floretPentagonalTiling theme n (m - 1) next_origin
+
+
+floretPentagonalLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+floretPentagonalLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                add origin
+                    (case modBy 5 n of
+                        4 ->
+                            add (getPoint (rotatePoly floret 60) size 2) (getPoint (rotatePoly floret 60) size 1)
+
+                        _ ->
+                            add (getPoint floret size 2) (getPoint floret size 1)
+                    )
+        in
+        floretPentagonalShape theme origin size ++ floretPentagonalLine theme (n - 1) next_origin size
+
+
+floretPentagonalShape : Theme -> Point -> Float -> List (Svg msg)
+floretPentagonalShape theme origin size =
+    [ polygonSvg floret size theme Ternary origin
+    , polygonSvg (rotatePoly floret 60) size theme Secondary origin
+    , polygonSvg (rotatePoly floret 120) size theme Primary origin
+    , polygonSvg (rotatePoly floret 180) size theme Ternary origin
+    , polygonSvg (rotatePoly floret 240) size theme Secondary origin
+    , polygonSvg (rotatePoly floret 300) size theme Primary origin
     ]

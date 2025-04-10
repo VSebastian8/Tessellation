@@ -26,12 +26,12 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 
 ## Laves Tilings
 
-|                                                              |                                                     |                                                           |
-| :----------------------------------------------------------: | :-------------------------------------------------: | :-------------------------------------------------------: |
-| <img src="./assets/laves/triakisTriangular.png" width="200"> | <img src="./assets/laves/rhombile.png" width="200"> | <img src="./assets/laves/tetrakisSquare.png" width="200"> |
-|                     _Triakis Triangular_                     |                     _Rhombile_                      |                     _Tetrakis Square_                     |
-| <img src="./assets/laves/disdyakisRhombile.png" width="200"> |       <img src="./assets/laves/" width="200">       |          <img src="./assets/laves/" width="200">          |
-|                     _Disdyakis Rhombile_                     |                         _b_                         |                            _c_                            |
+|                                                              |                                                                  |                                                             |
+| :----------------------------------------------------------: | :--------------------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="./assets/laves/triakisTriangular.png" width="200"> |       <img src="./assets/laves/rhombile.png" width="200">        |  <img src="./assets/laves/tetrakisSquare.png" width="200">  |
+|                     _Triakis Triangular_                     |                            _Rhombile_                            |                      _Tetrakis Square_                      |
+| <img src="./assets/laves/disdyakisRhombile.png" width="200"> | <img src="./assets/laves/deltoidalTriHexagonal.png" width="200"> | <img src="./assets/laves/floretPentagonal.png" width="200"> |
+|                     _Disdyakis Rhombile_                     |                     _Deltoidal Trihexagonal_                     |                     _Floret Pentagonal_                     |
 
 ## Experiments
 
