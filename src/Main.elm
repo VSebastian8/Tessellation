@@ -1,7 +1,7 @@
 module Main exposing (main)
 
 import Browser
-import ColorTheme exposing (Color(..), Theme, amethystTheme, aquaTheme, forestTheme, honeyTheme)
+import ColorTheme exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (checked, class, href, id, name, style, target, type_)
 import Html.Events exposing (onInput)

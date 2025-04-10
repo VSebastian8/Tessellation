@@ -43,3 +43,5 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 |                        _Pythagorean Tiling_                        |                         _Hugging Squares_                          |                      _Triangles and Rhombi_                      |
 |   <img src="./assets/experiments/hexagonStars.png" width="200">    | <img src="./assets/experiments/shiftedDodecagons.png" width="200"> |  <img src="./assets/experiments/disdyakisMess.png" width="200">  |
 |                          _Hexagon Stars_                           |                        _Shifted Dodecagons_                        |                         _Disdyakis Mess_                         |
+|  <img src="./assets/experiments/floretHexagona.png" width="200">   |           <img src="./assets/experiments/" width="200">            |          <img src="./assets/experiments/" width="200">           |
+|                         _Floret Hexagonal_                         |                                _B_                                 |                               _C_                                |

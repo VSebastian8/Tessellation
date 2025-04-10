@@ -17,6 +17,11 @@ sub p q =
     { x = p.x - q.x, y = p.y - q.y }
 
 
+mul : Point -> Float -> Point
+mul p s =
+    { x = s * p.x, y = s * p.y }
+
+
 mix2Color : Int -> Color
 mix2Color n =
     case modBy 2 n of

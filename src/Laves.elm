@@ -307,12 +307,6 @@ floretPentagonalTiling theme n m origin =
             size =
                 10
 
-            straight =
-                (getPoint floret size 1).x
-
-            up =
-                (getPoint floret size 2).x - straight
-
             next_origin =
                 add origin
                     (case modBy 3 m of

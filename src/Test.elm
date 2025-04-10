@@ -3,6 +3,7 @@ module Test exposing (..)
 import ColorTheme exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
+import Lab exposing (..)
 import Laves exposing (..)
 import Polygon exposing (..)
 import Regular exposing (..)
@@ -26,11 +27,11 @@ main =
             , width "800"
             , height "800"
             ]
-            (floretPentagonalTiling
+            (floretHexaTiling
                 forestTheme
-                20
-                20
-                { x = 150, y = 150 }
+                100
+                100
+                { x = -600, y = -600 }
             )
         ]
 
