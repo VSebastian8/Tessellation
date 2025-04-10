@@ -46,3 +46,13 @@ dodecagon =
 flowerPentagon : Polygon
 flowerPentagon =
     { lengths = [ 1, 1, 1, 2, 2 ], angles = [ 120, 120, 120, 120, 60 ], rotation = 60 }
+
+
+obtuseIso : Polygon
+obtuseIso =
+    { lengths = [ 1, 2 * cos (degrees 30), 1 ], angles = [ 30, 30, 120 ], rotation = 0 }
+
+
+rhombus : Polygon
+rhombus =
+    { lengths = [ 1, 1, 1, 1 ], angles = [ 60, 120, 60, 120 ], rotation = 0 }

@@ -24,6 +24,13 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 |  <img src="./assets/semiregular/snubTriHexagonal.png" width="200">  | <img src="./assets/semiregular/snubTriHexagonalMirror.png" width="200"> | <img src="./assets/semiregular/elongatedTriangular.png" width="200"> |
 |                         _Snub Trihexagonal_                         |                      _Mirrored Snub Trihexagonal_                       |                        _Elongated Triangular_                        |
 
+## Laves Tilings
+
+|                                                              |                                                     |                                         |
+| :----------------------------------------------------------: | :-------------------------------------------------: | :-------------------------------------: |
+| <img src="./assets/laves/triakisTriangular.png" width="200"> | <img src="./assets/laves/rhombile.png" width="200"> | <img src="./assets/laves/" width="200"> |
+|                     _Triakis Triangular_                     |                     _Rhombile_                      |                   _c_                   |
+
 ## Experiments
 
 |                                                                    |                                                                    |                                                                  |

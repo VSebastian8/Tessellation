@@ -70,3 +70,23 @@ honeyTheme =
                 Quart ->
                     "#CE7C00"
     }
+
+
+forestTheme : Theme
+forestTheme =
+    { strokeColor = "#3E3F5B"
+    , getColor =
+        \color ->
+            case color of
+                Primary ->
+                    "#8AB2A6"
+
+                Secondary ->
+                    "#ACD3A8"
+
+                Ternary ->
+                    "#F6F1DE"
+
+                Quart ->
+                    "#3E3F5B"
+    }
