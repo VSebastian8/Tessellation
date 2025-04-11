@@ -313,7 +313,7 @@ floretPentagonalTiling theme n m origin =
     else
         let
             size =
-                10
+                15
 
             next_origin =
                 add origin
@@ -378,7 +378,7 @@ cairoTiling theme n m origin =
     else
         let
             size =
-                30
+                20
 
             downSlope =
                 mul

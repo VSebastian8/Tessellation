@@ -29,6 +29,14 @@ rotatePoly { lengths, angles } a =
     }
 
 
+addRotation : Polygon -> Float -> Polygon
+addRotation { lengths, angles, rotation } a =
+    { lengths = lengths
+    , angles = angles
+    , rotation = rotation + a
+    }
+
+
 polygonPoints : Polygon -> Float -> List Point
 polygonPoints { lengths, angles, rotation } size =
     List.map2 Tuple.pair (List.map (\l -> l * size) lengths) (rotation + 180 :: angles)

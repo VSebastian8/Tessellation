@@ -47,3 +47,5 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 |                          _Hexagon Stars_                           |                        _Shifted Dodecagons_                        |                         _Disdyakis Mess_                         |
 |  <img src="./assets/experiments/floretHexagonal.png" width="200">  | <img src="./assets/experiments/deltoidalPattern.png" width="200">  |  <img src="./assets/experiments/floretPattern.png" width="200">  |
 |                         _Floret Hexagonal_                         |                        _Deltoidal Pattern_                         |                         _Floret Pattern_                         |
+|  <img src="./assets/experiments/type3Hexagon_2.png" width="200">   |  <img src="./assets/experiments/type3Hexagon_1.png" width="200">   | <img src="./assets/experiments/type3Hexagon_3.png" width="200">  |
+|                                                                    |                      _Type 3 Convex Hexagons_                      |                                                                  |

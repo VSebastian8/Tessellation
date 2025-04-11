@@ -1,4 +1,4 @@
-module Lab exposing (floretHexaTiling, pythagoreanTiling)
+module Lab exposing (convexHexaTiling, floretHexaTiling, pythagoreanTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -109,3 +109,61 @@ pythagoreanTiling theme n m origin =
                     |> List.map (\( point, size, color ) -> polygonSvg square size theme color point)
             )
         |> List.concat
+
+
+{-| Convex Hexagon type 3 Tiling
+-}
+convexHexaTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+convexHexaTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                15
+
+            next_origin =
+                add origin
+                    (sub
+                        (getPoint convexHexa size 2)
+                        (getPoint (addRotation convexHexa 120) size 2)
+                    )
+
+            offset =
+                case modBy 3 m of
+                    0 ->
+                        2
+
+                    1 ->
+                        1
+
+                    _ ->
+                        0
+        in
+        convexHexaLine theme n offset origin size ++ convexHexaTiling theme n (m - 1) next_origin
+
+
+convexHexaLine : Theme -> Int -> Int -> Point -> Float -> List (Svg msg)
+convexHexaLine theme n offset origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                add origin
+                    (sub
+                        (getPoint convexHexa size 2)
+                        (getPoint (addRotation convexHexa 240) size 2)
+                    )
+        in
+        convexHexaShape theme (mix3Color (n + offset)) origin size ++ convexHexaLine theme (n - 1) offset next_origin size
+
+
+convexHexaShape : Theme -> Color -> Point -> Float -> List (Svg msg)
+convexHexaShape theme color origin size =
+    [ polygonSvg convexHexa size theme color origin
+    , polygonSvg (addRotation convexHexa 120) size theme color origin
+    , polygonSvg (addRotation convexHexa 240) size theme color origin
+    ]

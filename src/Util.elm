@@ -59,3 +59,13 @@ mix4Color n =
 
         _ ->
             Quart
+
+
+tripleOp : (a -> b) -> ( a, a, a ) -> ( b, b, b )
+tripleOp f ( x, y, z ) =
+    ( f x, f y, f z )
+
+
+zip3 : ( a, a, a ) -> ( b, b, b ) -> ( ( a, b ), ( a, b ), ( a, b ) )
+zip3 ( a1, a2, a3 ) ( b1, b2, b3 ) =
+    ( ( a1, b1 ), ( a2, b2 ), ( a3, b3 ) )

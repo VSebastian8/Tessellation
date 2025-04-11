@@ -27,7 +27,7 @@ main =
             , width "800"
             , height "800"
             ]
-            (prismaticPentagonalTiling
+            (convexHexaTiling
                 forestTheme
                 20
                 10
