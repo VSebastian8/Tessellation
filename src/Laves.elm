@@ -263,8 +263,16 @@ deltoidalTriHexagonalTiling theme n m origin =
                     { x = size * cos (degrees 30) * toFloat (1 - modBy 2 m * 2)
                     , y = size + size * cos (degrees 60)
                     }
+
+            color_offset =
+                case modBy 2 m of
+                    0 ->
+                        1
+
+                    _ ->
+                        -1
         in
-        deltoidalTriHexagonalLine theme n origin size ++ deltoidalTriHexagonalTiling theme n (m - 1) next_origin
+        deltoidalTriHexagonalLine theme n origin size ++ deltoidalTriHexagonalTiling theme (n + color_offset) (m - 1) next_origin
 
 
 deltoidalTriHexagonalLine : Theme -> Int -> Point -> Float -> List (Svg msg)
@@ -277,17 +285,17 @@ deltoidalTriHexagonalLine theme n origin size =
             next_origin =
                 { x = origin.x + size * 2 * cos (degrees 30), y = origin.y }
         in
-        deltoidalTriHexagonalShape theme origin size ++ deltoidalTriHexagonalLine theme (n - 1) next_origin size
+        deltoidalTriHexagonalShape theme (mix3Color n) origin size ++ deltoidalTriHexagonalLine theme (n - 1) next_origin size
 
 
-deltoidalTriHexagonalShape : Theme -> Point -> Float -> List (Svg msg)
-deltoidalTriHexagonalShape theme origin size =
-    [ polygonSvg kite size theme Ternary origin
-    , polygonSvg (rotatePoly kite 60) size theme Secondary origin
-    , polygonSvg (rotatePoly kite 120) size theme Primary origin
-    , polygonSvg (rotatePoly kite 180) size theme Ternary origin
-    , polygonSvg (rotatePoly kite 240) size theme Secondary origin
-    , polygonSvg (rotatePoly kite 300) size theme Primary origin
+deltoidalTriHexagonalShape : Theme -> Color -> Point -> Float -> List (Svg msg)
+deltoidalTriHexagonalShape theme color origin size =
+    [ polygonSvg kite size theme color origin
+    , polygonSvg (rotatePoly kite 60) size theme color origin
+    , polygonSvg (rotatePoly kite 120) size theme color origin
+    , polygonSvg (rotatePoly kite 180) size theme color origin
+    , polygonSvg (rotatePoly kite 240) size theme color origin
+    , polygonSvg (rotatePoly kite 300) size theme color origin
     ]
 
 
@@ -309,19 +317,27 @@ floretPentagonalTiling theme n m origin =
 
             next_origin =
                 add origin
-                    (case modBy 3 m of
-                        0 ->
-                            add (getPoint (rotatePoly floret -120) size 2) (getPoint (rotatePoly floret -120) size 1)
-
-                        _ ->
-                            add (getPoint (rotatePoly floret -60) size 2) (getPoint (rotatePoly floret -60) size 1)
+                    (add
+                        (getPoint (rotatePoly floret -60) size 2)
+                        (getPoint (rotatePoly floret -60) size 1)
                     )
+
+            color_offset =
+                case modBy 3 m of
+                    0 ->
+                        0
+
+                    1 ->
+                        2
+
+                    _ ->
+                        1
         in
-        floretPentagonalLine theme n origin size ++ floretPentagonalTiling theme n (m - 1) next_origin
+        floretPentagonalLine theme n color_offset origin size ++ floretPentagonalTiling theme n (m - 1) next_origin
 
 
-floretPentagonalLine : Theme -> Int -> Point -> Float -> List (Svg msg)
-floretPentagonalLine theme n origin size =
+floretPentagonalLine : Theme -> Int -> Int -> Point -> Float -> List (Svg msg)
+floretPentagonalLine theme n offset origin size =
     if n <= 0 then
         []
 
@@ -329,23 +345,20 @@ floretPentagonalLine theme n origin size =
         let
             next_origin =
                 add origin
-                    (case modBy 5 n of
-                        4 ->
-                            add (getPoint (rotatePoly floret 60) size 2) (getPoint (rotatePoly floret 60) size 1)
-
-                        _ ->
-                            add (getPoint floret size 2) (getPoint floret size 1)
+                    (add
+                        (getPoint floret size 2)
+                        (getPoint floret size 1)
                     )
         in
-        floretPentagonalShape theme origin size ++ floretPentagonalLine theme (n - 1) next_origin size
+        floretPentagonalShape theme (mix3Color (n + offset)) origin size ++ floretPentagonalLine theme (n - 1) offset next_origin size
 
 
-floretPentagonalShape : Theme -> Point -> Float -> List (Svg msg)
-floretPentagonalShape theme origin size =
-    [ polygonSvg floret size theme Ternary origin
-    , polygonSvg (rotatePoly floret 60) size theme Secondary origin
-    , polygonSvg (rotatePoly floret 120) size theme Primary origin
-    , polygonSvg (rotatePoly floret 180) size theme Ternary origin
-    , polygonSvg (rotatePoly floret 240) size theme Secondary origin
-    , polygonSvg (rotatePoly floret 300) size theme Primary origin
+floretPentagonalShape : Theme -> Color -> Point -> Float -> List (Svg msg)
+floretPentagonalShape theme color origin size =
+    [ polygonSvg floret size theme color origin
+    , polygonSvg (rotatePoly floret 60) size theme color origin
+    , polygonSvg (rotatePoly floret 120) size theme color origin
+    , polygonSvg (rotatePoly floret 180) size theme color origin
+    , polygonSvg (rotatePoly floret 240) size theme color origin
+    , polygonSvg (rotatePoly floret 300) size theme color origin
     ]
