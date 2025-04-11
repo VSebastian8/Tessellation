@@ -32,6 +32,8 @@ Inspiration: [The Sacred Geometry of Tilings](https://www.youtube.com/watch?v=wi
 |                     _Triakis Triangular_                     |                            _Rhombile_                            |                      _Tetrakis Square_                      |
 | <img src="./assets/laves/disdyakisRhombile.png" width="200"> | <img src="./assets/laves/deltoidalTriHexagonal.png" width="200"> | <img src="./assets/laves/floretPentagonal.png" width="200"> |
 |                     _Disdyakis Rhombile_                     |                     _Deltoidal Trihexagonal_                     |                     _Floret Pentagonal_                     |
+|  <img src="./assets/laves/cairoPentagonal.png" width="200">  |             <img src="./assets/laves/" width="200">              |
+|                      _Cairo Pentagonal_                      |                               _b_                                |
 
 ## Experiments
 

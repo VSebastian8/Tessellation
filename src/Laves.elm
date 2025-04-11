@@ -1,4 +1,4 @@
-module Laves exposing (deltoidalTriHexagonalTiling, disdyakisRhombileTiling, floretPentagonalTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
+module Laves exposing (cairoTiling, deltoidalTriHexagonalTiling, disdyakisRhombileTiling, floretPentagonalTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -361,4 +361,89 @@ floretPentagonalShape theme color origin size =
     , polygonSvg (rotatePoly floret 180) size theme color origin
     , polygonSvg (rotatePoly floret 240) size theme color origin
     , polygonSvg (rotatePoly floret 300) size theme color origin
+    ]
+
+
+{-| Cairo Tiling
+
+  - Type: laves
+  - Symmetry: crosshatch
+
+-}
+cairoTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+cairoTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            downSlope =
+                mul
+                    (sub
+                        (getPoint cairo size 3)
+                        (getPoint cairo size 4)
+                    )
+                    2
+
+            w =
+                (getPoint cairo size 1).x
+
+            next_origin =
+                add
+                    origin
+                    (case modBy 2 m of
+                        0 ->
+                            { x = downSlope.x, y = w + downSlope.y }
+
+                        _ ->
+                            { x = -downSlope.x, y = w + downSlope.y }
+                    )
+        in
+        cairoLine theme n origin size ++ cairoTiling theme n (m - 1) next_origin
+
+
+cairoLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+cairoLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            w1 =
+                (getPoint
+                    (rotatePoly (startAt cairo 1) 30)
+                    size
+                    2
+                ).x
+
+            w2 =
+                (getPoint cairo size 1).x
+
+            next_origin =
+                { x = origin.x + 2 * w1 + w2, y = origin.y }
+        in
+        cairoShape theme origin size ++ cairoLine theme (n - 1) next_origin size
+
+
+cairoShape : Theme -> Point -> Float -> List (Svg msg)
+cairoShape theme origin size =
+    let
+        tip =
+            add origin
+                (getPoint
+                    (rotatePoly (startAt cairo 1) 30)
+                    size
+                    2
+                )
+
+        tip2 =
+            add tip (getPoint cairo size 1)
+    in
+    [ polygonSvg (rotatePoly (startAt cairo 1) 30) size theme Primary origin
+    , polygonSvg cairo size theme Secondary tip
+    , polygonSvg (rotatePoly (startAt cairo 1) 120) size theme Secondary tip
+    , polygonSvg (rotatePoly (startAt cairo 3) 60) size theme Primary tip2
     ]

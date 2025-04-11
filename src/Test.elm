@@ -27,11 +27,11 @@ main =
             , width "800"
             , height "800"
             ]
-            (floretHexaTiling
+            (cairoTiling
                 forestTheme
-                100
-                100
-                { x = -600, y = -600 }
+                10
+                20
+                { x = 150, y = 150 }
             )
         ]
 

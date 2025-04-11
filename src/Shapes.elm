@@ -88,3 +88,11 @@ floret =
     , angles = [ 120, 120, 120, 120, 60 ]
     , rotation = 0
     }
+
+
+cairo : Polygon
+cairo =
+    { lengths = [ sqrt 2 * 2 * cos (degrees 75), 1, 1, 1, 1 ]
+    , angles = [ 120, 90, 120, 90, 120 ]
+    , rotation = 0
+    }
