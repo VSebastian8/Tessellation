@@ -27,10 +27,10 @@ main =
             , width "800"
             , height "800"
             ]
-            (cairoTiling
+            (prismaticPentagonalTiling
                 forestTheme
-                10
                 20
+                10
                 { x = 150, y = 150 }
             )
         ]

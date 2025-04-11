@@ -1,4 +1,4 @@
-module Laves exposing (cairoTiling, deltoidalTriHexagonalTiling, disdyakisRhombileTiling, floretPentagonalTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
+module Laves exposing (cairoTiling, deltoidalTriHexagonalTiling, disdyakisRhombileTiling, floretPentagonalTiling, prismaticPentagonalTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (..)
@@ -446,4 +446,63 @@ cairoShape theme origin size =
     , polygonSvg cairo size theme Secondary tip
     , polygonSvg (rotatePoly (startAt cairo 1) 120) size theme Secondary tip
     , polygonSvg (rotatePoly (startAt cairo 3) 60) size theme Primary tip2
+    ]
+
+
+{-| Dual of the elongated triangular tiling
+
+  - Type: laves
+  - Symmetry: running bond
+
+-}
+prismaticPentagonalTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+prismaticPentagonalTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            leftSlope =
+                sub
+                    (getPoint prism size 3)
+                    (getPoint prism size 4)
+
+            rightSlope =
+                sub
+                    (getPoint prism size 3)
+                    (getPoint prism size 2)
+
+            next_origin =
+                add (add origin { x = 0, y = 2 * size })
+                    (case modBy 2 m of
+                        0 ->
+                            leftSlope
+
+                        _ ->
+                            rightSlope
+                    )
+        in
+        prismaticPentagonalLine theme n origin size ++ prismaticPentagonalTiling theme n (m - 1) next_origin
+
+
+prismaticPentagonalLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+prismaticPentagonalLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                { x = origin.x + size, y = origin.y }
+        in
+        prismaticPentagonalShape theme origin size ++ prismaticPentagonalLine theme (n - 1) next_origin size
+
+
+prismaticPentagonalShape : Theme -> Point -> Float -> List (Svg msg)
+prismaticPentagonalShape theme origin size =
+    [ polygonSvg prism size theme Primary origin
+    , polygonSvg (rotatePoly (startAt prism 2) 30) size theme Secondary (add origin (getPoint prism size 3))
     ]
