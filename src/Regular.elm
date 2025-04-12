@@ -26,9 +26,14 @@ squareTiling theme n m origin =
             (\y ->
                 List.range 1 n
                     |> List.map (\x -> ( add origin { x = size * toFloat x, y = size * toFloat y }, mix3Color (y + x) ))
-                    |> List.map (\( point, color ) -> polygonSvg square size theme color point)
+                    |> List.concatMap (\( point, color ) -> renderShape (squareShape theme color point size) point)
             )
         |> List.concat
+
+
+squareShape : Theme -> Color -> Point -> Float -> Shape msg
+squareShape theme color origin size =
+    { render = [ polygonSvg square size theme color origin ], leftTop = { x = 0, y = 0 }, rightBottom = { x = size, y = size } }
 
 
 {-| Regular Tiling of the plane with the `triangle` shape.

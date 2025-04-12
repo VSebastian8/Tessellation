@@ -27,11 +27,11 @@ main =
             , width "800"
             , height "800"
             ]
-            (convexHexaTiling
+            (squareTiling
                 forestTheme
-                20
-                10
-                { x = 150, y = 150 }
+                100
+                100
+                { x = 150, y = 0 }
             )
         ]
 
