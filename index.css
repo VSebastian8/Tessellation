@@ -13,6 +13,10 @@
 }
 
 @media screen and (max-width: 840px) {
+    body{
+        font-size: large;
+    }
+
     #container {
         grid-template-columns: 1fr !important;
         grid-template-areas: 
@@ -67,7 +71,7 @@ body {
     grid-area: right-top;
     width: auto;
     height: fit-content;
-    padding: 20px;
+    padding: 10px;
     margin-top: 50px;
     background: white;
     border: 1px solid #e0e0e0;
@@ -99,6 +103,11 @@ body {
 
 .icon {
     filter: invert(14%) sepia(17%) saturate(7438%) hue-rotate(270deg) brightness(94%) contrast(99%);
+    cursor: pointer;
+}
+
+.icon:hover{
+    filter: invert(17%) sepia(71%) saturate(3517%) hue-rotate(276deg) brightness(86%) contrast(113%);
 }
 
 .customColor {

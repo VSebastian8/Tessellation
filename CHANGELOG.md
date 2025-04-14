@@ -1,10 +1,9 @@
 # Changelog
 
-## Not Yet Implemented
+## v0.3.0 - 2025-04-14
 
-- Optimization: do not draw svgs outside of the rendering window
-- Download button for the svg tiling
-- Get rid of diagonals in floret and pythagorean tilings
+- `Optimizations`: do not draw svgs outside of the rendering window and minimize rows and columns for each tiling.
+- Option to `download` the svg tiling.
 
 ## v0.2.0 - 2025-04-11
 

@@ -203,26 +203,17 @@ convexHexa =
         ( a, b, c ) =
             ( x, y, z ) |> tripleOp (\w -> 2 * w * cos (degrees 30))
 
-        _ =
-            Debug.log "Lengths" ( a, b, c )
-
         ( a_ang, b_ang, c_ang ) =
             zip3
                 (( a ^ 2, b ^ 2, c ^ 2 ) |> tripleOp (\s -> a ^ 2 + b ^ 2 + c ^ 2 - 2 * s))
                 (( a, b, c ) |> tripleOp (\w -> 2 * a * b * c / w))
                 |> tripleOp (\( s, w ) -> s / w)
 
-        _ =
-            Debug.log "Small Angles" ( a_ang, b_ang, c_ang )
-
         ( a_angle, b_angle, c_angle ) =
             ( c_ang, a_ang, b_ang )
                 |> tripleOp acos
                 |> tripleOp (\w -> w * 57.29578)
                 |> tripleOp (\w -> w + 60)
-
-        _ =
-            Debug.log "Final Angles" ( a_angle, b_angle, c_angle )
     in
     { lengths = [ x, y, y, z, z, x ]
     , angles = [ a_angle, 120, b_angle, 120, c_angle, 120 ]

@@ -4370,9 +4370,6 @@ function _Browser_load(url)
 		}
 	}));
 }
-var $author$project$Main$Aqua = {$: 'Aqua'};
-var $author$project$Main$DeltoidalTriHexagonal = {$: 'DeltoidalTriHexagonal'};
-var $author$project$Main$init = {customPrimary: '#FFFFFF', customSecondary: '#FFFFFF', customStroke: '#000000', customTernary: '#FFFFFF', selectedTheme: $author$project$Main$Aqua, selectedTiling: $author$project$Main$DeltoidalTriHexagonal};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5161,61 +5158,116 @@ var $elm$core$Task$perform = F2(
 			$elm$core$Task$Perform(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
+var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$Aqua = {$: 'Aqua'};
+var $author$project$Main$DeltoidalTriHexagonal = {$: 'DeltoidalTriHexagonal'};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$init = _Utils_Tuple2(
+	{customPrimary: '#FFFFFF', customSecondary: '#FFFFFF', customStroke: '#000000', customTernary: '#FFFFFF', selectedTheme: $author$project$Main$Aqua, selectedTiling: $author$project$Main$DeltoidalTriHexagonal},
+	$elm$core$Platform$Cmd$none);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
-var $elm$browser$Browser$sandbox = function (impl) {
-	return _Browser_element(
-		{
-			init: function (_v0) {
-				return _Utils_Tuple2(impl.init, $elm$core$Platform$Cmd$none);
-			},
-			subscriptions: function (_v1) {
-				return $elm$core$Platform$Sub$none;
-			},
-			update: F2(
-				function (msg, model) {
-					return _Utils_Tuple2(
-						A2(impl.update, msg, model),
-						$elm$core$Platform$Cmd$none);
-				}),
-			view: impl.view
-		});
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$downloadSvg = _Platform_outgoingPort('downloadSvg', $elm$json$Json$Encode$string);
+var $author$project$Main$tessellationName = function (tiling) {
+	switch (tiling.$) {
+		case 'Square':
+			return 'square';
+		case 'Triangular':
+			return 'triangular';
+		case 'Hexagonal':
+			return 'hexagonal';
+		case 'TruncatedHexagonal':
+			return 'truncatedHexagonal';
+		case 'TriHexagonal':
+			return 'trihexagonal';
+		case 'TruncatedSquare':
+			return 'truncatedSquare';
+		case 'RhombiTriHexagonal':
+			return 'rhombiTrihexagonal';
+		case 'TruncatedTriHexagonal':
+			return 'truncatedTrihexagonal';
+		case 'SnubSquare':
+			return 'snubSquare';
+		case 'SnubTriHexagonal':
+			return 'snubTrihexagonal';
+		case 'ElongatedTriangular':
+			return 'elongatedTriangular';
+		case 'TriakisTriangular':
+			return 'triakisTriangular';
+		case 'Rhombile':
+			return 'rhombile';
+		case 'TetrakisSquare':
+			return 'tetrakisSquare';
+		case 'DisdyakisRhombile':
+			return 'disdyakisRhombile';
+		case 'DeltoidalTriHexagonal':
+			return 'deltoidalTrihexagonal';
+		case 'FloretPentagonal':
+			return 'floretPentagonal';
+		case 'CairoPentagonal':
+			return 'cairoPentagonal';
+		case 'PrismaticPentagonal':
+			return 'prismaticPentagonal';
+		case 'FloretHexagonal':
+			return 'floretHexagonal';
+		case 'Pythagorean':
+			return 'pythagorean';
+		default:
+			return 'convexHexagonal';
+	}
 };
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'SelectTiling':
 				var tiling = msg.a;
-				return _Utils_update(
-					model,
-					{selectedTiling: tiling});
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{selectedTiling: tiling}),
+					$elm$core$Platform$Cmd$none);
 			case 'SelectTheme':
 				var theme = msg.a;
-				return _Utils_update(
-					model,
-					{selectedTheme: theme});
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{selectedTheme: theme}),
+					$elm$core$Platform$Cmd$none);
 			case 'PickStroke':
 				var color = msg.a;
-				return _Utils_update(
-					model,
-					{customStroke: color});
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customStroke: color}),
+					$elm$core$Platform$Cmd$none);
 			case 'PickPrimary':
 				var color = msg.a;
-				return _Utils_update(
-					model,
-					{customPrimary: color});
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customPrimary: color}),
+					$elm$core$Platform$Cmd$none);
 			case 'PickSecondary':
 				var color = msg.a;
-				return _Utils_update(
-					model,
-					{customSecondary: color});
-			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customSecondary: color}),
+					$elm$core$Platform$Cmd$none);
+			case 'PickTernary':
 				var color = msg.a;
-				return _Utils_update(
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{customTernary: color}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
 					model,
-					{customTernary: color});
+					$author$project$Main$downloadSvg(
+						$author$project$Main$tessellationName(model.selectedTiling)));
 		}
 	});
 var $author$project$Main$Amethyst = {$: 'Amethyst'};
@@ -5223,6 +5275,7 @@ var $author$project$Main$CairoPentagonal = {$: 'CairoPentagonal'};
 var $author$project$Main$ConvexHexagonal = {$: 'ConvexHexagonal'};
 var $author$project$Main$Custom = {$: 'Custom'};
 var $author$project$Main$DisdyakisRhombile = {$: 'DisdyakisRhombile'};
+var $author$project$Main$DownloadSvg = {$: 'DownloadSvg'};
 var $author$project$Main$ElongatedTriangular = {$: 'ElongatedTriangular'};
 var $author$project$Main$FloretHexagonal = {$: 'FloretHexagonal'};
 var $author$project$Main$FloretPentagonal = {$: 'FloretPentagonal'};
@@ -5248,7 +5301,6 @@ var $author$project$Main$TruncatedHexagonal = {$: 'TruncatedHexagonal'};
 var $author$project$Main$TruncatedSquare = {$: 'TruncatedSquare'};
 var $author$project$Main$TruncatedTriHexagonal = {$: 'TruncatedTriHexagonal'};
 var $elm$html$Html$a = _VirtualDom_node('a');
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
@@ -5927,7 +5979,6 @@ var $author$project$Polygon$addRotation = F2(
 		return {angles: angles, lengths: lengths, origin: origin, rotation: rotation + angle};
 	});
 var $elm$core$Basics$acos = _Basics_acos;
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Basics$pow = _Basics_pow;
 var $author$project$Util$tripleOp = F2(
 	function (f, _v0) {
@@ -6011,18 +6062,6 @@ var $author$project$Shapes$convexHexa = function () {
 	var a_angle = _v4.a;
 	var b_angle = _v4.b;
 	var c_angle = _v4.c;
-	var _v5 = A2(
-		$elm$core$Debug$log,
-		'Lengths',
-		_Utils_Tuple3(a, b, c));
-	var _v6 = A2(
-		$elm$core$Debug$log,
-		'Small Angles',
-		_Utils_Tuple3(a_ang, b_ang, c_ang));
-	var _v7 = A2(
-		$elm$core$Debug$log,
-		'Final Angles',
-		_Utils_Tuple3(a_angle, b_angle, c_angle));
 	return {
 		angles: _List_fromArray(
 			[a_angle, 120, b_angle, 120, c_angle, 120]),
@@ -8050,6 +8089,22 @@ var $elm$html$Html$Attributes$href = function (url) {
 };
 var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$img = _VirtualDom_node('img');
+var $elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var $elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			$elm$virtual_dom$VirtualDom$on,
+			event,
+			$elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var $elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		$elm$json$Json$Decode$succeed(msg));
+};
 var $elm$html$Html$Attributes$src = function (url) {
 	return A2(
 		$elm$html$Html$Attributes$stringProperty,
@@ -8063,47 +8118,47 @@ var $author$project$Main$tessellationLink = function (tiling) {
 		case 'Square':
 			return 'Regular.elm#L18';
 		case 'Triangular':
-			return 'Regular.elm#L41';
+			return 'Regular.elm#L47';
 		case 'Hexagonal':
-			return 'Regular.elm#L80';
+			return 'Regular.elm#L86';
 		case 'TruncatedHexagonal':
 			return 'Semiregular.elm#L18';
 		case 'TriHexagonal':
-			return 'Semiregular.elm#L71';
+			return 'Semiregular.elm#L85';
 		case 'TruncatedSquare':
-			return 'Semiregular.elm#L124';
+			return 'Semiregular.elm#L152';
 		case 'RhombiTriHexagonal':
-			return 'Semiregular.elm#L167';
+			return 'Semiregular.elm#L211';
 		case 'TruncatedTriHexagonal':
-			return 'Semiregular.elm#L246';
+			return 'Semiregular.elm#L293';
 		case 'SnubSquare':
-			return 'Semiregular.elm#L325';
+			return 'Semiregular.elm#L375';
 		case 'SnubTriHexagonal':
-			return 'Semiregular.elm#L389';
+			return 'Semiregular.elm#L444';
 		case 'ElongatedTriangular':
-			return 'Semiregular.elm#L459';
+			return 'Semiregular.elm#L521';
 		case 'TriakisTriangular':
-			return 'Laves.elm#L17';
+			return 'Laves.elm#L18';
 		case 'Rhombile':
-			return 'Laves.elm#L89';
+			return 'Laves.elm#L95';
 		case 'TetrakisSquare':
-			return 'Laves.elm#L148';
+			return 'Laves.elm#L157';
 		case 'DisdyakisRhombile':
-			return 'Laves.elm#L192';
+			return 'Laves.elm#L203';
 		case 'DeltoidalTriHexagonal':
-			return 'Laves.elm#L251';
+			return 'Laves.elm#L268';
 		case 'FloretPentagonal':
-			return 'Laves.elm#L308';
+			return 'Laves.elm#L327';
 		case 'CairoPentagonal':
-			return 'Laves.elm#L373';
+			return 'Laves.elm#L394';
 		case 'PrismaticPentagonal':
-			return 'Laves.elm#L458';
+			return 'Laves.elm#L475';
 		case 'FloretHexagonal':
-			return 'Lab.elm#L13';
+			return 'Lab.elm#L14';
 		case 'Pythagorean':
-			return 'Lab.elm#L75';
+			return 'Lab.elm#L78';
 		default:
-			return 'Lab.elm#L116';
+			return 'Lab.elm#L119';
 	}
 };
 var $author$project$Main$SelectTheme = function (a) {
@@ -8152,22 +8207,6 @@ var $author$project$Main$SelectTiling = function (a) {
 	return {$: 'SelectTiling', a: a};
 };
 var $elm$html$Html$button = _VirtualDom_node('button');
-var $elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var $elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			$elm$virtual_dom$VirtualDom$on,
-			event,
-			$elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var $elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		$elm$html$Html$Events$on,
-		'click',
-		$elm$json$Json$Decode$succeed(msg));
-};
 var $author$project$Main$tilingRadio = F3(
 	function (tilingValue, tilingText, model) {
 		return A2(
@@ -8270,6 +8309,25 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$a,
 						_List_fromArray(
 							[
+								$elm$html$Html$Events$onClick($author$project$Main$DownloadSvg),
+								$elm$html$Html$Attributes$class('icon')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$img,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$src('assets/save.svg'),
+										$elm$svg$Svg$Attributes$width('50'),
+										$elm$svg$Svg$Attributes$height('50')
+									]),
+								_List_Nil)
+							])),
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
 								$elm$html$Html$Attributes$href('https://github.com/VSebastian8/Tessellation'),
 								$elm$html$Html$Attributes$target('_blank'),
 								$elm$html$Html$Attributes$class('icon')
@@ -8351,7 +8409,16 @@ var $author$project$Main$view = function (model) {
 					]))
 			]));
 };
-var $author$project$Main$main = $elm$browser$Browser$sandbox(
-	{init: $author$project$Main$init, update: $author$project$Main$update, view: $author$project$Main$view});
+var $author$project$Main$main = $elm$browser$Browser$element(
+	{
+		init: function (_v0) {
+			return $author$project$Main$init;
+		},
+		subscriptions: function (_v1) {
+			return $elm$core$Platform$Sub$none;
+		},
+		update: $author$project$Main$update,
+		view: $author$project$Main$view
+	});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});}(this));

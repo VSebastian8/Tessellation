@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (..)
 
 import Browser
 import ColorTheme exposing (..)
@@ -14,15 +14,23 @@ import Svg.Attributes exposing (height, viewBox, width)
 
 
 
+-- Outgoing port to JavaScript
+
+
+port downloadSvg : String -> Cmd msg
+
+
+
 -- MAIN
 
 
 main : Program () Model Msg
 main =
-    Browser.sandbox
-        { init = init
+    Browser.element
+        { init = \() -> init
         , view = view
         , update = update
+        , subscriptions = \_ -> Sub.none
         }
 
 
@@ -73,15 +81,17 @@ type ColorTheme
     | Custom
 
 
-init : Model
+init : ( Model, Cmd msg )
 init =
-    { selectedTiling = DeltoidalTriHexagonal
-    , selectedTheme = Aqua
-    , customStroke = "#000000"
-    , customPrimary = "#FFFFFF"
-    , customSecondary = "#FFFFFF"
-    , customTernary = "#FFFFFF"
-    }
+    ( { selectedTiling = DeltoidalTriHexagonal
+      , selectedTheme = Aqua
+      , customStroke = "#000000"
+      , customPrimary = "#FFFFFF"
+      , customSecondary = "#FFFFFF"
+      , customTernary = "#FFFFFF"
+      }
+    , Cmd.none
+    )
 
 
 
@@ -95,28 +105,32 @@ type Msg
     | PickPrimary String
     | PickSecondary String
     | PickTernary String
+    | DownloadSvg
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SelectTiling tiling ->
-            { model | selectedTiling = tiling }
+            ( { model | selectedTiling = tiling }, Cmd.none )
 
         SelectTheme theme ->
-            { model | selectedTheme = theme }
+            ( { model | selectedTheme = theme }, Cmd.none )
 
         PickStroke color ->
-            { model | customStroke = color }
+            ( { model | customStroke = color }, Cmd.none )
 
         PickPrimary color ->
-            { model | customPrimary = color }
+            ( { model | customPrimary = color }, Cmd.none )
 
         PickSecondary color ->
-            { model | customSecondary = color }
+            ( { model | customSecondary = color }, Cmd.none )
 
         PickTernary color ->
-            { model | customTernary = color }
+            ( { model | customTernary = color }, Cmd.none )
+
+        DownloadSvg ->
+            ( model, downloadSvg (tessellationName model.selectedTiling) )
 
 
 
@@ -173,6 +187,17 @@ view model =
           div
             [ id "infoContainer" ]
             [ a
+                [ onClick DownloadSvg
+                , class "icon"
+                ]
+                [ img
+                    [ src "assets/save.svg"
+                    , width "50"
+                    , height "50"
+                    ]
+                    []
+                ]
+            , a
                 [ href "https://github.com/VSebastian8/Tessellation"
                 , target "_blank" -- Opens in new tab
                 , class "icon"
@@ -417,64 +442,134 @@ tessellationLink tiling =
             "Regular.elm#L18"
 
         Triangular ->
-            "Regular.elm#L41"
+            "Regular.elm#L47"
 
         Hexagonal ->
-            "Regular.elm#L80"
+            "Regular.elm#L86"
 
         TruncatedHexagonal ->
             "Semiregular.elm#L18"
 
         TriHexagonal ->
-            "Semiregular.elm#L71"
+            "Semiregular.elm#L85"
 
         TruncatedSquare ->
-            "Semiregular.elm#L124"
+            "Semiregular.elm#L152"
 
         RhombiTriHexagonal ->
-            "Semiregular.elm#L167"
+            "Semiregular.elm#L211"
 
         TruncatedTriHexagonal ->
-            "Semiregular.elm#L246"
+            "Semiregular.elm#L293"
 
         SnubSquare ->
-            "Semiregular.elm#L325"
+            "Semiregular.elm#L375"
 
         SnubTriHexagonal ->
-            "Semiregular.elm#L389"
+            "Semiregular.elm#L444"
 
         ElongatedTriangular ->
-            "Semiregular.elm#L459"
+            "Semiregular.elm#L521"
 
         TriakisTriangular ->
-            "Laves.elm#L17"
+            "Laves.elm#L18"
 
         Rhombile ->
-            "Laves.elm#L89"
+            "Laves.elm#L95"
 
         TetrakisSquare ->
-            "Laves.elm#L148"
+            "Laves.elm#L157"
 
         DisdyakisRhombile ->
-            "Laves.elm#L192"
+            "Laves.elm#L203"
 
         DeltoidalTriHexagonal ->
-            "Laves.elm#L251"
+            "Laves.elm#L268"
 
         FloretPentagonal ->
-            "Laves.elm#L308"
+            "Laves.elm#L327"
 
         CairoPentagonal ->
-            "Laves.elm#L373"
+            "Laves.elm#L394"
 
         PrismaticPentagonal ->
-            "Laves.elm#L458"
+            "Laves.elm#L475"
 
         FloretHexagonal ->
-            "Lab.elm#L13"
+            "Lab.elm#L14"
 
         Pythagorean ->
-            "Lab.elm#L75"
+            "Lab.elm#L78"
 
         ConvexHexagonal ->
-            "Lab.elm#L116"
+            "Lab.elm#L119"
+
+
+tessellationName : Tiling -> String
+tessellationName tiling =
+    case tiling of
+        Square ->
+            "square"
+
+        Triangular ->
+            "triangular"
+
+        Hexagonal ->
+            "hexagonal"
+
+        TruncatedHexagonal ->
+            "truncatedHexagonal"
+
+        TriHexagonal ->
+            "trihexagonal"
+
+        TruncatedSquare ->
+            "truncatedSquare"
+
+        RhombiTriHexagonal ->
+            "rhombiTrihexagonal"
+
+        TruncatedTriHexagonal ->
+            "truncatedTrihexagonal"
+
+        SnubSquare ->
+            "snubSquare"
+
+        SnubTriHexagonal ->
+            "snubTrihexagonal"
+
+        ElongatedTriangular ->
+            "elongatedTriangular"
+
+        TriakisTriangular ->
+            "triakisTriangular"
+
+        Rhombile ->
+            "rhombile"
+
+        TetrakisSquare ->
+            "tetrakisSquare"
+
+        DisdyakisRhombile ->
+            "disdyakisRhombile"
+
+        DeltoidalTriHexagonal ->
+            "deltoidalTrihexagonal"
+
+        FloretPentagonal ->
+            "floretPentagonal"
+
+        CairoPentagonal ->
+            "cairoPentagonal"
+
+        PrismaticPentagonal ->
+            "prismaticPentagonal"
+
+        FloretHexagonal ->
+            "floretHexagonal"
+
+        Pythagorean ->
+            "pythagorean"
+
+        ConvexHexagonal ->
+            "convexHexagonal"
