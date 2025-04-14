@@ -54,7 +54,7 @@ renderShape { render, topLeft, bottomRight } size origin theme colors =
             { x = 0, y = 0 }
 
         rightBound =
-            { x = 500, y = 500 }
+            { x = 800, y = 800 }
     in
     if before leftBound rightPoint || after rightBound leftPoint then
         []

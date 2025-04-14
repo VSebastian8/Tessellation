@@ -1,5 +1,7 @@
 module Test exposing (..)
 
+-- import Laves exposing (..)
+
 import ColorTheme exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
@@ -8,6 +10,7 @@ import Laves exposing (..)
 import Polygon exposing (..)
 import Regular exposing (..)
 import Semiregular exposing (..)
+import Shapes exposing (..)
 import Svg exposing (Svg, svg)
 import Svg.Attributes exposing (height, viewBox, width)
 import Util exposing (..)
@@ -27,11 +30,11 @@ main =
             , width "800"
             , height "800"
             ]
-            (squareTiling
+            (deltoidalTriHexagonalTiling
                 forestTheme
                 100
                 100
-                { x = 150, y = 0 }
+                { x = -150, y = -150 }
             )
         ]
 
@@ -68,9 +71,10 @@ templateLine theme n origin size =
             next_origin =
                 origin
         in
-        templateShape theme origin size ++ templateLine theme (n - 1) next_origin size
+        renderShape templateShape size origin theme [ Primary ]
+            ++ templateLine theme (n - 1) next_origin size
 
 
-templateShape : Theme -> Point -> Float -> List (Svg msg)
-templateShape _ _ _ =
-    []
+templateShape : Shape
+templateShape =
+    [] |> asShape

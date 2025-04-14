@@ -1,7 +1,7 @@
 module Regular exposing (hexagonalTiling, squareTiling, triangularTiling)
 
 import ColorTheme exposing (..)
-import Polygon exposing (rotatePoly)
+import Polygon exposing (setRotation)
 import Shapes exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -70,7 +70,7 @@ triangularTiling theme n m origin =
                                     renderShape (asShape [ equilateral ]) size point theme [ color ]
 
                                 _ ->
-                                    renderShape (asShape [ rotatePoly equilateral 60 ]) size point theme [ color ]
+                                    renderShape (asShape [ setRotation 60 equilateral ]) size point theme [ color ]
                         )
             )
         |> List.concat
@@ -103,6 +103,6 @@ hexagonalTiling theme n m origin =
                             )
                         )
                     |> List.concatMap
-                        (\( point, color ) -> renderShape (asShape [ rotatePoly hexagon 30 ]) size point theme [ color ])
+                        (\( point, color ) -> renderShape (asShape [ setRotation 30 hexagon ]) size point theme [ color ])
             )
         |> List.concat

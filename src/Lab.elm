@@ -1,6 +1,7 @@
 module Lab exposing (convexHexaTiling, floretHexaTiling, pythagoreanTiling)
 
 import ColorTheme exposing (..)
+import List exposing (repeat)
 import Polygon exposing (..)
 import Shapes exposing (..)
 import Svg exposing (..)
@@ -21,14 +22,15 @@ floretHexaTiling theme n m origin =
                 10
 
             next_origin =
-                add origin
-                    (case modBy 2 m of
-                        0 ->
-                            add (getPoint (rotatePoly floret -120) size 2) (getPoint (rotatePoly floret -120) size 1)
+                (case modBy 2 m of
+                    0 ->
+                        add (floret |> setRotation -120 |> getPoint 2) (floret |> setRotation -120 |> getPoint 1)
 
-                        _ ->
-                            add (getPoint floret size 3) (getPoint floret size 4)
-                    )
+                    _ ->
+                        add (getPoint 3 floret) (getPoint 4 floret)
+                )
+                    |> mul size
+                    |> add origin
 
             color_offset =
                 case modBy 2 m of
@@ -49,25 +51,26 @@ floretHexaLine theme n origin size =
     else
         let
             next_origin =
-                add origin
-                    (add
-                        (mul 2 (getPoint floret size 1))
-                        { x = 2 * size, y = 0 }
-                    )
+                add
+                    (getPoint 1 floret |> mul 2)
+                    { x = 2, y = 0 }
+                    |> mul size
+                    |> add origin
         in
-        floretHexaShape theme (mix3Color n) origin size ++ floretHexaLine theme (n - 1) next_origin size
+        renderShape floretHexaShape size origin theme ((mix3Color n |> repeat 6) ++ [ Quart ]) ++ floretHexaLine theme (n - 1) next_origin size
 
 
-floretHexaShape : Theme -> Color -> Point -> Float -> List (Svg msg)
-floretHexaShape theme color origin size =
-    [ polygonSvg floret size origin theme color
-    , polygonSvg (rotatePoly floret 60) size origin theme color
-    , polygonSvg (rotatePoly floret 120) size origin theme color
-    , polygonSvg (rotatePoly floret 180) size origin theme color
-    , polygonSvg (rotatePoly floret 240) size origin theme color
-    , polygonSvg (rotatePoly floret 300) size origin theme color
-    , polygonSvg hexagon size (add origin (getPoint (rotatePoly floret 60) size 3)) theme Quart
+floretHexaShape : Shape
+floretHexaShape =
+    [ floret
+    , floret |> setRotation 60
+    , floret |> setRotation 120
+    , floret |> setRotation 180
+    , floret |> setRotation 240
+    , floret |> setRotation 300
+    , hexagon |> setOrigin (floret |> setRotation 60 |> getPoint 3)
     ]
+        |> asShape
 
 
 {-| Big squares with little squares between them
@@ -106,7 +109,7 @@ pythagoreanTiling theme n m origin =
                               )
                             ]
                         )
-                    |> List.map (\( point, size, color ) -> polygonSvg square size point theme color)
+                    |> List.concatMap (\( point, size, color ) -> renderShape (asShape [ square ]) size point theme [ color ])
             )
         |> List.concat
 
@@ -124,11 +127,11 @@ convexHexaTiling theme n m origin =
                 15
 
             next_origin =
-                add origin
-                    (sub
-                        (getPoint convexHexa size 2)
-                        (getPoint (addRotation convexHexa 120) size 2)
-                    )
+                sub
+                    (getPoint 2 convexHexa)
+                    (convexHexa |> addRotation 120 |> getPoint 2)
+                    |> mul size
+                    |> add origin
 
             offset =
                 case modBy 3 m of
@@ -152,18 +155,19 @@ convexHexaLine theme n offset origin size =
     else
         let
             next_origin =
-                add origin
-                    (sub
-                        (getPoint convexHexa size 2)
-                        (getPoint (addRotation convexHexa 240) size 2)
-                    )
+                sub
+                    (getPoint 2 convexHexa)
+                    (convexHexa |> addRotation 240 |> getPoint 2)
+                    |> mul size
+                    |> add origin
         in
-        convexHexaShape theme (mix3Color (n + offset)) origin size ++ convexHexaLine theme (n - 1) offset next_origin size
+        renderShape convexHexaShape size origin theme (n + offset |> mix3Color |> repeat 3) ++ convexHexaLine theme (n - 1) offset next_origin size
 
 
-convexHexaShape : Theme -> Color -> Point -> Float -> List (Svg msg)
-convexHexaShape theme color origin size =
-    [ polygonSvg convexHexa size origin theme color
-    , polygonSvg (addRotation convexHexa 120) size origin theme color
-    , polygonSvg (addRotation convexHexa 240) size origin theme color
+convexHexaShape : Shape
+convexHexaShape =
+    [ convexHexa
+    , convexHexa |> addRotation 120
+    , convexHexa |> addRotation 240
     ]
+        |> asShape

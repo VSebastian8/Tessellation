@@ -14,8 +14,8 @@ type alias Polygon =
     }
 
 
-startAt : Polygon -> Int -> Polygon
-startAt { lengths, angles, rotation, origin } n =
+startAt : Int -> Polygon -> Polygon
+startAt n { lengths, angles, rotation, origin } =
     { lengths = List.drop n lengths ++ List.take n lengths
     , angles = List.drop n angles ++ List.take n angles
     , rotation = rotation
@@ -23,20 +23,29 @@ startAt { lengths, angles, rotation, origin } n =
     }
 
 
-rotatePoly : Polygon -> Float -> Polygon
-rotatePoly { lengths, angles, origin } a =
+setRotation : Float -> Polygon -> Polygon
+setRotation angle { lengths, angles, origin } =
     { lengths = lengths
     , angles = angles
-    , rotation = a
+    , rotation = angle
     , origin = origin
     }
 
 
-addRotation : Polygon -> Float -> Polygon
-addRotation { lengths, angles, rotation, origin } a =
+addRotation : Float -> Polygon -> Polygon
+addRotation angle { lengths, angles, rotation, origin } =
     { lengths = lengths
     , angles = angles
-    , rotation = rotation + a
+    , rotation = rotation + angle
+    , origin = origin
+    }
+
+
+setOrigin : Point -> Polygon -> Polygon
+setOrigin origin { lengths, angles, rotation } =
+    { lengths = lengths
+    , angles = angles
+    , rotation = rotation
     , origin = origin
     }
 
@@ -46,6 +55,22 @@ asPoints { lengths, angles, rotation, origin } =
     List.map2 Tuple.pair lengths (rotation + 180 :: angles)
         |> pointSequence { x = 0, y = 0 } 0
         |> List.map (add origin)
+
+
+getPoint : Int -> Polygon -> Point
+getPoint index poly =
+    let
+        n =
+            List.length poly.lengths
+    in
+    case
+        asPoints poly |> List.drop (modBy n (n + index)) |> List.head
+    of
+        Nothing ->
+            { x = 0, y = 0 }
+
+        Just point ->
+            point
 
 
 pointSequence : Point -> Float -> List ( Float, Float ) -> List Point
@@ -92,19 +117,3 @@ polygonSvg poly size origin theme color =
         , strokeWidth "2"
         ]
         []
-
-
-getPoint : Polygon -> Float -> Int -> Point
-getPoint poly size index =
-    let
-        n =
-            List.length poly.lengths
-    in
-    case
-        asPoints poly |> scaleWith size |> List.drop (modBy n (n + index)) |> List.head
-    of
-        Nothing ->
-            { x = 0, y = 0 }
-
-        Just point ->
-            point

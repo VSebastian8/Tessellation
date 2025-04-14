@@ -1,6 +1,7 @@
 module Laves exposing (cairoTiling, deltoidalTriHexagonalTiling, disdyakisRhombileTiling, floretPentagonalTiling, prismaticPentagonalTiling, rhombileTiling, tetrakisSquareTiling, triakisTriangularTiling)
 
 import ColorTheme exposing (..)
+import List exposing (repeat)
 import Polygon exposing (..)
 import Shapes exposing (..)
 import Svg exposing (..)
@@ -26,15 +27,18 @@ triakisTriangularTiling theme n m origin =
 
             downSlope =
                 sub
-                    (getPoint (rotatePoly obtuseIso -90) size 1)
-                    (getPoint (rotatePoly obtuseIso -90) size 2)
+                    (obtuseIso |> setRotation -90 |> getPoint 1)
+                    (obtuseIso |> setRotation -90 |> getPoint 2)
 
             next_origin =
-                if modBy 2 m == 0 then
-                    add origin downSlope
+                (if modBy 2 m == 0 then
+                    downSlope
 
-                else
-                    add origin { x = -downSlope.x, y = downSlope.y }
+                 else
+                    { x = -downSlope.x, y = downSlope.y }
+                )
+                    |> mul size
+                    |> add origin
         in
         triakisTriLine theme n origin size ++ triakisTriangularTiling theme n (m - 1) next_origin
 
@@ -47,37 +51,39 @@ triakisTriLine theme n origin size =
     else
         let
             downSlant =
-                sub (getPoint (rotatePoly obtuseIso 150) size 0)
-                    (getPoint (rotatePoly obtuseIso 150) size 1)
+                sub (obtuseIso |> setRotation 150 |> getPoint 0)
+                    (obtuseIso |> setRotation 150 |> getPoint 1)
 
             downOrigin =
-                add origin downSlant
+                downSlant |> mul size |> add origin
 
             upOrigin =
-                add origin (add downSlant downSlant)
+                add downSlant downSlant |> mul size |> add origin
 
             next_origin =
                 { x = origin.x + size * 2 * cos (degrees 30), y = origin.y }
         in
-        triakisTriDownShape theme downOrigin size
-            ++ triakisTriUpShape theme upOrigin size
+        renderShape triakisTriDownShape size downOrigin theme [ Secondary, Primary, Ternary ]
+            ++ renderShape triakisTriUpShape size upOrigin theme [ Secondary, Ternary, Primary ]
             ++ triakisTriLine theme (n - 1) next_origin size
 
 
-triakisTriDownShape : Theme -> Point -> Float -> List (Svg msg)
-triakisTriDownShape theme origin size =
-    [ polygonSvg (rotatePoly obtuseIso 30) size origin theme Secondary
-    , polygonSvg (rotatePoly obtuseIso 150) size origin theme Primary
-    , polygonSvg (rotatePoly obtuseIso -90) size origin theme Ternary
+triakisTriDownShape : Shape
+triakisTriDownShape =
+    [ setRotation 30 obtuseIso
+    , setRotation 150 obtuseIso
+    , setRotation -90 obtuseIso
     ]
+        |> asShape
 
 
-triakisTriUpShape : Theme -> Point -> Float -> List (Svg msg)
-triakisTriUpShape theme origin size =
-    [ polygonSvg (rotatePoly obtuseIso 90) size origin theme Secondary
-    , polygonSvg (rotatePoly obtuseIso 210) size origin theme Ternary
-    , polygonSvg (rotatePoly obtuseIso -30) size origin theme Primary
+triakisTriUpShape : Shape
+triakisTriUpShape =
+    [ setRotation 90 obtuseIso
+    , setRotation 210 obtuseIso
+    , setRotation -30 obtuseIso
     ]
+        |> asShape
 
 
 {-| Dual rectification of the triangular tiling
@@ -98,17 +104,18 @@ rhombileTiling theme n m origin =
 
             downSlope =
                 sub
-                    (getPoint (rotatePoly rhombus 150) size 0)
-                    (getPoint (rotatePoly rhombus 150) size 1)
+                    (rhombus |> setRotation 150 |> getPoint 0)
+                    (rhombus |> setRotation 150 |> getPoint 1)
 
             next_origin =
-                add origin
-                    (if modBy 2 m == 0 then
-                        add downSlope { x = 0, y = size }
+                (if modBy 2 m == 0 then
+                    add downSlope { x = 0, y = 1 }
 
-                     else
-                        { x = -downSlope.x, y = downSlope.y + size }
-                    )
+                 else
+                    { x = -downSlope.x, y = downSlope.y + 1 }
+                )
+                    |> mul size
+                    |> add origin
         in
         rhombileLine theme n origin size ++ rhombileTiling theme n (m - 1) next_origin
 
@@ -122,21 +129,23 @@ rhombileLine theme n origin size =
         let
             upSlope =
                 sub
-                    (getPoint (rotatePoly rhombus 30) size 1)
-                    (getPoint (rotatePoly rhombus 30) size 0)
+                    (rhombus |> setRotation 30 |> getPoint 1)
+                    (rhombus |> setRotation 30 |> getPoint 0)
 
             next_origin =
-                add origin { x = upSlope.x * 2, y = 0 }
+                add origin { x = upSlope.x * 2 * size, y = 0 }
         in
-        rhombileShape theme origin size ++ rhombileLine theme (n - 1) next_origin size
+        renderShape rhombileShape size origin theme [ Secondary, Ternary, Primary ]
+            ++ rhombileLine theme (n - 1) next_origin size
 
 
-rhombileShape : Theme -> Point -> Float -> List (Svg msg)
-rhombileShape theme origin size =
-    [ polygonSvg (rotatePoly rhombus 30) size origin theme Secondary
-    , polygonSvg (rotatePoly rhombus 150) size origin theme Ternary
-    , polygonSvg (rotatePoly rhombus -90) size origin theme Primary
+rhombileShape : Shape
+rhombileShape =
+    [ setRotation 30 rhombus
+    , setRotation 150 rhombus
+    , setRotation -90 rhombus
     ]
+        |> asShape
 
 
 {-| Dual truncation of the square tiling
@@ -171,16 +180,18 @@ tetrakisSquareLine theme n origin size =
             next_origin =
                 { x = origin.x + size * 2 * sin (degrees 45), y = origin.y }
         in
-        tetrakisSquareShape theme origin size ++ tetrakisSquareLine theme (n - 1) next_origin size
+        renderShape tetrakisSquareShape size origin theme [ Primary, Ternary, Secondary, Quart ]
+            ++ tetrakisSquareLine theme (n - 1) next_origin size
 
 
-tetrakisSquareShape : Theme -> Point -> Float -> List (Svg msg)
-tetrakisSquareShape theme origin size =
-    [ polygonSvg (rotatePoly isosceles 45) size origin theme Primary
-    , polygonSvg (rotatePoly isosceles 135) size origin theme Ternary
-    , polygonSvg (rotatePoly isosceles -135) size origin theme Secondary
-    , polygonSvg (rotatePoly isosceles -45) size origin theme Quart
+tetrakisSquareShape : Shape
+tetrakisSquareShape =
+    [ setRotation 45 isosceles
+    , setRotation 135 isosceles
+    , setRotation -135 isosceles
+    , setRotation -45 isosceles
     ]
+        |> asShape
 
 
 {-| Dual truncation of the rhombile tiling
@@ -201,13 +212,13 @@ disdyakisRhombileTiling theme n m origin =
 
             slant =
                 if modBy 2 m == 0 then
-                    getPoint (rotatePoly left 330) size 2
+                    left |> setRotation 330 |> getPoint 2
 
                 else
-                    getPoint (rotatePoly left 270) size 2
+                    left |> setRotation 270 |> getPoint 2
 
             next_origin =
-                add origin (add slant slant)
+                add slant slant |> mul size |> add origin
         in
         disdyakisRhombileLine theme n origin size ++ disdyakisRhombileTiling theme n (m - 1) next_origin
 
@@ -222,24 +233,30 @@ disdyakisRhombileLine theme n origin size =
             next_origin =
                 { x = origin.x + size * 2 * cos (degrees 30), y = origin.y }
         in
-        disdyakisRhombileShape theme origin size ++ disdyakisRhombileLine theme (n - 1) next_origin size
+        renderShape disdyakisRhombileShape
+            size
+            origin
+            theme
+            ([ Secondary, Primary ] |> repeat 6 |> List.concat)
+            ++ disdyakisRhombileLine theme (n - 1) next_origin size
 
 
-disdyakisRhombileShape : Theme -> Point -> Float -> List (Svg msg)
-disdyakisRhombileShape theme origin size =
-    [ polygonSvg (startAt right 1) size origin theme Secondary
-    , polygonSvg (rotatePoly left 30) size origin theme Primary
-    , polygonSvg (rotatePoly (startAt right 1) 60) size origin theme Secondary
-    , polygonSvg (rotatePoly left 90) size origin theme Primary
-    , polygonSvg (rotatePoly (startAt right 1) 120) size origin theme Secondary
-    , polygonSvg (rotatePoly left 150) size origin theme Primary
-    , polygonSvg (rotatePoly (startAt right 1) 180) size origin theme Secondary
-    , polygonSvg (rotatePoly left 210) size origin theme Primary
-    , polygonSvg (rotatePoly (startAt right 1) 240) size origin theme Secondary
-    , polygonSvg (rotatePoly left 270) size origin theme Primary
-    , polygonSvg (rotatePoly (startAt right 1) 300) size origin theme Secondary
-    , polygonSvg (rotatePoly left 330) size origin theme Primary
+disdyakisRhombileShape : Shape
+disdyakisRhombileShape =
+    [ startAt 1 right
+    , setRotation 30 left
+    , right |> setRotation 60 |> startAt 1
+    , setRotation 90 left
+    , right |> setRotation 120 |> startAt 1
+    , setRotation 150 left
+    , right |> setRotation 180 |> startAt 1
+    , setRotation 210 left
+    , right |> setRotation 240 |> startAt 1
+    , setRotation 270 left
+    , right |> setRotation 300 |> startAt 1
+    , setRotation 330 left
     ]
+        |> asShape
 
 
 {-| Dual rectification of the rhombile tiling
@@ -285,18 +302,20 @@ deltoidalTriHexagonalLine theme n origin size =
             next_origin =
                 { x = origin.x + size * 2 * cos (degrees 30), y = origin.y }
         in
-        deltoidalTriHexagonalShape theme (mix3Color n) origin size ++ deltoidalTriHexagonalLine theme (n - 1) next_origin size
+        renderShape deltoidalTriHexagonalShape size origin theme (mix3Color n |> repeat 6)
+            ++ deltoidalTriHexagonalLine theme (n - 1) next_origin size
 
 
-deltoidalTriHexagonalShape : Theme -> Color -> Point -> Float -> List (Svg msg)
-deltoidalTriHexagonalShape theme color origin size =
-    [ polygonSvg kite size origin theme color
-    , polygonSvg (rotatePoly kite 60) size origin theme color
-    , polygonSvg (rotatePoly kite 120) size origin theme color
-    , polygonSvg (rotatePoly kite 180) size origin theme color
-    , polygonSvg (rotatePoly kite 240) size origin theme color
-    , polygonSvg (rotatePoly kite 300) size origin theme color
+deltoidalTriHexagonalShape : Shape
+deltoidalTriHexagonalShape =
+    [ kite
+    , kite |> setRotation 60
+    , kite |> setRotation 120
+    , kite |> setRotation 180
+    , kite |> setRotation 240
+    , kite |> setRotation 300
     ]
+        |> asShape
 
 
 {-| Half truncation of the disdyakis trihexagonal tiling
@@ -316,11 +335,11 @@ floretPentagonalTiling theme n m origin =
                 15
 
             next_origin =
-                add origin
-                    (add
-                        (getPoint (rotatePoly floret -60) size 2)
-                        (getPoint (rotatePoly floret -60) size 1)
-                    )
+                add
+                    (floret |> setRotation -60 |> getPoint 2)
+                    (floret |> setRotation -60 |> getPoint 1)
+                    |> mul size
+                    |> add origin
 
             color_offset =
                 case modBy 3 m of
@@ -344,24 +363,26 @@ floretPentagonalLine theme n offset origin size =
     else
         let
             next_origin =
-                add origin
-                    (add
-                        (getPoint floret size 2)
-                        (getPoint floret size 1)
-                    )
+                add
+                    (getPoint 2 floret)
+                    (getPoint 1 floret)
+                    |> mul size
+                    |> add origin
         in
-        floretPentagonalShape theme (mix3Color (n + offset)) origin size ++ floretPentagonalLine theme (n - 1) offset next_origin size
+        renderShape floretPentagonalShape size origin theme (mix3Color (n + offset) |> repeat 6)
+            ++ floretPentagonalLine theme (n - 1) offset next_origin size
 
 
-floretPentagonalShape : Theme -> Color -> Point -> Float -> List (Svg msg)
-floretPentagonalShape theme color origin size =
-    [ polygonSvg floret size origin theme color
-    , polygonSvg (rotatePoly floret 60) size origin theme color
-    , polygonSvg (rotatePoly floret 120) size origin theme color
-    , polygonSvg (rotatePoly floret 180) size origin theme color
-    , polygonSvg (rotatePoly floret 240) size origin theme color
-    , polygonSvg (rotatePoly floret 300) size origin theme color
+floretPentagonalShape : Shape
+floretPentagonalShape =
+    [ floret
+    , floret |> setRotation 60
+    , floret |> setRotation 120
+    , floret |> setRotation 180
+    , floret |> setRotation 240
+    , floret |> setRotation 300
     ]
+        |> asShape
 
 
 {-| Cairo Tiling
@@ -381,25 +402,24 @@ cairoTiling theme n m origin =
                 20
 
             downSlope =
-                mul 2
-                    (sub
-                        (getPoint cairo size 3)
-                        (getPoint cairo size 4)
-                    )
+                sub
+                    (getPoint 3 cairo)
+                    (getPoint 4 cairo)
+                    |> mul 2
 
             w =
-                (getPoint cairo size 1).x
+                (getPoint 1 cairo).x
 
             next_origin =
-                add
-                    origin
-                    (case modBy 2 m of
-                        0 ->
-                            { x = downSlope.x, y = w + downSlope.y }
+                (case modBy 2 m of
+                    0 ->
+                        { x = downSlope.x, y = w + downSlope.y }
 
-                        _ ->
-                            { x = -downSlope.x, y = w + downSlope.y }
-                    )
+                    _ ->
+                        { x = -downSlope.x, y = w + downSlope.y }
+                )
+                    |> mul size
+                    |> add origin
         in
         cairoLine theme n origin size ++ cairoTiling theme n (m - 1) next_origin
 
@@ -412,40 +432,38 @@ cairoLine theme n origin size =
     else
         let
             w1 =
-                (getPoint
-                    (rotatePoly (startAt cairo 1) 30)
-                    size
-                    2
-                ).x
+                (cairo |> setRotation 30 |> startAt 1 |> getPoint 2).x * size
 
             w2 =
-                (getPoint cairo size 1).x
+                (getPoint 1 cairo).x * size
 
             next_origin =
                 { x = origin.x + 2 * w1 + w2, y = origin.y }
         in
-        cairoShape theme origin size ++ cairoLine theme (n - 1) next_origin size
+        renderShape
+            cairoShape
+            size
+            origin
+            theme
+            [ Primary, Secondary, Secondary, Primary ]
+            ++ cairoLine theme (n - 1) next_origin size
 
 
-cairoShape : Theme -> Point -> Float -> List (Svg msg)
-cairoShape theme origin size =
+cairoShape : Shape
+cairoShape =
     let
         tip =
-            add origin
-                (getPoint
-                    (rotatePoly (startAt cairo 1) 30)
-                    size
-                    2
-                )
+            cairo |> setRotation 30 |> startAt 1 |> getPoint 2
 
         tip2 =
-            add tip (getPoint cairo size 1)
+            add tip (getPoint 1 cairo)
     in
-    [ polygonSvg (rotatePoly (startAt cairo 1) 30) size origin theme Primary
-    , polygonSvg cairo size tip theme Secondary
-    , polygonSvg (rotatePoly (startAt cairo 1) 120) size tip theme Secondary
-    , polygonSvg (rotatePoly (startAt cairo 3) 60) size tip2 theme Primary
+    [ cairo |> setRotation 30 |> startAt 1
+    , cairo |> setOrigin tip
+    , cairo |> setRotation 120 |> startAt 1 |> setOrigin tip
+    , cairo |> setRotation 60 |> startAt 3 |> setOrigin tip2
     ]
+        |> asShape
 
 
 {-| Dual of the elongated triangular tiling
@@ -466,23 +484,25 @@ prismaticPentagonalTiling theme n m origin =
 
             leftSlope =
                 sub
-                    (getPoint prism size 3)
-                    (getPoint prism size 4)
+                    (getPoint 3 prism)
+                    (getPoint 4 prism)
 
             rightSlope =
                 sub
-                    (getPoint prism size 3)
-                    (getPoint prism size 2)
+                    (getPoint 3 prism)
+                    (getPoint 2 prism)
 
             next_origin =
-                add (add origin { x = 0, y = 2 * size })
-                    (case modBy 2 m of
-                        0 ->
-                            leftSlope
+                (case modBy 2 m of
+                    0 ->
+                        leftSlope
 
-                        _ ->
-                            rightSlope
-                    )
+                    _ ->
+                        rightSlope
+                )
+                    |> add { x = 0, y = 2 }
+                    |> mul size
+                    |> add origin
         in
         prismaticPentagonalLine theme n origin size ++ prismaticPentagonalTiling theme n (m - 1) next_origin
 
@@ -497,11 +517,13 @@ prismaticPentagonalLine theme n origin size =
             next_origin =
                 { x = origin.x + size, y = origin.y }
         in
-        prismaticPentagonalShape theme origin size ++ prismaticPentagonalLine theme (n - 1) next_origin size
+        renderShape prismaticPentagonalShape size origin theme [ Primary, Secondary ]
+            ++ prismaticPentagonalLine theme (n - 1) next_origin size
 
 
-prismaticPentagonalShape : Theme -> Point -> Float -> List (Svg msg)
-prismaticPentagonalShape theme origin size =
-    [ polygonSvg prism size origin theme Primary
-    , polygonSvg (rotatePoly (startAt prism 2) 30) size (add origin (getPoint prism size 3)) theme Secondary
+prismaticPentagonalShape : Shape
+prismaticPentagonalShape =
+    [ prism
+    , prism |> setRotation 30 |> startAt 2 |> setOrigin (getPoint 3 prism)
     ]
+        |> asShape

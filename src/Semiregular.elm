@@ -22,18 +22,18 @@ truncatedHexagonalTiling theme n m origin =
 
     else
         let
-            decagon_width =
-                sub (getPoint dodecagon size 3) (getPoint dodecagon size 0)
-
             size =
                 20
 
+            decagon_width =
+                sub (getPoint 3 dodecagon) (getPoint 0 dodecagon) |> mul size
+
             next_origin =
                 if modBy 2 m == 0 then
-                    add origin (getPoint dodecagon size 7)
+                    add origin (getPoint 7 dodecagon |> mul size)
 
                 else
-                    sub (add origin (getPoint dodecagon size 8)) decagon_width
+                    sub (add origin (getPoint 8 dodecagon |> mul size)) decagon_width
         in
         truncatedHexagonalLine theme n origin ++ truncatedHexagonalTiling theme n (m - 1) next_origin
 
@@ -49,20 +49,30 @@ truncatedHexagonalLine theme n origin =
                 20
 
             first_trig =
-                getPoint dodecagon size 3
-
-            second_trig =
-                getPoint dodecagon size 6
+                getPoint 3 dodecagon
 
             next_origin =
-                add (add origin first_trig)
-                    (getPoint equilateral size 1)
+                add origin
+                    (add first_trig (getPoint 1 equilateral) |> mul size)
         in
-        [ polygonSvg dodecagon size origin theme Primary
-        , polygonSvg equilateral size (add origin first_trig) theme Secondary
-        , polygonSvg (rotatePoly equilateral 60) size (add origin second_trig) theme Secondary
-        ]
+        renderShape truncatedHexagonalShape size origin theme [ Primary, Secondary, Secondary ]
             ++ truncatedHexagonalLine theme (n - 1) next_origin
+
+
+truncatedHexagonalShape : Shape
+truncatedHexagonalShape =
+    let
+        first_trig =
+            getPoint 3 dodecagon
+
+        second_trig =
+            getPoint 6 dodecagon
+    in
+    [ dodecagon
+    , equilateral |> setOrigin first_trig
+    , equilateral |> setRotation 60 |> setOrigin second_trig
+    ]
+        |> asShape
 
 
 {-| Rectification of the hexagon (the original edges vanish)
@@ -87,10 +97,10 @@ triHexagonalTiling theme n m origin =
 
             next_origin =
                 if modBy 2 m == 0 then
-                    add origin (getPoint hexagon size 3)
+                    add origin (getPoint 3 hexagon |> mul size)
 
                 else
-                    sub (add origin (getPoint hexagon size 3)) hexagon_translate
+                    sub (add origin (getPoint 3 hexagon |> mul size)) hexagon_translate
         in
         triHexagonalLine theme n origin ++ triHexagonalTiling theme n (m - 1) next_origin
 
@@ -106,20 +116,30 @@ triHexagonalLine theme n origin =
                 30
 
             first_trig =
-                getPoint hexagon size 1
-
-            second_trig =
-                getPoint hexagon size 3
+                getPoint 1 hexagon
 
             next_origin =
-                add (add origin first_trig)
-                    (getPoint equilateral size 1)
+                add origin
+                    (add first_trig (getPoint 1 equilateral) |> mul size)
         in
-        [ polygonSvg hexagon size origin theme Primary
-        , polygonSvg equilateral size (add origin first_trig) theme Secondary
-        , polygonSvg (rotatePoly equilateral 60) size (add origin second_trig) theme Secondary
-        ]
+        renderShape triHexagonalShape size origin theme [ Primary, Secondary, Secondary ]
             ++ triHexagonalLine theme (n - 1) next_origin
+
+
+triHexagonalShape : Shape
+triHexagonalShape =
+    let
+        first_trig =
+            getPoint 1 hexagon
+
+        second_trig =
+            getPoint 3 hexagon
+    in
+    [ hexagon
+    , equilateral |> setOrigin first_trig
+    , equilateral |> setRotation 60 |> setOrigin second_trig
+    ]
+        |> asShape
 
 
 {-| Truncation of the square tiling
@@ -140,7 +160,7 @@ truncatedSquareTiling theme n m origin =
                 20
 
             next_origin =
-                add origin (getPoint octagon size 5)
+                add origin (getPoint 5 octagon |> mul size)
         in
         truncatedSquareLine theme n origin ++ truncatedSquareTiling theme n (m - 1) next_origin
 
@@ -156,23 +176,36 @@ truncatedSquareLine theme n origin =
                 20
 
             top_square =
-                getPoint octagon size 1
+                getPoint 1 octagon
 
             next_origin =
-                add (add origin top_square)
-                    (getPoint (rotatePoly square 45) size 2)
+                add origin
+                    (add top_square
+                        (square |> setRotation 45 |> getPoint 2)
+                        |> mul size
+                    )
         in
-        [ polygonSvg octagon size origin theme Primary
-        , polygonSvg (rotatePoly square 45) size (add origin top_square) theme Secondary
-        ]
+        renderShape truncatedSquareShape size origin theme [ Primary, Secondary ]
             ++ truncatedSquareLine theme (n - 1) next_origin
+
+
+truncatedSquareShape : Shape
+truncatedSquareShape =
+    let
+        top_square =
+            getPoint 1 octagon
+    in
+    [ octagon
+    , square |> setRotation 45 |> setOrigin top_square
+    ]
+        |> asShape
 
 
 {-| Rectification of the trihexagonal tiling
 
-  - Type: semiregular
-  - Corners: **3.4.6.4**
-  - Symmetry: hexagonal
+     - Type: semiregular
+     - Corners: **3.4.6.4**
+     - Symmetry: hexagonal
 
 -}
 rhombiTriHexagonalTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
@@ -187,13 +220,13 @@ rhombiTriHexagonalTiling theme n m origin =
 
             next_point =
                 if modBy 2 m == 0 then
-                    sub (add (getPoint hexagon size -1) (getPoint (rotatePoly square -60) size -1)) { x = size, y = 0 }
+                    sub (add (getPoint -1 hexagon) (square |> setRotation -60 |> getPoint -1)) { x = 1, y = 0 }
 
                 else
-                    add (getPoint hexagon size 2) (getPoint (rotatePoly square -30) size 1)
+                    add (getPoint 2 hexagon) (square |> setRotation -30 |> getPoint 1)
 
             next_origin =
-                add origin next_point
+                next_point |> mul size |> add origin
         in
         rhombiTriHexaLine theme n origin size ++ rhombiTriHexagonalTiling theme n (m - 1) next_origin
 
@@ -206,52 +239,55 @@ rhombiTriHexaLine theme n origin size =
     else
         let
             hexagon_width =
-                sub (getPoint hexagon size 2) (getPoint hexagon size -1)
+                sub (getPoint 2 hexagon) (getPoint -1 hexagon) |> mul size
 
             square_slant =
                 { x =
-                    (sub (getPoint (rotatePoly square -30) size 1) (getPoint (rotatePoly square -30) size 0)).x
+                    (sub (square |> setRotation -30 |> getPoint 1) (square |> setRotation -30 |> getPoint 0)).x
                 , y = 0
                 }
+                    |> mul size
 
             next_origin =
                 add origin (add hexagon_width (add square_slant (add { x = size, y = 0 } square_slant)))
         in
-        rhombiTriHexaShape theme origin size ++ rhombiTriHexaLine theme (n - 1) next_origin size
+        renderShape rhombiTriHexaShape size origin theme [ Primary, Ternary, Secondary, Ternary, Secondary, Ternary ]
+            ++ rhombiTriHexaLine theme (n - 1) next_origin size
 
 
-rhombiTriHexaShape : Theme -> Point -> Float -> List (Svg msg)
-rhombiTriHexaShape theme origin size =
+rhombiTriHexaShape : Shape
+rhombiTriHexaShape =
     let
         square1 =
-            getPoint hexagon size 2
+            getPoint 2 hexagon
 
         trig1 =
-            getPoint hexagon size 3
+            getPoint 3 hexagon
 
         square2 =
-            getPoint hexagon size 4
+            getPoint 4 hexagon
 
         trig2 =
-            getPoint hexagon size 4
+            getPoint 4 hexagon
 
         square3 =
-            getPoint hexagon size 5
+            getPoint 5 hexagon
     in
-    [ polygonSvg hexagon size origin theme Primary
-    , polygonSvg (rotatePoly square -30) size (add origin square1) theme Ternary
-    , polygonSvg (rotatePoly equilateral -30) size (add origin trig1) theme Secondary
-    , polygonSvg square size (add origin square2) theme Ternary
-    , polygonSvg (rotatePoly equilateral -90) size (add origin trig2) theme Secondary
-    , polygonSvg (rotatePoly square -60) size (add origin square3) theme Ternary
+    [ hexagon
+    , square |> setRotation -30 |> setOrigin square1
+    , equilateral |> setRotation -30 |> setOrigin trig1
+    , square |> setOrigin square2
+    , equilateral |> setRotation -90 |> setOrigin trig2
+    , square |> setRotation -60 |> setOrigin square3
     ]
+        |> asShape
 
 
 {-| Truncation of the trihexagonal tiling
 
-  - Type: semiregular
-  - Corners: **4.6.12**
-  - Symmetry: hexagonal
+     - Type: semiregular
+     - Corners: **4.6.12**
+     - Symmetry: hexagonal
 
 -}
 truncatedTriHexagonalTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
@@ -265,17 +301,18 @@ truncatedTriHexagonalTiling theme n m origin =
                 20
 
             hexagon_width =
-                sub (getPoint (rotatePoly hexagon 30) size 2) (getPoint (rotatePoly hexagon 30) size 0)
+                sub (hexagon |> setRotation 30 |> getPoint 2) (hexagon |> setRotation 30 |> getPoint 0)
 
             next_point =
                 if modBy 2 m == 0 then
-                    sub (add (getPoint dodecagon size 10) (getPoint (rotatePoly square -60) size -1)) (add hexagon_width { x = size, y = 0 })
+                    sub (add (getPoint 10 dodecagon) (square |> setRotation -60 |> getPoint -1))
+                        (add hexagon_width { x = 1, y = 0 })
 
                 else
-                    add (getPoint dodecagon size 6) (getPoint (rotatePoly square 60) size 2)
+                    add (getPoint 6 dodecagon) (square |> setRotation 60 |> getPoint 2)
 
             next_origin =
-                add origin next_point
+                next_point |> mul size |> add origin
         in
         truncTriHexaLine theme n origin size ++ truncatedTriHexagonalTiling theme n (m - 1) next_origin
 
@@ -288,49 +325,51 @@ truncTriHexaLine theme n origin size =
     else
         let
             dodecagon_width =
-                sub (getPoint dodecagon size 4) (getPoint dodecagon size -1)
+                sub (getPoint 4 dodecagon) (getPoint -1 dodecagon)
 
             hexagon_width =
-                sub (getPoint (rotatePoly hexagon 30) size 2) (getPoint (rotatePoly hexagon 30) size 0)
+                sub (hexagon |> setRotation 30 |> getPoint 2) (hexagon |> setRotation 30 |> getPoint 0)
 
             next_origin =
-                add origin (add dodecagon_width (add hexagon_width (add hexagon_width { x = size, y = 0 })))
+                dodecagon_width |> add hexagon_width |> add hexagon_width |> add { x = 1, y = 0 } |> mul size |> add origin
         in
-        truncTriHexaShape theme origin size ++ truncTriHexaLine theme (n - 1) next_origin size
+        renderShape truncTriHexaShape size origin theme [ Primary, Ternary, Ternary, Ternary, Secondary, Secondary ]
+            ++ truncTriHexaLine theme (n - 1) next_origin size
 
 
-truncTriHexaShape : Theme -> Point -> Float -> List (Svg msg)
-truncTriHexaShape theme origin size =
+truncTriHexaShape : Shape
+truncTriHexaShape =
     let
         square1 =
-            getPoint dodecagon size 6
+            getPoint 6 dodecagon
 
         square2 =
-            getPoint dodecagon size 8
+            getPoint 8 dodecagon
 
         square3 =
-            getPoint dodecagon size 10
+            getPoint 10 dodecagon
 
         hex1 =
-            getPoint dodecagon size 7
+            getPoint 7 dodecagon
 
         hex2 =
-            getPoint dodecagon size 9
+            getPoint 9 dodecagon
     in
-    [ polygonSvg dodecagon size origin theme Primary
-    , polygonSvg (rotatePoly square 60) size (add origin square1) theme Ternary
-    , polygonSvg square size (add origin square2) theme Ternary
-    , polygonSvg (rotatePoly square -60) size (add origin square3) theme Ternary
-    , polygonSvg (rotatePoly hexagon 30) size (add origin hex1) theme Secondary
-    , polygonSvg (rotatePoly hexagon -30) size (add origin hex2) theme Secondary
+    [ dodecagon
+    , square |> setRotation 60 |> setOrigin square1
+    , square |> setOrigin square2
+    , square |> setRotation -60 |> setOrigin square3
+    , hexagon |> setRotation 30 |> setOrigin hex1
+    , hexagon |> setRotation -30 |> setOrigin hex2
     ]
+        |> asShape
 
 
 {-| Half truncation of the truncated square tiling
 
-  - Type: semiregular
-  - Corners: **3.3.4.3.4**
-  - Symmetry: crosshatch
+     - Type: semiregular
+     - Corners: **3.3.4.3.4**
+     - Symmetry: crosshatch
 
 -}
 snubSquareTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
@@ -344,14 +383,17 @@ snubSquareTiling theme n m origin =
                 30
 
             square_diag =
-                sub (getPoint (rotatePoly square 30) size 2) (getPoint (rotatePoly square 30) size 0)
+                sub (square |> setRotation 30 |> getPoint 2) (square |> setRotation 30 |> getPoint 0)
 
             next_origin =
-                if modBy 2 m == 0 then
-                    add origin (add square_diag { x = -2 * square_diag.x, y = size })
+                (if modBy 2 m == 0 then
+                    add square_diag { x = -2 * square_diag.x, y = 1 }
 
-                else
-                    add origin (add square_diag { x = 0, y = size })
+                 else
+                    add square_diag { x = 0, y = 1 }
+                )
+                    |> mul size
+                    |> add origin
         in
         snubSquareLine theme n origin size ++ snubSquareTiling theme n (m - 1) next_origin
 
@@ -364,30 +406,32 @@ snubSquareLine theme n origin size =
     else
         let
             triangle_slant =
-                sub (getPoint (rotatePoly equilateral 90) size 2) (getPoint (rotatePoly equilateral 90) size 0)
+                sub (equilateral |> setRotation 90 |> getPoint 2) (equilateral |> setRotation 90 |> getPoint 0)
 
             next_origin =
-                { x = origin.x + 2 * triangle_slant.x + size, y = origin.y }
+                { x = origin.x + 2 * size * triangle_slant.x + size, y = origin.y }
         in
-        snubSquareShape theme origin size ++ snubSquareLine theme (n - 1) next_origin size
+        renderShape snubSquareShape size origin theme [ Primary, Secondary, Primary, Primary, Primary, Secondary ]
+            ++ snubSquareLine theme (n - 1) next_origin size
 
 
-snubSquareShape : Theme -> Point -> Float -> List (Svg msg)
-snubSquareShape theme origin size =
+snubSquareShape : Shape
+snubSquareShape =
     let
         first =
-            add origin (getPoint (rotatePoly equilateral 90) size 2)
+            equilateral |> setRotation 90 |> getPoint 2
 
         second =
-            add first { x = size, y = 0 }
+            add first { x = 1, y = 0 }
     in
-    [ polygonSvg (rotatePoly equilateral 90) size origin theme Primary
-    , polygonSvg (rotatePoly square 30) size origin theme Secondary
-    , polygonSvg equilateral size first theme Primary
-    , polygonSvg (rotatePoly equilateral 60) size first theme Primary
-    , polygonSvg (rotatePoly equilateral 30) size second theme Primary
-    , polygonSvg (rotatePoly square -30) size second theme Secondary
+    [ equilateral |> setRotation 90
+    , square |> setRotation 30
+    , equilateral |> setOrigin first
+    , equilateral |> setRotation 60 |> setOrigin first
+    , equilateral |> setRotation 30 |> setOrigin second
+    , square |> setRotation -30 |> setOrigin second
     ]
+        |> asShape
 
 
 {-| Half truncation of the trihexagonal tiling
@@ -408,17 +452,18 @@ snubTriHexagonalTiling theme n m origin =
                 30
 
             next_origin =
-                add origin
-                    (case modBy 3 m of
-                        0 ->
-                            sub (getPoint hexagon size -1) { x = 2 * size, y = 0 }
+                (case modBy 3 m of
+                    0 ->
+                        sub (getPoint -1 hexagon) { x = 2, y = 0 }
 
-                        1 ->
-                            add (getPoint hexagon size 2) { x = 3 * size, y = 0 }
+                    1 ->
+                        add (getPoint 2 hexagon) { x = 3, y = 0 }
 
-                        _ ->
-                            sub (getPoint hexagon size -1) { x = 2 * size, y = 0 }
-                    )
+                    _ ->
+                        sub (getPoint -1 hexagon) { x = 2, y = 0 }
+                )
+                    |> mul size
+                    |> add origin
         in
         snubTriHexagonalLine theme n origin size ++ snubTriHexagonalTiling theme n (m - 1) next_origin
 
@@ -433,38 +478,44 @@ snubTriHexagonalLine theme n origin size =
             next_origin =
                 { x = origin.x + 7 * size, y = origin.y }
         in
-        snubTriHexagonalShape theme origin size ++ snubTriHexagonalLine theme (n - 1) next_origin size
+        renderShape snubTriHexagonalShape
+            size
+            origin
+            theme
+            [ Primary, Secondary, Secondary, Secondary, Secondary, Secondary, Secondary, Secondary, Secondary ]
+            ++ snubTriHexagonalLine theme (n - 1) next_origin size
 
 
-snubTriHexagonalShape : Theme -> Point -> Float -> List (Svg msg)
-snubTriHexagonalShape theme origin size =
+snubTriHexagonalShape : Shape
+snubTriHexagonalShape =
     let
         first =
-            add origin (getPoint hexagon size 3)
+            getPoint 3 hexagon
 
         second =
-            add origin (getPoint hexagon size 4)
+            getPoint 4 hexagon
 
         third =
-            add origin (getPoint hexagon size 5)
+            getPoint 5 hexagon
     in
-    [ polygonSvg hexagon size origin theme Primary
-    , polygonSvg (rotatePoly equilateral 60) size first theme Secondary
-    , polygonSvg equilateral size first theme Secondary
-    , polygonSvg (rotatePoly equilateral -60) size first theme Secondary
-    , polygonSvg equilateral size second theme Secondary
-    , polygonSvg (rotatePoly equilateral -60) size second theme Secondary
-    , polygonSvg (rotatePoly equilateral -120) size second theme Secondary
-    , polygonSvg (rotatePoly equilateral -60) size third theme Secondary
-    , polygonSvg (rotatePoly equilateral -120) size third theme Secondary
+    [ hexagon
+    , equilateral |> setRotation 60 |> setOrigin first
+    , equilateral |> setOrigin first
+    , equilateral |> setRotation -60 |> setOrigin first
+    , equilateral |> setOrigin second
+    , equilateral |> setRotation -60 |> setOrigin second
+    , equilateral |> setRotation -120 |> setOrigin second
+    , equilateral |> setRotation -60 |> setOrigin third
+    , equilateral |> setRotation -120 |> setOrigin third
     ]
+        |> asShape
 
 
 {-| Only non Wythoffian semiregular tiling
 
-  - Type: semiregular
-  - Corners: **3.3.3.4.4**
-  - Symmetry: running bond
+     - Type: semiregular
+     - Corners: **3.3.3.4.4**
+     - Symmetry: running bond
 
 -}
 elongatedTriangular : Theme -> Int -> Int -> Point -> List (Svg msg)
@@ -478,15 +529,14 @@ elongatedTriangular theme n m origin =
                 30
 
             squareLine =
-                List.range 1 n |> List.map (\i -> polygonSvg square size { x = origin.x + toFloat i * size, y = origin.y } theme Secondary)
+                List.range 1 n |> List.concatMap (\i -> renderShape (asShape [ square ]) size { x = origin.x + toFloat i * size, y = origin.y } theme [ Secondary ])
 
             triangleLine =
                 List.range 1 n
                     |> List.concatMap
                         (\i ->
-                            [ polygonSvg (rotatePoly equilateral -60) size { x = origin.x + toFloat i * size, y = origin.y } theme Primary
-                            , polygonSvg equilateral size { x = origin.x + toFloat i * size, y = origin.y } theme Ternary
-                            ]
+                            renderShape (asShape [ equilateral |> setRotation -60 ]) size { x = origin.x + toFloat i * size, y = origin.y } theme [ Primary ]
+                                ++ renderShape (asShape [ equilateral ]) size { x = origin.x + toFloat i * size, y = origin.y } theme [ Ternary ]
                         )
 
             selectedLine =
@@ -497,19 +547,20 @@ elongatedTriangular theme n m origin =
                     triangleLine
 
             next_origin =
-                add origin
-                    (case modBy 4 m of
-                        0 ->
-                            { x = 0, y = size }
+                (case modBy 4 m of
+                    0 ->
+                        { x = 0, y = 1 }
 
-                        1 ->
-                            getPoint (rotatePoly equilateral -60) size 1
+                    1 ->
+                        (equilateral |> setRotation -60) |> getPoint 1
 
-                        2 ->
-                            { x = 0, y = size }
+                    2 ->
+                        { x = 0, y = 1 }
 
-                        _ ->
-                            getPoint (rotatePoly equilateral -60) size -1
-                    )
+                    _ ->
+                        equilateral |> setRotation -60 |> getPoint -1
+                )
+                    |> mul size
+                    |> add origin
         in
         selectedLine ++ elongatedTriangular theme n (m - 1) next_origin
