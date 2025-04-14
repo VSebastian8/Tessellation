@@ -11,7 +11,6 @@ import Regular exposing (..)
 import Semiregular exposing (..)
 import Svg exposing (Svg, svg)
 import Svg.Attributes exposing (height, viewBox, width)
-import Util exposing (Point)
 
 
 
@@ -223,9 +222,6 @@ view model =
                         model.selectedTheme
                         model
                     )
-                    60
-                    90
-                    { x = -750, y = -680 }
                 )
             ]
         ]
@@ -310,74 +306,74 @@ colorPicker colorType labelText model =
 --   <input type="color" id="favcolor" name="favcolor" value="#ff0000"><br><br>
 
 
-getTessellation : Tiling -> (Theme -> Int -> Int -> Point -> List (Svg msg))
-getTessellation tiling =
+getTessellation : Tiling -> (Theme -> List (Svg msg))
+getTessellation tiling theme =
     case tiling of
         Square ->
-            squareTiling
+            squareTiling theme 26 26 { x = -5, y = -5 }
 
         Triangular ->
-            triangularTiling
+            triangularTiling theme 20 50 { x = -40, y = -10 }
 
         Hexagonal ->
-            hexagonalTiling
+            hexagonalTiling theme 16 20 { x = -40, y = -20 }
 
         TruncatedHexagonal ->
-            truncatedHexagonalTiling
+            truncatedHexagonalTiling theme 15 15 { x = 0, y = -15 }
 
         TriHexagonal ->
-            triHexagonalTiling
+            triHexagonalTiling theme 15 17 { x = -5, y = -15 }
 
         TruncatedSquare ->
-            truncatedSquareTiling
+            truncatedSquareTiling theme 20 18 { x = -20, y = -10 }
 
         RhombiTriHexagonal ->
-            rhombiTriHexagonalTiling
+            rhombiTriHexagonalTiling theme 8 25 { x = -10, y = -55 }
 
         TruncatedTriHexagonal ->
-            truncatedTriHexagonalTiling
+            truncatedTriHexagonalTiling theme 8 20 { x = 3, y = -67 }
 
         SnubSquare ->
-            snubSquareTiling
+            snubSquareTiling theme 11 22 { x = 0, y = 0 }
 
         SnubTriHexagonal ->
-            snubTriHexagonalTiling
+            snubTriHexagonalTiling theme 5 35 { x = 50, y = -65 }
 
         ElongatedTriangular ->
-            elongatedTriangular
+            elongatedTriangular theme 30 30 { x = -18, y = 0 }
 
         TriakisTriangular ->
-            triakisTriangularTiling
+            triakisTriangularTiling theme 18 18 { x = -55, y = 0 }
 
         Rhombile ->
-            rhombileTiling
+            rhombileTiling theme 18 19 { x = -55, y = -10 }
 
         TetrakisSquare ->
-            tetrakisSquareTiling
+            tetrakisSquareTiling theme 20 20 { x = 0, y = 0 }
 
         DisdyakisRhombile ->
-            disdyakisRhombileTiling
+            disdyakisRhombileTiling theme 15 15 { x = -16, y = 0 }
 
         DeltoidalTriHexagonal ->
-            deltoidalTriHexagonalTiling
+            deltoidalTriHexagonalTiling theme 18 20 { x = 0, y = 0 }
 
         FloretPentagonal ->
-            floretPentagonalTiling
+            floretPentagonalTiling theme 18 16 { x = -340, y = -200 }
 
         CairoPentagonal ->
-            cairoTiling
+            cairoTiling theme 15 25 { x = -40, y = 0 }
 
         PrismaticPentagonal ->
-            prismaticPentagonalTiling
+            prismaticPentagonalTiling theme 30 15 { x = -30, y = -10 }
 
         FloretHexagonal ->
-            floretHexaTiling
+            floretHexaTiling theme 20 25 { x = -20, y = -10 }
 
         Pythagorean ->
-            pythagoreanTiling
+            pythagoreanTiling theme 50 50 { x = -915, y = -813 }
 
         ConvexHexagonal ->
-            convexHexaTiling
+            convexHexaTiling theme 16 15 { x = -505, y = -205 }
 
 
 getTheme : ColorTheme -> Model -> Theme

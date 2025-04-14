@@ -21,10 +21,10 @@ squareTiling theme n m origin =
         size =
             30.0
     in
-    List.range 1 m
+    List.range 0 m
         |> List.map
             (\y ->
-                List.range 1 n
+                List.range 0 n
                     |> List.map (\x -> ( add origin { x = size * toFloat x, y = size * toFloat y }, mix3Color (y + x) ))
                     |> List.concatMap (\( point, color ) -> renderShape squareShape size point theme [ color ])
             )
@@ -50,10 +50,10 @@ triangularTiling theme n m origin =
         size =
             40.0
     in
-    List.range 1 m
+    List.range 0 m
         |> List.map
             (\y ->
-                List.range 1 n
+                List.range 0 n
                     |> List.map
                         (\x ->
                             ( add origin
@@ -89,10 +89,10 @@ hexagonalTiling theme n m origin =
         size =
             30.0
     in
-    List.range 1 m
+    List.range 0 m
         |> List.map
             (\y ->
-                List.range 1 n
+                List.range 0 n
                     |> List.map
                         (\x ->
                             ( add origin

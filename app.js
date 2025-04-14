@@ -5380,7 +5380,150 @@ var $author$project$Shapes$cairo = {
 			1,
 			1
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
+};
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$Polygon$pointSequence = F3(
+	function (point, rotation, polyList) {
+		if (!polyList.b) {
+			return _List_Nil;
+		} else {
+			var _v1 = polyList.a;
+			var length = _v1.a;
+			var angle = _v1.b;
+			var rest = polyList.b;
+			var next_rotation = (180 + rotation) + angle;
+			var next_point = {
+				x: point.x + (length * $elm$core$Basics$cos(
+					$elm$core$Basics$degrees(next_rotation))),
+				y: point.y - (length * $elm$core$Basics$sin(
+					$elm$core$Basics$degrees(next_rotation)))
+			};
+			return A2(
+				$elm$core$List$cons,
+				point,
+				A3($author$project$Polygon$pointSequence, next_point, next_rotation, rest));
+		}
+	});
+var $author$project$Polygon$asPoints = function (_v0) {
+	var lengths = _v0.lengths;
+	var angles = _v0.angles;
+	var rotation = _v0.rotation;
+	var origin = _v0.origin;
+	return A2(
+		$elm$core$List$map,
+		$author$project$Util$add(origin),
+		A3(
+			$author$project$Polygon$pointSequence,
+			{x: 0, y: 0},
+			0,
+			A3(
+				$elm$core$List$map2,
+				$elm$core$Tuple$pair,
+				lengths,
+				A2($elm$core$List$cons, rotation + 180, angles))));
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Shapes$asShape = function (polygons) {
+	var points = A2($elm$core$List$concatMap, $author$project$Polygon$asPoints, polygons);
+	var xmax = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(
+			A2(
+				$elm$core$List$map,
+				function (p) {
+					return p.x;
+				},
+				points)));
+	var xmin = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(
+			A2(
+				$elm$core$List$map,
+				function (p) {
+					return p.x;
+				},
+				points)));
+	var ymax = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$maximum(
+			A2(
+				$elm$core$List$map,
+				function (p) {
+					return p.y;
+				},
+				points)));
+	var ymin = A2(
+		$elm$core$Maybe$withDefault,
+		0,
+		$elm$core$List$minimum(
+			A2(
+				$elm$core$List$map,
+				function (p) {
+					return p.y;
+				},
+				points)));
+	return {
+		bottomRight: {x: xmax, y: ymax},
+		render: polygons,
+		topLeft: {x: xmin, y: ymin}
+	};
 };
 var $elm$core$List$drop = F2(
 	function (n, list) {
@@ -5413,61 +5556,14 @@ var $elm$core$List$head = function (list) {
 	}
 };
 var $elm$core$Basics$modBy = _Basics_modBy;
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
-var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Polygon$pointSequence = F3(
-	function (point, rotation, polyList) {
-		if (!polyList.b) {
-			return _List_Nil;
-		} else {
-			var _v1 = polyList.a;
-			var length = _v1.a;
-			var angle = _v1.b;
-			var rest = polyList.b;
-			var next_rotation = (180 + rotation) + angle;
-			var next_point = {
-				x: point.x + (length * $elm$core$Basics$cos(
-					$elm$core$Basics$degrees(next_rotation))),
-				y: point.y - (length * $elm$core$Basics$sin(
-					$elm$core$Basics$degrees(next_rotation)))
-			};
-			return A2(
-				$elm$core$List$cons,
-				point,
-				A3($author$project$Polygon$pointSequence, next_point, next_rotation, rest));
-		}
-	});
-var $author$project$Polygon$polygonPoints = F2(
-	function (_v0, size) {
-		var lengths = _v0.lengths;
-		var angles = _v0.angles;
-		var rotation = _v0.rotation;
-		return A3(
-			$author$project$Polygon$pointSequence,
-			{x: 0, y: 0},
-			0,
-			A3(
-				$elm$core$List$map2,
-				$elm$core$Tuple$pair,
-				A2(
-					$elm$core$List$map,
-					function (l) {
-						return l * size;
-					},
-					lengths),
-				A2($elm$core$List$cons, rotation + 180, angles)));
-	});
-var $author$project$Polygon$getPoint = F3(
-	function (poly, size, index) {
+var $author$project$Polygon$getPoint = F2(
+	function (index, poly) {
 		var n = $elm$core$List$length(poly.lengths);
 		var _v0 = $elm$core$List$head(
 			A2(
 				$elm$core$List$drop,
 				A2($elm$core$Basics$modBy, n, n + index),
-				A2($author$project$Polygon$polygonPoints, poly, size)));
+				$author$project$Polygon$asPoints(poly)));
 		if (_v0.$ === 'Nothing') {
 			return {x: 0, y: 0};
 		} else {
@@ -5475,53 +5571,19 @@ var $author$project$Polygon$getPoint = F3(
 			return point;
 		}
 	});
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$polygon = $elm$svg$Svg$trustedNode('polygon');
-var $author$project$Polygon$startPoint = F2(
-	function (points, p) {
-		return A2(
-			$elm$core$List$map,
-			function (q) {
-				return {x: q.x + p.x, y: q.y + p.y};
-			},
-			points);
-	});
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $author$project$Polygon$polygonSvg = F5(
-	function (poly, size, theme, color, point) {
-		var svgPoints = A2(
-			$elm$core$String$join,
-			' ',
-			A2(
-				$elm$core$List$map,
-				function (p) {
-					return $elm$core$String$fromFloat(p.x) + (',' + $elm$core$String$fromFloat(p.y));
-				},
-				A2(
-					$author$project$Polygon$startPoint,
-					A2($author$project$Polygon$polygonPoints, poly, size),
-					point)));
-		return A2(
-			$elm$svg$Svg$polygon,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$points(svgPoints),
-					$elm$svg$Svg$Attributes$fill(
-					theme.getColor(color)),
-					$elm$svg$Svg$Attributes$stroke(theme.strokeColor),
-					$elm$svg$Svg$Attributes$strokeWidth('2')
-				]),
-			_List_Nil);
-	});
-var $author$project$Polygon$rotatePoly = F2(
-	function (_v0, a) {
+var $author$project$Polygon$setOrigin = F2(
+	function (origin, _v0) {
 		var lengths = _v0.lengths;
 		var angles = _v0.angles;
-		return {angles: angles, lengths: lengths, rotation: a};
+		var rotation = _v0.rotation;
+		return {angles: angles, lengths: lengths, origin: origin, rotation: rotation};
+	});
+var $author$project$Polygon$setRotation = F2(
+	function (angle, _v0) {
+		var lengths = _v0.lengths;
+		var angles = _v0.angles;
+		var origin = _v0.origin;
+		return {angles: angles, lengths: lengths, origin: origin, rotation: angle};
 	});
 var $elm$core$List$takeReverse = F3(
 	function (n, list, kept) {
@@ -5650,10 +5712,11 @@ var $elm$core$List$take = F2(
 		return A3($elm$core$List$takeFast, 0, n, list);
 	});
 var $author$project$Polygon$startAt = F2(
-	function (_v0, n) {
+	function (n, _v0) {
 		var lengths = _v0.lengths;
 		var angles = _v0.angles;
 		var rotation = _v0.rotation;
+		var origin = _v0.origin;
 		return {
 			angles: _Utils_ap(
 				A2($elm$core$List$drop, n, angles),
@@ -5661,84 +5724,159 @@ var $author$project$Polygon$startAt = F2(
 			lengths: _Utils_ap(
 				A2($elm$core$List$drop, n, lengths),
 				A2($elm$core$List$take, n, lengths)),
+			origin: origin,
 			rotation: rotation
 		};
 	});
-var $author$project$Laves$cairoShape = F3(
-	function (theme, origin, size) {
-		var tip = A2(
+var $author$project$Laves$cairoShape = function () {
+	var tip = A2(
+		$author$project$Polygon$getPoint,
+		2,
+		A2(
+			$author$project$Polygon$startAt,
+			1,
+			A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$cairo)));
+	var tip2 = A2(
+		$author$project$Util$add,
+		tip,
+		A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$cairo));
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
+			[
+				A2(
+				$author$project$Polygon$startAt,
+				1,
+				A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$cairo)),
+				A2($author$project$Polygon$setOrigin, tip, $author$project$Shapes$cairo),
+				A2(
+				$author$project$Polygon$setOrigin,
+				tip,
+				A2(
+					$author$project$Polygon$startAt,
+					1,
+					A2($author$project$Polygon$setRotation, 120, $author$project$Shapes$cairo))),
+				A2(
+				$author$project$Polygon$setOrigin,
+				tip2,
+				A2(
+					$author$project$Polygon$startAt,
+					3,
+					A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$cairo)))
+			]));
+}();
+var $author$project$Shapes$after = F2(
+	function (p, q) {
+		return (_Utils_cmp(q.x, p.x) > 0) || (_Utils_cmp(q.y, p.y) > 0);
+	});
+var $author$project$Shapes$before = F2(
+	function (p, q) {
+		return (_Utils_cmp(q.x, p.x) < 0) || (_Utils_cmp(q.y, p.y) < 0);
+	});
+var $author$project$Util$mul = F2(
+	function (s, p) {
+		return {x: s * p.x, y: s * p.y};
+	});
+var $author$project$Polygon$drawAt = F2(
+	function (origin, points) {
+		return A2(
+			$elm$core$List$map,
+			$author$project$Util$add(origin),
+			points);
+	});
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$polygon = $elm$svg$Svg$trustedNode('polygon');
+var $author$project$Polygon$scaleWith = F2(
+	function (size, points) {
+		return A2(
+			$elm$core$List$map,
+			function (p) {
+				return A2($author$project$Util$mul, size, p);
+			},
+			points);
+	});
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $author$project$Polygon$polygonSvg = F5(
+	function (poly, size, origin, theme, color) {
+		var svgPoints = A2(
+			$elm$core$String$join,
+			' ',
+			A2(
+				$elm$core$List$map,
+				function (p) {
+					return $elm$core$String$fromFloat(p.x) + (',' + $elm$core$String$fromFloat(p.y));
+				},
+				A2(
+					$author$project$Polygon$drawAt,
+					origin,
+					A2(
+						$author$project$Polygon$scaleWith,
+						size,
+						$author$project$Polygon$asPoints(poly)))));
+		return A2(
+			$elm$svg$Svg$polygon,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$points(svgPoints),
+					$elm$svg$Svg$Attributes$fill(
+					theme.getColor(color)),
+					$elm$svg$Svg$Attributes$stroke(theme.strokeColor),
+					$elm$svg$Svg$Attributes$strokeWidth('2')
+				]),
+			_List_Nil);
+	});
+var $author$project$Shapes$renderShape = F5(
+	function (_v0, size, origin, theme, colors) {
+		var render = _v0.render;
+		var topLeft = _v0.topLeft;
+		var bottomRight = _v0.bottomRight;
+		var rightPoint = A2(
 			$author$project$Util$add,
 			origin,
-			A3(
-				$author$project$Polygon$getPoint,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$cairo, 1),
-					30),
-				size,
-				2));
-		var tip2 = A2(
+			A2($author$project$Util$mul, size, bottomRight));
+		var rightBound = {x: 800, y: 800};
+		var leftPoint = A2(
 			$author$project$Util$add,
-			tip,
-			A3($author$project$Polygon$getPoint, $author$project$Shapes$cairo, size, 1));
-		return _List_fromArray(
-			[
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$cairo, 1),
-					30),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$cairo, size, theme, $author$project$ColorTheme$Secondary, tip),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$cairo, 1),
-					120),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				tip),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$cairo, 3),
-					60),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				tip2)
-			]);
+			origin,
+			A2($author$project$Util$mul, size, topLeft));
+		var leftBound = {x: 0, y: 0};
+		return (A2($author$project$Shapes$before, leftBound, rightPoint) || A2($author$project$Shapes$after, rightBound, leftPoint)) ? _List_Nil : A3(
+			$elm$core$List$map2,
+			F2(
+				function (poly, color) {
+					return A5($author$project$Polygon$polygonSvg, poly, size, origin, theme, color);
+				}),
+			render,
+			colors);
 	});
 var $author$project$Laves$cairoLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
 			return _List_Nil;
 		} else {
-			var w2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$cairo, size, 1).x;
-			var w1 = A3(
+			var w2 = A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$cairo).x * size;
+			var w1 = A2(
 				$author$project$Polygon$getPoint,
+				2,
 				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$cairo, 1),
-					30),
-				size,
-				2).x;
+					$author$project$Polygon$startAt,
+					1,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$cairo))).x * size;
 			var next_origin = {x: (origin.x + (2 * w1)) + w2, y: origin.y};
 			return _Utils_ap(
-				A3($author$project$Laves$cairoShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Laves$cairoShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Primary])),
 				A4($author$project$Laves$cairoLine, theme, n - 1, next_origin, size));
 		}
-	});
-var $author$project$Util$mul = F2(
-	function (p, s) {
-		return {x: s * p.x, y: s * p.y};
 	});
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5752,37 +5890,41 @@ var $author$project$Laves$cairoTiling = F4(
 		if (m <= 0) {
 			return _List_Nil;
 		} else {
+			var w = A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$cairo).x;
 			var size = 20;
-			var w = A3($author$project$Polygon$getPoint, $author$project$Shapes$cairo, size, 1).x;
 			var downSlope = A2(
 				$author$project$Util$mul,
+				2,
 				A2(
 					$author$project$Util$sub,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$cairo, size, 3),
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$cairo, size, 4)),
-				2);
+					A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$cairo),
+					A2($author$project$Polygon$getPoint, 4, $author$project$Shapes$cairo)));
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				function () {
-					var _v0 = A2($elm$core$Basics$modBy, 2, m);
-					if (!_v0) {
-						return {x: downSlope.x, y: w + downSlope.y};
-					} else {
-						return {x: -downSlope.x, y: w + downSlope.y};
-					}
-				}());
+				A2(
+					$author$project$Util$mul,
+					size,
+					function () {
+						var _v0 = A2($elm$core$Basics$modBy, 2, m);
+						if (!_v0) {
+							return {x: downSlope.x, y: w + downSlope.y};
+						} else {
+							return {x: -downSlope.x, y: w + downSlope.y};
+						}
+					}()));
 			return _Utils_ap(
 				A4($author$project$Laves$cairoLine, theme, n, origin, size),
 				A4($author$project$Laves$cairoTiling, theme, n, m - 1, next_origin));
 		}
 	});
 var $author$project$Polygon$addRotation = F2(
-	function (_v0, a) {
+	function (angle, _v0) {
 		var lengths = _v0.lengths;
 		var angles = _v0.angles;
 		var rotation = _v0.rotation;
-		return {angles: angles, lengths: lengths, rotation: rotation + a};
+		var origin = _v0.origin;
+		return {angles: angles, lengths: lengths, origin: origin, rotation: rotation + angle};
 	});
 var $elm$core$Basics$acos = _Basics_acos;
 var $elm$core$Debug$log = _Debug_log;
@@ -5886,30 +6028,17 @@ var $author$project$Shapes$convexHexa = function () {
 			[a_angle, 120, b_angle, 120, c_angle, 120]),
 		lengths: _List_fromArray(
 			[x, y, y, z, z, x]),
+		origin: {x: 0, y: 0},
 		rotation: 20
 	};
 }();
-var $author$project$Lab$convexHexaShape = F4(
-	function (theme, color, origin, size) {
-		return _List_fromArray(
-			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$convexHexa, size, theme, color, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$addRotation, $author$project$Shapes$convexHexa, 120),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$addRotation, $author$project$Shapes$convexHexa, 240),
-				size,
-				theme,
-				color,
-				origin)
-			]);
-	});
+var $author$project$Lab$convexHexaShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			$author$project$Shapes$convexHexa,
+			A2($author$project$Polygon$addRotation, 120, $author$project$Shapes$convexHexa),
+			A2($author$project$Polygon$addRotation, 240, $author$project$Shapes$convexHexa)
+		]));
 var $author$project$Util$mix3Color = function (n) {
 	var _v0 = A2($elm$core$Basics$modBy, 3, n);
 	switch (_v0) {
@@ -5921,6 +6050,27 @@ var $author$project$Util$mix3Color = function (n) {
 			return $author$project$ColorTheme$Ternary;
 	}
 };
+var $elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2($elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var $elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
 var $author$project$Lab$convexHexaLine = F5(
 	function (theme, n, offset, origin, size) {
 		if (n <= 0) {
@@ -5930,20 +6080,26 @@ var $author$project$Lab$convexHexaLine = F5(
 				$author$project$Util$add,
 				origin,
 				A2(
-					$author$project$Util$sub,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$convexHexa, size, 2),
-					A3(
-						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$addRotation, $author$project$Shapes$convexHexa, 240),
-						size,
-						2)));
+					$author$project$Util$mul,
+					size,
+					A2(
+						$author$project$Util$sub,
+						A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$convexHexa),
+						A2(
+							$author$project$Polygon$getPoint,
+							2,
+							A2($author$project$Polygon$addRotation, 240, $author$project$Shapes$convexHexa)))));
 			return _Utils_ap(
-				A4(
+				A5(
+					$author$project$Shapes$renderShape,
 					$author$project$Lab$convexHexaShape,
-					theme,
-					$author$project$Util$mix3Color(n + offset),
+					size,
 					origin,
-					size),
+					theme,
+					A2(
+						$elm$core$List$repeat,
+						3,
+						$author$project$Util$mix3Color(n + offset))),
 				A5($author$project$Lab$convexHexaLine, theme, n - 1, offset, next_origin, size));
 		}
 	});
@@ -5968,13 +6124,15 @@ var $author$project$Lab$convexHexaTiling = F4(
 				$author$project$Util$add,
 				origin,
 				A2(
-					$author$project$Util$sub,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$convexHexa, size, 2),
-					A3(
-						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$addRotation, $author$project$Shapes$convexHexa, 120),
-						size,
-						2)));
+					$author$project$Util$mul,
+					size,
+					A2(
+						$author$project$Util$sub,
+						A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$convexHexa),
+						A2(
+							$author$project$Polygon$getPoint,
+							2,
+							A2($author$project$Polygon$addRotation, 120, $author$project$Shapes$convexHexa)))));
 			return _Utils_ap(
 				A5($author$project$Lab$convexHexaLine, theme, n, offset, origin, size),
 				A4($author$project$Lab$convexHexaTiling, theme, n, m - 1, next_origin));
@@ -5994,50 +6152,19 @@ var $author$project$Shapes$kite = {
 			$elm$core$Basics$cos(
 			$elm$core$Basics$degrees(30))
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
-var $author$project$Laves$deltoidalTriHexagonalShape = F4(
-	function (theme, color, origin, size) {
-		return _List_fromArray(
-			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$kite, size, theme, color, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$kite, 60),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$kite, 120),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$kite, 180),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$kite, 240),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$kite, 300),
-				size,
-				theme,
-				color,
-				origin)
-			]);
-	});
+var $author$project$Laves$deltoidalTriHexagonalShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			$author$project$Shapes$kite,
+			A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$kite),
+			A2($author$project$Polygon$setRotation, 120, $author$project$Shapes$kite),
+			A2($author$project$Polygon$setRotation, 180, $author$project$Shapes$kite),
+			A2($author$project$Polygon$setRotation, 240, $author$project$Shapes$kite),
+			A2($author$project$Polygon$setRotation, 300, $author$project$Shapes$kite)
+		]));
 var $author$project$Laves$deltoidalTriHexagonalLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -6049,12 +6176,16 @@ var $author$project$Laves$deltoidalTriHexagonalLine = F4(
 				y: origin.y
 			};
 			return _Utils_ap(
-				A4(
+				A5(
+					$author$project$Shapes$renderShape,
 					$author$project$Laves$deltoidalTriHexagonalShape,
-					theme,
-					$author$project$Util$mix3Color(n),
+					size,
 					origin,
-					size),
+					theme,
+					A2(
+						$elm$core$List$repeat,
+						6,
+						$author$project$Util$mix3Color(n))),
 				A4($author$project$Laves$deltoidalTriHexagonalLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -6097,6 +6228,7 @@ var $author$project$Shapes$left = {
 			$elm$core$Basics$cos(
 			$elm$core$Basics$degrees(30))
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
 var $author$project$Shapes$right = {
@@ -6110,113 +6242,40 @@ var $author$project$Shapes$right = {
 			$elm$core$Basics$cos(
 			$elm$core$Basics$degrees(60))
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
-var $author$project$Laves$disdyakisRhombileShape = F3(
-	function (theme, origin, size) {
-		return _List_fromArray(
-			[
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$startAt, $author$project$Shapes$right, 1),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 30),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$right, 1),
-					60),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 90),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$right, 1),
-					120),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 150),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$right, 1),
-					180),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 210),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$right, 1),
-					240),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 270),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$right, 1),
-					300),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 330),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin)
-			]);
-	});
+var $author$project$Laves$disdyakisRhombileShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			A2($author$project$Polygon$startAt, 1, $author$project$Shapes$right),
+			A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$left),
+			A2(
+			$author$project$Polygon$startAt,
+			1,
+			A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$right)),
+			A2($author$project$Polygon$setRotation, 90, $author$project$Shapes$left),
+			A2(
+			$author$project$Polygon$startAt,
+			1,
+			A2($author$project$Polygon$setRotation, 120, $author$project$Shapes$right)),
+			A2($author$project$Polygon$setRotation, 150, $author$project$Shapes$left),
+			A2(
+			$author$project$Polygon$startAt,
+			1,
+			A2($author$project$Polygon$setRotation, 180, $author$project$Shapes$right)),
+			A2($author$project$Polygon$setRotation, 210, $author$project$Shapes$left),
+			A2(
+			$author$project$Polygon$startAt,
+			1,
+			A2($author$project$Polygon$setRotation, 240, $author$project$Shapes$right)),
+			A2($author$project$Polygon$setRotation, 270, $author$project$Shapes$left),
+			A2(
+			$author$project$Polygon$startAt,
+			1,
+			A2($author$project$Polygon$setRotation, 300, $author$project$Shapes$right)),
+			A2($author$project$Polygon$setRotation, 330, $author$project$Shapes$left)
+		]));
 var $author$project$Laves$disdyakisRhombileLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -6228,7 +6287,18 @@ var $author$project$Laves$disdyakisRhombileLine = F4(
 				y: origin.y
 			};
 			return _Utils_ap(
-				A3($author$project$Laves$disdyakisRhombileShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Laves$disdyakisRhombileShape,
+					size,
+					origin,
+					theme,
+					$elm$core$List$concat(
+						A2(
+							$elm$core$List$repeat,
+							6,
+							_List_fromArray(
+								[$author$project$ColorTheme$Secondary, $author$project$ColorTheme$Primary])))),
 				A4($author$project$Laves$disdyakisRhombileLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -6237,46 +6307,32 @@ var $author$project$Laves$disdyakisRhombileTiling = F4(
 		if (m <= 0) {
 			return _List_Nil;
 		} else {
+			var slant = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+				$author$project$Polygon$getPoint,
+				2,
+				A2($author$project$Polygon$setRotation, 330, $author$project$Shapes$left)) : A2(
+				$author$project$Polygon$getPoint,
+				2,
+				A2($author$project$Polygon$setRotation, 270, $author$project$Shapes$left));
 			var size = 40;
-			var slant = (!A2($elm$core$Basics$modBy, 2, m)) ? A3(
-				$author$project$Polygon$getPoint,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 330),
-				size,
-				2) : A3(
-				$author$project$Polygon$getPoint,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$left, 270),
-				size,
-				2);
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				A2($author$project$Util$add, slant, slant));
+				A2(
+					$author$project$Util$mul,
+					size,
+					A2($author$project$Util$add, slant, slant)));
 			return _Utils_ap(
 				A4($author$project$Laves$disdyakisRhombileLine, theme, n, origin, size),
 				A4($author$project$Laves$disdyakisRhombileTiling, theme, n, m - 1, next_origin));
 		}
-	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
 	});
 var $author$project$Shapes$equilateral = {
 	angles: _List_fromArray(
 		[60, 60, 60]),
 	lengths: _List_fromArray(
 		[1, 1, 1]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
 var $author$project$Shapes$square = {
@@ -6284,6 +6340,7 @@ var $author$project$Shapes$square = {
 		[90, 90, 90, 90]),
 	lengths: _List_fromArray(
 		[1, 1, 1, 1]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
 var $author$project$Semiregular$elongatedTriangular = F4(
@@ -6293,64 +6350,74 @@ var $author$project$Semiregular$elongatedTriangular = F4(
 		} else {
 			var size = 30;
 			var squareLine = A2(
-				$elm$core$List$map,
+				$elm$core$List$concatMap,
 				function (i) {
 					return A5(
-						$author$project$Polygon$polygonSvg,
-						$author$project$Shapes$square,
+						$author$project$Shapes$renderShape,
+						$author$project$Shapes$asShape(
+							_List_fromArray(
+								[$author$project$Shapes$square])),
 						size,
+						{x: origin.x + (i * size), y: origin.y},
 						theme,
-						$author$project$ColorTheme$Secondary,
-						{x: origin.x + (i * size), y: origin.y});
+						_List_fromArray(
+							[$author$project$ColorTheme$Secondary]));
 				},
-				A2($elm$core$List$range, 1, n));
+				A2($elm$core$List$range, 0, n));
 			var triangleLine = A2(
 				$elm$core$List$concatMap,
 				function (i) {
-					return _List_fromArray(
-						[
-							A5(
-							$author$project$Polygon$polygonSvg,
-							A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
+					return _Utils_ap(
+						A5(
+							$author$project$Shapes$renderShape,
+							$author$project$Shapes$asShape(
+								_List_fromArray(
+									[
+										A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$equilateral)
+									])),
 							size,
+							{x: origin.x + (i * size), y: origin.y},
 							theme,
-							$author$project$ColorTheme$Primary,
-							{x: origin.x + (i * size), y: origin.y}),
-							A5(
-							$author$project$Polygon$polygonSvg,
-							$author$project$Shapes$equilateral,
+							_List_fromArray(
+								[$author$project$ColorTheme$Primary])),
+						A5(
+							$author$project$Shapes$renderShape,
+							$author$project$Shapes$asShape(
+								_List_fromArray(
+									[$author$project$Shapes$equilateral])),
 							size,
+							{x: origin.x + (i * size), y: origin.y},
 							theme,
-							$author$project$ColorTheme$Ternary,
-							{x: origin.x + (i * size), y: origin.y})
-						]);
+							_List_fromArray(
+								[$author$project$ColorTheme$Ternary])));
 				},
-				A2($elm$core$List$range, 1, n));
+				A2($elm$core$List$range, 0, n));
 			var selectedLine = (!A2($elm$core$Basics$modBy, 2, m)) ? squareLine : triangleLine;
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				function () {
-					var _v0 = A2($elm$core$Basics$modBy, 4, m);
-					switch (_v0) {
-						case 0:
-							return {x: 0, y: size};
-						case 1:
-							return A3(
-								$author$project$Polygon$getPoint,
-								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
-								size,
-								1);
-						case 2:
-							return {x: 0, y: size};
-						default:
-							return A3(
-								$author$project$Polygon$getPoint,
-								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
-								size,
-								-1);
-					}
-				}());
+				A2(
+					$author$project$Util$mul,
+					size,
+					function () {
+						var _v0 = A2($elm$core$Basics$modBy, 4, m);
+						switch (_v0) {
+							case 0:
+								return {x: 0, y: 1};
+							case 1:
+								return A2(
+									$author$project$Polygon$getPoint,
+									1,
+									A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$equilateral));
+							case 2:
+								return {x: 0, y: 1};
+							default:
+								return A2(
+									$author$project$Polygon$getPoint,
+									-1,
+									A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$equilateral));
+						}
+					}()));
 			return _Utils_ap(
 				selectedLine,
 				A4($author$project$Semiregular$elongatedTriangular, theme, n, m - 1, next_origin));
@@ -6369,6 +6436,7 @@ var $author$project$Shapes$floret = {
 			1 + (2 * $elm$core$Basics$cos(
 			$elm$core$Basics$degrees(60)))
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
 var $author$project$Shapes$hexagon = {
@@ -6376,64 +6444,26 @@ var $author$project$Shapes$hexagon = {
 		[120, 120, 120, 120, 120, 120]),
 	lengths: _List_fromArray(
 		[1, 1, 1, 1, 1, 1]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
-var $author$project$Lab$floretHexaShape = F4(
-	function (theme, color, origin, size) {
-		return _List_fromArray(
-			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$floret, size, theme, color, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 60),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 120),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 180),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 240),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 300),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				$author$project$Shapes$hexagon,
-				size,
-				theme,
-				$author$project$ColorTheme$Quart,
-				A2(
-					$author$project$Util$add,
-					origin,
-					A3(
-						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 60),
-						size,
-						3)))
-			]);
-	});
+var $author$project$Lab$floretHexaShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			$author$project$Shapes$floret,
+			A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 120, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 180, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 240, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 300, $author$project$Shapes$floret),
+			A2(
+			$author$project$Polygon$setOrigin,
+			A2(
+				$author$project$Polygon$getPoint,
+				3,
+				A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$floret)),
+			$author$project$Shapes$hexagon)
+		]));
 var $author$project$Lab$floretHexaLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -6443,19 +6473,29 @@ var $author$project$Lab$floretHexaLine = F4(
 				$author$project$Util$add,
 				origin,
 				A2(
-					$author$project$Util$add,
+					$author$project$Util$mul,
+					size,
 					A2(
-						$author$project$Util$mul,
-						A3($author$project$Polygon$getPoint, $author$project$Shapes$floret, size, 1),
-						2),
-					{x: 2 * size, y: 0}));
+						$author$project$Util$add,
+						A2(
+							$author$project$Util$mul,
+							2,
+							A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$floret)),
+						{x: 2, y: 0})));
 			return _Utils_ap(
-				A4(
+				A5(
+					$author$project$Shapes$renderShape,
 					$author$project$Lab$floretHexaShape,
-					theme,
-					$author$project$Util$mix3Color(n),
+					size,
 					origin,
-					size),
+					theme,
+					_Utils_ap(
+						A2(
+							$elm$core$List$repeat,
+							6,
+							$author$project$Util$mix3Color(n)),
+						_List_fromArray(
+							[$author$project$ColorTheme$Quart]))),
 				A4($author$project$Lab$floretHexaLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -6468,28 +6508,29 @@ var $author$project$Lab$floretHexaTiling = F4(
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				function () {
-					var _v1 = A2($elm$core$Basics$modBy, 2, m);
-					if (!_v1) {
-						return A2(
-							$author$project$Util$add,
-							A3(
-								$author$project$Polygon$getPoint,
-								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, -120),
-								size,
-								2),
-							A3(
-								$author$project$Polygon$getPoint,
-								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, -120),
-								size,
-								1));
-					} else {
-						return A2(
-							$author$project$Util$add,
-							A3($author$project$Polygon$getPoint, $author$project$Shapes$floret, size, 3),
-							A3($author$project$Polygon$getPoint, $author$project$Shapes$floret, size, 4));
-					}
-				}());
+				A2(
+					$author$project$Util$mul,
+					size,
+					function () {
+						var _v1 = A2($elm$core$Basics$modBy, 2, m);
+						if (!_v1) {
+							return A2(
+								$author$project$Util$add,
+								A2(
+									$author$project$Polygon$getPoint,
+									2,
+									A2($author$project$Polygon$setRotation, -120, $author$project$Shapes$floret)),
+								A2(
+									$author$project$Polygon$getPoint,
+									1,
+									A2($author$project$Polygon$setRotation, -120, $author$project$Shapes$floret)));
+						} else {
+							return A2(
+								$author$project$Util$add,
+								A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$floret),
+								A2($author$project$Polygon$getPoint, 4, $author$project$Shapes$floret));
+						}
+					}()));
 			var color_offset = function () {
 				var _v0 = A2($elm$core$Basics$modBy, 2, m);
 				if (!_v0) {
@@ -6503,48 +6544,16 @@ var $author$project$Lab$floretHexaTiling = F4(
 				A4($author$project$Lab$floretHexaTiling, theme, n + color_offset, m - 1, next_origin));
 		}
 	});
-var $author$project$Laves$floretPentagonalShape = F4(
-	function (theme, color, origin, size) {
-		return _List_fromArray(
-			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$floret, size, theme, color, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 60),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 120),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 180),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 240),
-				size,
-				theme,
-				color,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, 300),
-				size,
-				theme,
-				color,
-				origin)
-			]);
-	});
+var $author$project$Laves$floretPentagonalShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			$author$project$Shapes$floret,
+			A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 120, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 180, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 240, $author$project$Shapes$floret),
+			A2($author$project$Polygon$setRotation, 300, $author$project$Shapes$floret)
+		]));
 var $author$project$Laves$floretPentagonalLine = F5(
 	function (theme, n, offset, origin, size) {
 		if (n <= 0) {
@@ -6554,16 +6563,23 @@ var $author$project$Laves$floretPentagonalLine = F5(
 				$author$project$Util$add,
 				origin,
 				A2(
-					$author$project$Util$add,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$floret, size, 2),
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$floret, size, 1)));
+					$author$project$Util$mul,
+					size,
+					A2(
+						$author$project$Util$add,
+						A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$floret),
+						A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$floret))));
 			return _Utils_ap(
-				A4(
+				A5(
+					$author$project$Shapes$renderShape,
 					$author$project$Laves$floretPentagonalShape,
-					theme,
-					$author$project$Util$mix3Color(n + offset),
+					size,
 					origin,
-					size),
+					theme,
+					A2(
+						$elm$core$List$repeat,
+						6,
+						$author$project$Util$mix3Color(n + offset))),
 				A5($author$project$Laves$floretPentagonalLine, theme, n - 1, offset, next_origin, size));
 		}
 	});
@@ -6577,17 +6593,18 @@ var $author$project$Laves$floretPentagonalTiling = F4(
 				$author$project$Util$add,
 				origin,
 				A2(
-					$author$project$Util$add,
-					A3(
-						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, -60),
-						size,
-						2),
-					A3(
-						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$floret, -60),
-						size,
-						1)));
+					$author$project$Util$mul,
+					size,
+					A2(
+						$author$project$Util$add,
+						A2(
+							$author$project$Polygon$getPoint,
+							2,
+							A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$floret)),
+						A2(
+							$author$project$Polygon$getPoint,
+							1,
+							A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$floret)))));
 			var color_offset = function () {
 				var _v0 = A2($elm$core$Basics$modBy, 3, m);
 				switch (_v0) {
@@ -6620,17 +6637,22 @@ var $author$project$Regular$hexagonalTiling = F4(
 				$elm$core$List$map,
 				function (y) {
 					return A2(
-						$elm$core$List$map,
+						$elm$core$List$concatMap,
 						function (_v0) {
 							var point = _v0.a;
 							var color = _v0.b;
 							return A5(
-								$author$project$Polygon$polygonSvg,
-								A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
+								$author$project$Shapes$renderShape,
+								$author$project$Shapes$asShape(
+									_List_fromArray(
+										[
+											A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$hexagon)
+										])),
 								size,
+								point,
 								theme,
-								color,
-								point);
+								_List_fromArray(
+									[color]));
 						},
 						A2(
 							$elm$core$List$map,
@@ -6645,9 +6667,9 @@ var $author$project$Regular$hexagonalTiling = F4(
 										}),
 									$author$project$Util$mix2Color(y));
 							},
-							A2($elm$core$List$range, 1, n)));
+							A2($elm$core$List$range, 0, n)));
 				},
-				A2($elm$core$List$range, 1, m)));
+				A2($elm$core$List$range, 0, m)));
 	});
 var $author$project$Shapes$prism = {
 	angles: _List_fromArray(
@@ -6662,28 +6684,21 @@ var $author$project$Shapes$prism = {
 			$elm$core$Basics$degrees(30))),
 			1
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
-var $author$project$Laves$prismaticPentagonalShape = F3(
-	function (theme, origin, size) {
-		return _List_fromArray(
-			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$prism, size, theme, $author$project$ColorTheme$Primary, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2(
-					$author$project$Polygon$rotatePoly,
-					A2($author$project$Polygon$startAt, $author$project$Shapes$prism, 2),
-					30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				A2(
-					$author$project$Util$add,
-					origin,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$prism, size, 3)))
-			]);
-	});
+var $author$project$Laves$prismaticPentagonalShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			$author$project$Shapes$prism,
+			A2(
+			$author$project$Polygon$setOrigin,
+			A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$prism),
+			A2(
+				$author$project$Polygon$startAt,
+				2,
+				A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$prism)))
+		]));
 var $author$project$Laves$prismaticPentagonalLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -6691,7 +6706,14 @@ var $author$project$Laves$prismaticPentagonalLine = F4(
 		} else {
 			var next_origin = {x: origin.x + size, y: origin.y};
 			return _Utils_ap(
-				A3($author$project$Laves$prismaticPentagonalShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Laves$prismaticPentagonalShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary])),
 				A4($author$project$Laves$prismaticPentagonalLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -6703,26 +6725,29 @@ var $author$project$Laves$prismaticPentagonalTiling = F4(
 			var size = 30;
 			var rightSlope = A2(
 				$author$project$Util$sub,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$prism, size, 3),
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$prism, size, 2));
+				A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$prism),
+				A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$prism));
 			var leftSlope = A2(
 				$author$project$Util$sub,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$prism, size, 3),
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$prism, size, 4));
+				A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$prism),
+				A2($author$project$Polygon$getPoint, 4, $author$project$Shapes$prism));
 			var next_origin = A2(
 				$author$project$Util$add,
+				origin,
 				A2(
-					$author$project$Util$add,
-					origin,
-					{x: 0, y: 2 * size}),
-				function () {
-					var _v0 = A2($elm$core$Basics$modBy, 2, m);
-					if (!_v0) {
-						return leftSlope;
-					} else {
-						return rightSlope;
-					}
-				}());
+					$author$project$Util$mul,
+					size,
+					A2(
+						$author$project$Util$add,
+						{x: 0, y: 2},
+						function () {
+							var _v0 = A2($elm$core$Basics$modBy, 2, m);
+							if (!_v0) {
+								return leftSlope;
+							} else {
+								return rightSlope;
+							}
+						}())));
 			return _Utils_ap(
 				A4($author$project$Laves$prismaticPentagonalLine, theme, n, origin, size),
 				A4($author$project$Laves$prismaticPentagonalTiling, theme, n, m - 1, next_origin));
@@ -6738,12 +6763,21 @@ var $author$project$Lab$pythagoreanTiling = F4(
 				$elm$core$List$map,
 				function (y) {
 					return A2(
-						$elm$core$List$map,
+						$elm$core$List$concatMap,
 						function (_v0) {
 							var point = _v0.a;
 							var size = _v0.b;
 							var color = _v0.c;
-							return A5($author$project$Polygon$polygonSvg, $author$project$Shapes$square, size, theme, color, point);
+							return A5(
+								$author$project$Shapes$renderShape,
+								$author$project$Shapes$asShape(
+									_List_fromArray(
+										[$author$project$Shapes$square])),
+								size,
+								point,
+								theme,
+								_List_fromArray(
+									[color]));
 						},
 						A2(
 							$elm$core$List$concatMap,
@@ -6770,77 +6804,63 @@ var $author$project$Lab$pythagoreanTiling = F4(
 				},
 				A2($elm$core$List$range, 1, m)));
 	});
-var $author$project$Semiregular$rhombiTriHexaShape = F3(
-	function (theme, origin, size) {
-		var trig2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 4);
-		var trig1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3);
-		var square3 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 5);
-		var square2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 4);
-		var square1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2);
-		return _List_fromArray(
+var $author$project$Semiregular$rhombiTriHexaShape = function () {
+	var trig2 = A2($author$project$Polygon$getPoint, 4, $author$project$Shapes$hexagon);
+	var trig1 = A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$hexagon);
+	var square3 = A2($author$project$Polygon$getPoint, 5, $author$project$Shapes$hexagon);
+	var square2 = A2($author$project$Polygon$getPoint, 4, $author$project$Shapes$hexagon);
+	var square1 = A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$hexagon);
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
 			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$hexagon, size, theme, $author$project$ColorTheme$Primary, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				A2($author$project$Util$add, origin, square1)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				A2($author$project$Util$add, origin, trig1)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				$author$project$Shapes$square,
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				A2($author$project$Util$add, origin, square2)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -90),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				A2($author$project$Util$add, origin, trig2)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				A2($author$project$Util$add, origin, square3))
-			]);
-	});
+				$author$project$Shapes$hexagon,
+				A2(
+				$author$project$Polygon$setOrigin,
+				square1,
+				A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$square)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				trig1,
+				A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$equilateral)),
+				A2($author$project$Polygon$setOrigin, square2, $author$project$Shapes$square),
+				A2(
+				$author$project$Polygon$setOrigin,
+				trig2,
+				A2($author$project$Polygon$setRotation, -90, $author$project$Shapes$equilateral)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				square3,
+				A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$square))
+			]));
+}();
 var $author$project$Semiregular$rhombiTriHexaLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
 			return _List_Nil;
 		} else {
-			var square_slant = {
-				x: A2(
-					$author$project$Util$sub,
-					A3(
-						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
-						size,
-						1),
-					A3(
-						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
-						size,
-						0)).x,
-				y: 0
-			};
+			var square_slant = A2(
+				$author$project$Util$mul,
+				size,
+				{
+					x: A2(
+						$author$project$Util$sub,
+						A2(
+							$author$project$Polygon$getPoint,
+							1,
+							A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$square)),
+						A2(
+							$author$project$Polygon$getPoint,
+							0,
+							A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$square))).x,
+					y: 0
+				});
 			var hexagon_width = A2(
-				$author$project$Util$sub,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2),
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1));
+				$author$project$Util$mul,
+				size,
+				A2(
+					$author$project$Util$sub,
+					A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$hexagon),
+					A2($author$project$Polygon$getPoint, -1, $author$project$Shapes$hexagon)));
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
@@ -6855,7 +6875,14 @@ var $author$project$Semiregular$rhombiTriHexaLine = F4(
 							{x: size, y: 0},
 							square_slant))));
 			return _Utils_ap(
-				A3($author$project$Semiregular$rhombiTriHexaShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Semiregular$rhombiTriHexaShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Ternary])),
 				A4($author$project$Semiregular$rhombiTriHexaLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -6869,21 +6896,22 @@ var $author$project$Semiregular$rhombiTriHexagonalTiling = F4(
 				$author$project$Util$sub,
 				A2(
 					$author$project$Util$add,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1),
-					A3(
+					A2($author$project$Polygon$getPoint, -1, $author$project$Shapes$hexagon),
+					A2(
 						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
-						size,
-						-1)),
-				{x: size, y: 0}) : A2(
+						-1,
+						A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$square))),
+				{x: 1, y: 0}) : A2(
 				$author$project$Util$add,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2),
-				A3(
+				A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$hexagon),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
-					size,
-					1));
-			var next_origin = A2($author$project$Util$add, origin, next_point);
+					1,
+					A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$square)));
+			var next_origin = A2(
+				$author$project$Util$add,
+				origin,
+				A2($author$project$Util$mul, size, next_point));
 			return _Utils_ap(
 				A4($author$project$Semiregular$rhombiTriHexaLine, theme, n, origin, size),
 				A4($author$project$Semiregular$rhombiTriHexagonalTiling, theme, n, m - 1, next_origin));
@@ -6894,35 +6922,16 @@ var $author$project$Shapes$rhombus = {
 		[60, 120, 60, 120]),
 	lengths: _List_fromArray(
 		[1, 1, 1, 1]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
-var $author$project$Laves$rhombileShape = F3(
-	function (theme, origin, size) {
-		return _List_fromArray(
-			[
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$rhombus, 30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$rhombus, 150),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$rhombus, -90),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin)
-			]);
-	});
+var $author$project$Laves$rhombileShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$rhombus),
+			A2($author$project$Polygon$setRotation, 150, $author$project$Shapes$rhombus),
+			A2($author$project$Polygon$setRotation, -90, $author$project$Shapes$rhombus)
+		]));
 var $author$project$Laves$rhombileLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -6930,22 +6939,27 @@ var $author$project$Laves$rhombileLine = F4(
 		} else {
 			var upSlope = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$rhombus, 30),
-					size,
-					1),
-				A3(
+					1,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$rhombus)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$rhombus, 30),
-					size,
-					0));
+					0,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$rhombus)));
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				{x: upSlope.x * 2, y: 0});
+				{x: (upSlope.x * 2) * size, y: 0});
 			return _Utils_ap(
-				A3($author$project$Laves$rhombileShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Laves$rhombileShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Secondary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Primary])),
 				A4($author$project$Laves$rhombileLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -6957,82 +6971,58 @@ var $author$project$Laves$rhombileTiling = F4(
 			var size = 30;
 			var downSlope = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$rhombus, 150),
-					size,
-					0),
-				A3(
+					0,
+					A2($author$project$Polygon$setRotation, 150, $author$project$Shapes$rhombus)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$rhombus, 150),
-					size,
-					1));
+					1,
+					A2($author$project$Polygon$setRotation, 150, $author$project$Shapes$rhombus)));
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				(!A2($elm$core$Basics$modBy, 2, m)) ? A2(
-					$author$project$Util$add,
-					downSlope,
-					{x: 0, y: size}) : {x: -downSlope.x, y: downSlope.y + size});
+				A2(
+					$author$project$Util$mul,
+					size,
+					(!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+						$author$project$Util$add,
+						downSlope,
+						{x: 0, y: 1}) : {x: -downSlope.x, y: downSlope.y + 1}));
 			return _Utils_ap(
 				A4($author$project$Laves$rhombileLine, theme, n, origin, size),
 				A4($author$project$Laves$rhombileTiling, theme, n, m - 1, next_origin));
 		}
 	});
-var $author$project$Semiregular$snubSquareShape = F3(
-	function (theme, origin, size) {
-		var first = A2(
-			$author$project$Util$add,
-			origin,
-			A3(
-				$author$project$Polygon$getPoint,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
-				size,
-				2));
-		var second = A2(
-			$author$project$Util$add,
-			first,
-			{x: size, y: 0});
-		return _List_fromArray(
+var $author$project$Semiregular$snubSquareShape = function () {
+	var first = A2(
+		$author$project$Polygon$getPoint,
+		2,
+		A2($author$project$Polygon$setRotation, 90, $author$project$Shapes$equilateral));
+	var second = A2(
+		$author$project$Util$add,
+		first,
+		{x: 1, y: 0});
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
 			[
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, $author$project$ColorTheme$Primary, first),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				first),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 30),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				second),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				second)
-			]);
-	});
+				A2($author$project$Polygon$setRotation, 90, $author$project$Shapes$equilateral),
+				A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$square),
+				A2($author$project$Polygon$setOrigin, first, $author$project$Shapes$equilateral),
+				A2(
+				$author$project$Polygon$setOrigin,
+				first,
+				A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$equilateral)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				second,
+				A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$equilateral)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				second,
+				A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$square))
+			]));
+}();
 var $author$project$Semiregular$snubSquareLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -7040,19 +7030,24 @@ var $author$project$Semiregular$snubSquareLine = F4(
 		} else {
 			var triangle_slant = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
-					size,
-					2),
-				A3(
+					2,
+					A2($author$project$Polygon$setRotation, 90, $author$project$Shapes$equilateral)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 90),
-					size,
-					0));
-			var next_origin = {x: (origin.x + (2 * triangle_slant.x)) + size, y: origin.y};
+					0,
+					A2($author$project$Polygon$setRotation, 90, $author$project$Shapes$equilateral)));
+			var next_origin = {x: (origin.x + ((2 * size) * triangle_slant.x)) + size, y: origin.y};
 			return _Utils_ap(
-				A3($author$project$Semiregular$snubSquareShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Semiregular$snubSquareShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Primary, $author$project$ColorTheme$Primary, $author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary])),
 				A4($author$project$Semiregular$snubSquareLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -7061,100 +7056,71 @@ var $author$project$Semiregular$snubSquareTiling = F4(
 		if (m <= 0) {
 			return _List_Nil;
 		} else {
-			var size = 30;
 			var square_diag = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 30),
-					size,
-					2),
-				A3(
+					2,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$square)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 30),
-					size,
-					0));
-			var next_origin = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+					0,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$square)));
+			var size = 30;
+			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
 				A2(
-					$author$project$Util$add,
-					square_diag,
-					{x: (-2) * square_diag.x, y: size})) : A2(
-				$author$project$Util$add,
-				origin,
-				A2(
-					$author$project$Util$add,
-					square_diag,
-					{x: 0, y: size}));
+					$author$project$Util$mul,
+					size,
+					(!A2($elm$core$Basics$modBy, 2, m)) ? A2(
+						$author$project$Util$add,
+						square_diag,
+						{x: (-2) * square_diag.x, y: 1}) : A2(
+						$author$project$Util$add,
+						square_diag,
+						{x: 0, y: 1})));
 			return _Utils_ap(
 				A4($author$project$Semiregular$snubSquareLine, theme, n, origin, size),
 				A4($author$project$Semiregular$snubSquareTiling, theme, n, m - 1, next_origin));
 		}
 	});
-var $author$project$Semiregular$snubTriHexagonalShape = F3(
-	function (theme, origin, size) {
-		var third = A2(
-			$author$project$Util$add,
-			origin,
-			A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 5));
-		var second = A2(
-			$author$project$Util$add,
-			origin,
-			A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 4));
-		var first = A2(
-			$author$project$Util$add,
-			origin,
-			A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3));
-		return _List_fromArray(
+var $author$project$Semiregular$snubTriHexagonalShape = function () {
+	var third = A2($author$project$Polygon$getPoint, 5, $author$project$Shapes$hexagon);
+	var second = A2($author$project$Polygon$getPoint, 4, $author$project$Shapes$hexagon);
+	var first = A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$hexagon);
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
 			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$hexagon, size, theme, $author$project$ColorTheme$Primary, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				first),
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, $author$project$ColorTheme$Secondary, first),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				first),
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, $author$project$ColorTheme$Secondary, second),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				second),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -120),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				second),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -60),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				third),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, -120),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				third)
-			]);
-	});
+				$author$project$Shapes$hexagon,
+				A2(
+				$author$project$Polygon$setOrigin,
+				first,
+				A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$equilateral)),
+				A2($author$project$Polygon$setOrigin, first, $author$project$Shapes$equilateral),
+				A2(
+				$author$project$Polygon$setOrigin,
+				first,
+				A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$equilateral)),
+				A2($author$project$Polygon$setOrigin, second, $author$project$Shapes$equilateral),
+				A2(
+				$author$project$Polygon$setOrigin,
+				second,
+				A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$equilateral)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				second,
+				A2($author$project$Polygon$setRotation, -120, $author$project$Shapes$equilateral)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				third,
+				A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$equilateral)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				third,
+				A2($author$project$Polygon$setRotation, -120, $author$project$Shapes$equilateral))
+			]));
+}();
 var $author$project$Semiregular$snubTriHexagonalLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -7162,7 +7128,14 @@ var $author$project$Semiregular$snubTriHexagonalLine = F4(
 		} else {
 			var next_origin = {x: origin.x + (7 * size), y: origin.y};
 			return _Utils_ap(
-				A3($author$project$Semiregular$snubTriHexagonalShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Semiregular$snubTriHexagonalShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary])),
 				A4($author$project$Semiregular$snubTriHexagonalLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -7175,31 +7148,37 @@ var $author$project$Semiregular$snubTriHexagonalTiling = F4(
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				function () {
-					var _v0 = A2($elm$core$Basics$modBy, 3, m);
-					switch (_v0) {
-						case 0:
-							return A2(
-								$author$project$Util$sub,
-								A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1),
-								{x: 2 * size, y: 0});
-						case 1:
-							return A2(
-								$author$project$Util$add,
-								A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 2),
-								{x: 3 * size, y: 0});
-						default:
-							return A2(
-								$author$project$Util$sub,
-								A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, -1),
-								{x: 2 * size, y: 0});
-					}
-				}());
+				A2(
+					$author$project$Util$mul,
+					size,
+					function () {
+						var _v0 = A2($elm$core$Basics$modBy, 3, m);
+						switch (_v0) {
+							case 0:
+								return A2(
+									$author$project$Util$sub,
+									A2($author$project$Polygon$getPoint, -1, $author$project$Shapes$hexagon),
+									{x: 2, y: 0});
+							case 1:
+								return A2(
+									$author$project$Util$add,
+									A2($author$project$Polygon$getPoint, 2, $author$project$Shapes$hexagon),
+									{x: 3, y: 0});
+							default:
+								return A2(
+									$author$project$Util$sub,
+									A2($author$project$Polygon$getPoint, -1, $author$project$Shapes$hexagon),
+									{x: 2, y: 0});
+						}
+					}()));
 			return _Utils_ap(
 				A4($author$project$Semiregular$snubTriHexagonalLine, theme, n, origin, size),
 				A4($author$project$Semiregular$snubTriHexagonalTiling, theme, n, m - 1, next_origin));
 		}
 	});
+var $author$project$Regular$squareShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[$author$project$Shapes$square]));
 var $author$project$Regular$squareTiling = F4(
 	function (theme, n, m, origin) {
 		var size = 30.0;
@@ -7208,11 +7187,18 @@ var $author$project$Regular$squareTiling = F4(
 				$elm$core$List$map,
 				function (y) {
 					return A2(
-						$elm$core$List$map,
+						$elm$core$List$concatMap,
 						function (_v0) {
 							var point = _v0.a;
 							var color = _v0.b;
-							return A5($author$project$Polygon$polygonSvg, $author$project$Shapes$square, size, theme, color, point);
+							return A5(
+								$author$project$Shapes$renderShape,
+								$author$project$Regular$squareShape,
+								size,
+								point,
+								theme,
+								_List_fromArray(
+									[color]));
 						},
 						A2(
 							$elm$core$List$map,
@@ -7224,9 +7210,9 @@ var $author$project$Regular$squareTiling = F4(
 										{x: size * x, y: size * y}),
 									$author$project$Util$mix3Color(y + x));
 							},
-							A2($elm$core$List$range, 1, n)));
+							A2($elm$core$List$range, 0, n)));
 				},
-				A2($elm$core$List$range, 1, m)));
+				A2($elm$core$List$range, 0, m)));
 	});
 var $author$project$Shapes$isosceles = {
 	angles: _List_fromArray(
@@ -7238,42 +7224,17 @@ var $author$project$Shapes$isosceles = {
 			$elm$core$Basics$degrees(45)),
 			1
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
-var $author$project$Laves$tetrakisSquareShape = F3(
-	function (theme, origin, size) {
-		return _List_fromArray(
-			[
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$isosceles, 45),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$isosceles, 135),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$isosceles, -135),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$isosceles, -45),
-				size,
-				theme,
-				$author$project$ColorTheme$Quart,
-				origin)
-			]);
-	});
+var $author$project$Laves$tetrakisSquareShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			A2($author$project$Polygon$setRotation, 45, $author$project$Shapes$isosceles),
+			A2($author$project$Polygon$setRotation, 135, $author$project$Shapes$isosceles),
+			A2($author$project$Polygon$setRotation, -135, $author$project$Shapes$isosceles),
+			A2($author$project$Polygon$setRotation, -45, $author$project$Shapes$isosceles)
+		]));
 var $author$project$Laves$tetrakisSquareLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -7285,7 +7246,14 @@ var $author$project$Laves$tetrakisSquareLine = F4(
 				y: origin.y
 			};
 			return _Utils_ap(
-				A3($author$project$Laves$tetrakisSquareShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Laves$tetrakisSquareShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Quart])),
 				A4($author$project$Laves$tetrakisSquareLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -7305,37 +7273,46 @@ var $author$project$Laves$tetrakisSquareTiling = F4(
 				A4($author$project$Laves$tetrakisSquareTiling, theme, n, m - 1, next_origin));
 		}
 	});
+var $author$project$Semiregular$triHexagonalShape = function () {
+	var second_trig = A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$hexagon);
+	var first_trig = A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$hexagon);
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
+			[
+				$author$project$Shapes$hexagon,
+				A2($author$project$Polygon$setOrigin, first_trig, $author$project$Shapes$equilateral),
+				A2(
+				$author$project$Polygon$setOrigin,
+				second_trig,
+				A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$equilateral))
+			]));
+}();
 var $author$project$Semiregular$triHexagonalLine = F3(
 	function (theme, n, origin) {
 		if (n <= 0) {
 			return _List_Nil;
 		} else {
 			var size = 30;
-			var second_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3);
-			var first_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 1);
+			var first_trig = A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$hexagon);
 			var next_origin = A2(
 				$author$project$Util$add,
-				A2($author$project$Util$add, origin, first_trig),
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$equilateral, size, 1));
+				origin,
+				A2(
+					$author$project$Util$mul,
+					size,
+					A2(
+						$author$project$Util$add,
+						first_trig,
+						A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$equilateral))));
 			return _Utils_ap(
-				_List_fromArray(
-					[
-						A5($author$project$Polygon$polygonSvg, $author$project$Shapes$hexagon, size, theme, $author$project$ColorTheme$Primary, origin),
-						A5(
-						$author$project$Polygon$polygonSvg,
-						$author$project$Shapes$equilateral,
-						size,
-						theme,
-						$author$project$ColorTheme$Secondary,
-						A2($author$project$Util$add, origin, first_trig)),
-						A5(
-						$author$project$Polygon$polygonSvg,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
-						size,
-						theme,
-						$author$project$ColorTheme$Secondary,
-						A2($author$project$Util$add, origin, second_trig))
-					]),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Semiregular$triHexagonalShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary])),
 				A3($author$project$Semiregular$triHexagonalLine, theme, n - 1, next_origin));
 		}
 	});
@@ -7349,12 +7326,18 @@ var $author$project$Semiregular$triHexagonalTiling = F4(
 			var next_origin = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
 				$author$project$Util$add,
 				origin,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3)) : A2(
+				A2(
+					$author$project$Util$mul,
+					size,
+					A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$hexagon))) : A2(
 				$author$project$Util$sub,
 				A2(
 					$author$project$Util$add,
 					origin,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$hexagon, size, 3)),
+					A2(
+						$author$project$Util$mul,
+						size,
+						A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$hexagon))),
 				hexagon_translate);
 			return _Utils_ap(
 				A3($author$project$Semiregular$triHexagonalLine, theme, n, origin),
@@ -7371,62 +7354,23 @@ var $author$project$Shapes$obtuseIso = {
 			$elm$core$Basics$degrees(30)),
 			1
 		]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
-var $author$project$Laves$triakisTriDownShape = F3(
-	function (theme, origin, size) {
-		return _List_fromArray(
-			[
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, 30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, 150),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, -90),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				origin)
-			]);
-	});
-var $author$project$Laves$triakisTriUpShape = F3(
-	function (theme, origin, size) {
-		return _List_fromArray(
-			[
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, 90),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, 210),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, -30),
-				size,
-				theme,
-				$author$project$ColorTheme$Primary,
-				origin)
-			]);
-	});
+var $author$project$Laves$triakisTriDownShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$obtuseIso),
+			A2($author$project$Polygon$setRotation, 150, $author$project$Shapes$obtuseIso),
+			A2($author$project$Polygon$setRotation, -90, $author$project$Shapes$obtuseIso)
+		]));
+var $author$project$Laves$triakisTriUpShape = $author$project$Shapes$asShape(
+	_List_fromArray(
+		[
+			A2($author$project$Polygon$setRotation, 90, $author$project$Shapes$obtuseIso),
+			A2($author$project$Polygon$setRotation, 210, $author$project$Shapes$obtuseIso),
+			A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$obtuseIso)
+		]));
 var $author$project$Laves$triakisTriLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -7439,25 +7383,43 @@ var $author$project$Laves$triakisTriLine = F4(
 			};
 			var downSlant = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, 150),
-					size,
-					0),
-				A3(
+					0,
+					A2($author$project$Polygon$setRotation, 150, $author$project$Shapes$obtuseIso)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, 150),
-					size,
-					1));
+					1,
+					A2($author$project$Polygon$setRotation, 150, $author$project$Shapes$obtuseIso)));
 			var upOrigin = A2(
 				$author$project$Util$add,
 				origin,
-				A2($author$project$Util$add, downSlant, downSlant));
-			var downOrigin = A2($author$project$Util$add, origin, downSlant);
+				A2(
+					$author$project$Util$mul,
+					size,
+					A2($author$project$Util$add, downSlant, downSlant)));
+			var downOrigin = A2(
+				$author$project$Util$add,
+				origin,
+				A2($author$project$Util$mul, size, downSlant));
 			return _Utils_ap(
-				A3($author$project$Laves$triakisTriDownShape, theme, downOrigin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Laves$triakisTriDownShape,
+					size,
+					downOrigin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Secondary, $author$project$ColorTheme$Primary, $author$project$ColorTheme$Ternary])),
 				_Utils_ap(
-					A3($author$project$Laves$triakisTriUpShape, theme, upOrigin, size),
+					A5(
+						$author$project$Shapes$renderShape,
+						$author$project$Laves$triakisTriUpShape,
+						size,
+						upOrigin,
+						theme,
+						_List_fromArray(
+							[$author$project$ColorTheme$Secondary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Primary])),
 					A4($author$project$Laves$triakisTriLine, theme, n - 1, next_origin, size)));
 		}
 	});
@@ -7469,20 +7431,21 @@ var $author$project$Laves$triakisTriangularTiling = F4(
 			var size = 30;
 			var downSlope = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, -90),
-					size,
-					1),
-				A3(
+					1,
+					A2($author$project$Polygon$setRotation, -90, $author$project$Shapes$obtuseIso)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$obtuseIso, -90),
-					size,
-					2));
-			var next_origin = (!A2($elm$core$Basics$modBy, 2, m)) ? A2($author$project$Util$add, origin, downSlope) : A2(
+					2,
+					A2($author$project$Polygon$setRotation, -90, $author$project$Shapes$obtuseIso)));
+			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				{x: -downSlope.x, y: downSlope.y});
+				A2(
+					$author$project$Util$mul,
+					size,
+					(!A2($elm$core$Basics$modBy, 2, m)) ? downSlope : {x: -downSlope.x, y: downSlope.y}));
 			return _Utils_ap(
 				A4($author$project$Laves$triakisTriLine, theme, n, origin, size),
 				A4($author$project$Laves$triakisTriangularTiling, theme, n, m - 1, next_origin));
@@ -7509,21 +7472,35 @@ var $author$project$Regular$triangularTiling = F4(
 				$elm$core$List$map,
 				function (y) {
 					return A2(
-						$elm$core$List$map,
+						$elm$core$List$concatMap,
 						function (_v0) {
 							var point = _v0.a;
 							var color = _v0.b;
 							var _v1 = A2($elm$core$Basics$modBy, 2, y);
 							if (!_v1) {
-								return A5($author$project$Polygon$polygonSvg, $author$project$Shapes$equilateral, size, theme, color, point);
+								return A5(
+									$author$project$Shapes$renderShape,
+									$author$project$Shapes$asShape(
+										_List_fromArray(
+											[$author$project$Shapes$equilateral])),
+									size,
+									point,
+									theme,
+									_List_fromArray(
+										[color]));
 							} else {
 								return A5(
-									$author$project$Polygon$polygonSvg,
-									A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
+									$author$project$Shapes$renderShape,
+									$author$project$Shapes$asShape(
+										_List_fromArray(
+											[
+												A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$equilateral)
+											])),
 									size,
+									point,
 									theme,
-									color,
-									point);
+									_List_fromArray(
+										[color]));
 							}
 						},
 						A2(
@@ -7539,48 +7516,58 @@ var $author$project$Regular$triangularTiling = F4(
 										}),
 									$author$project$Util$mix4Color(y));
 							},
-							A2($elm$core$List$range, 1, n)));
+							A2($elm$core$List$range, 0, n)));
 				},
-				A2($elm$core$List$range, 1, m)));
+				A2($elm$core$List$range, 0, m)));
 	});
 var $author$project$Shapes$dodecagon = {
 	angles: _List_fromArray(
 		[150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150]),
 	lengths: _List_fromArray(
 		[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]),
+	origin: {x: 0, y: 0},
 	rotation: 30
 };
+var $author$project$Semiregular$truncatedHexagonalShape = function () {
+	var second_trig = A2($author$project$Polygon$getPoint, 6, $author$project$Shapes$dodecagon);
+	var first_trig = A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$dodecagon);
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
+			[
+				$author$project$Shapes$dodecagon,
+				A2($author$project$Polygon$setOrigin, first_trig, $author$project$Shapes$equilateral),
+				A2(
+				$author$project$Polygon$setOrigin,
+				second_trig,
+				A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$equilateral))
+			]));
+}();
 var $author$project$Semiregular$truncatedHexagonalLine = F3(
 	function (theme, n, origin) {
 		if (n <= 0) {
 			return _List_Nil;
 		} else {
 			var size = 20;
-			var second_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 6);
-			var first_trig = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 3);
+			var first_trig = A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$dodecagon);
 			var next_origin = A2(
 				$author$project$Util$add,
-				A2($author$project$Util$add, origin, first_trig),
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$equilateral, size, 1));
+				origin,
+				A2(
+					$author$project$Util$mul,
+					size,
+					A2(
+						$author$project$Util$add,
+						first_trig,
+						A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$equilateral))));
 			return _Utils_ap(
-				_List_fromArray(
-					[
-						A5($author$project$Polygon$polygonSvg, $author$project$Shapes$dodecagon, size, theme, $author$project$ColorTheme$Primary, origin),
-						A5(
-						$author$project$Polygon$polygonSvg,
-						$author$project$Shapes$equilateral,
-						size,
-						theme,
-						$author$project$ColorTheme$Secondary,
-						A2($author$project$Util$add, origin, first_trig)),
-						A5(
-						$author$project$Polygon$polygonSvg,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$equilateral, 60),
-						size,
-						theme,
-						$author$project$ColorTheme$Secondary,
-						A2($author$project$Util$add, origin, second_trig))
-					]),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Semiregular$truncatedHexagonalShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary])),
 				A3($author$project$Semiregular$truncatedHexagonalLine, theme, n - 1, next_origin));
 		}
 	});
@@ -7591,18 +7578,27 @@ var $author$project$Semiregular$truncatedHexagonalTiling = F4(
 		} else {
 			var size = 20;
 			var decagon_width = A2(
-				$author$project$Util$sub,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 3),
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 0));
+				$author$project$Util$mul,
+				size,
+				A2(
+					$author$project$Util$sub,
+					A2($author$project$Polygon$getPoint, 3, $author$project$Shapes$dodecagon),
+					A2($author$project$Polygon$getPoint, 0, $author$project$Shapes$dodecagon)));
 			var next_origin = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
 				$author$project$Util$add,
 				origin,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 7)) : A2(
+				A2(
+					$author$project$Util$mul,
+					size,
+					A2($author$project$Polygon$getPoint, 7, $author$project$Shapes$dodecagon))) : A2(
 				$author$project$Util$sub,
 				A2(
 					$author$project$Util$add,
 					origin,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 8)),
+					A2(
+						$author$project$Util$mul,
+						size,
+						A2($author$project$Polygon$getPoint, 8, $author$project$Shapes$dodecagon))),
 				decagon_width);
 			return _Utils_ap(
 				A3($author$project$Semiregular$truncatedHexagonalLine, theme, n, origin),
@@ -7614,35 +7610,50 @@ var $author$project$Shapes$octagon = {
 		[135, 135, 135, 135, 135, 135, 135, 135]),
 	lengths: _List_fromArray(
 		[1, 1, 1, 1, 1, 1, 1, 1]),
+	origin: {x: 0, y: 0},
 	rotation: 0
 };
+var $author$project$Semiregular$truncatedSquareShape = function () {
+	var top_square = A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$octagon);
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
+			[
+				$author$project$Shapes$octagon,
+				A2(
+				$author$project$Polygon$setOrigin,
+				top_square,
+				A2($author$project$Polygon$setRotation, 45, $author$project$Shapes$square))
+			]));
+}();
 var $author$project$Semiregular$truncatedSquareLine = F3(
 	function (theme, n, origin) {
 		if (n <= 0) {
 			return _List_Nil;
 		} else {
+			var top_square = A2($author$project$Polygon$getPoint, 1, $author$project$Shapes$octagon);
 			var size = 20;
-			var top_square = A3($author$project$Polygon$getPoint, $author$project$Shapes$octagon, size, 1);
 			var next_origin = A2(
 				$author$project$Util$add,
-				A2($author$project$Util$add, origin, top_square),
-				A3(
-					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 45),
+				origin,
+				A2(
+					$author$project$Util$mul,
 					size,
-					2));
+					A2(
+						$author$project$Util$add,
+						top_square,
+						A2(
+							$author$project$Polygon$getPoint,
+							2,
+							A2($author$project$Polygon$setRotation, 45, $author$project$Shapes$square)))));
 			return _Utils_ap(
-				_List_fromArray(
-					[
-						A5($author$project$Polygon$polygonSvg, $author$project$Shapes$octagon, size, theme, $author$project$ColorTheme$Primary, origin),
-						A5(
-						$author$project$Polygon$polygonSvg,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 45),
-						size,
-						theme,
-						$author$project$ColorTheme$Secondary,
-						A2($author$project$Util$add, origin, top_square))
-					]),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Semiregular$truncatedSquareShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Secondary])),
 				A3($author$project$Semiregular$truncatedSquareLine, theme, n - 1, next_origin));
 		}
 	});
@@ -7655,59 +7666,44 @@ var $author$project$Semiregular$truncatedSquareTiling = F4(
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$octagon, size, 5));
+				A2(
+					$author$project$Util$mul,
+					size,
+					A2($author$project$Polygon$getPoint, 5, $author$project$Shapes$octagon)));
 			return _Utils_ap(
 				A3($author$project$Semiregular$truncatedSquareLine, theme, n, origin),
 				A4($author$project$Semiregular$truncatedSquareTiling, theme, n, m - 1, next_origin));
 		}
 	});
-var $author$project$Semiregular$truncTriHexaShape = F3(
-	function (theme, origin, size) {
-		var square3 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 10);
-		var square2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 8);
-		var square1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 6);
-		var hex2 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 9);
-		var hex1 = A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 7);
-		return _List_fromArray(
+var $author$project$Semiregular$truncTriHexaShape = function () {
+	var square3 = A2($author$project$Polygon$getPoint, 10, $author$project$Shapes$dodecagon);
+	var square2 = A2($author$project$Polygon$getPoint, 8, $author$project$Shapes$dodecagon);
+	var square1 = A2($author$project$Polygon$getPoint, 6, $author$project$Shapes$dodecagon);
+	var hex2 = A2($author$project$Polygon$getPoint, 9, $author$project$Shapes$dodecagon);
+	var hex1 = A2($author$project$Polygon$getPoint, 7, $author$project$Shapes$dodecagon);
+	return $author$project$Shapes$asShape(
+		_List_fromArray(
 			[
-				A5($author$project$Polygon$polygonSvg, $author$project$Shapes$dodecagon, size, theme, $author$project$ColorTheme$Primary, origin),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 60),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				A2($author$project$Util$add, origin, square1)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				$author$project$Shapes$square,
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				A2($author$project$Util$add, origin, square2)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
-				size,
-				theme,
-				$author$project$ColorTheme$Ternary,
-				A2($author$project$Util$add, origin, square3)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				A2($author$project$Util$add, origin, hex1)),
-				A5(
-				$author$project$Polygon$polygonSvg,
-				A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, -30),
-				size,
-				theme,
-				$author$project$ColorTheme$Secondary,
-				A2($author$project$Util$add, origin, hex2))
-			]);
-	});
+				$author$project$Shapes$dodecagon,
+				A2(
+				$author$project$Polygon$setOrigin,
+				square1,
+				A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$square)),
+				A2($author$project$Polygon$setOrigin, square2, $author$project$Shapes$square),
+				A2(
+				$author$project$Polygon$setOrigin,
+				square3,
+				A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$square)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				hex1,
+				A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$hexagon)),
+				A2(
+				$author$project$Polygon$setOrigin,
+				hex2,
+				A2($author$project$Polygon$setRotation, -30, $author$project$Shapes$hexagon))
+			]));
+}();
 var $author$project$Semiregular$truncTriHexaLine = F4(
 	function (theme, n, origin, size) {
 		if (n <= 0) {
@@ -7715,35 +7711,40 @@ var $author$project$Semiregular$truncTriHexaLine = F4(
 		} else {
 			var hexagon_width = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
-					size,
-					2),
-				A3(
+					2,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$hexagon)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
-					size,
-					0));
+					0,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$hexagon)));
 			var dodecagon_width = A2(
 				$author$project$Util$sub,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 4),
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, -1));
+				A2($author$project$Polygon$getPoint, 4, $author$project$Shapes$dodecagon),
+				A2($author$project$Polygon$getPoint, -1, $author$project$Shapes$dodecagon));
 			var next_origin = A2(
 				$author$project$Util$add,
 				origin,
 				A2(
-					$author$project$Util$add,
-					dodecagon_width,
+					$author$project$Util$mul,
+					size,
 					A2(
 						$author$project$Util$add,
-						hexagon_width,
+						{x: 1, y: 0},
 						A2(
 							$author$project$Util$add,
 							hexagon_width,
-							{x: size, y: 0}))));
+							A2($author$project$Util$add, hexagon_width, dodecagon_width)))));
 			return _Utils_ap(
-				A3($author$project$Semiregular$truncTriHexaShape, theme, origin, size),
+				A5(
+					$author$project$Shapes$renderShape,
+					$author$project$Semiregular$truncTriHexaShape,
+					size,
+					origin,
+					theme,
+					_List_fromArray(
+						[$author$project$ColorTheme$Primary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Ternary, $author$project$ColorTheme$Secondary, $author$project$ColorTheme$Secondary])),
 				A4($author$project$Semiregular$truncTriHexaLine, theme, n - 1, next_origin, size));
 		}
 	});
@@ -7755,91 +7756,201 @@ var $author$project$Semiregular$truncatedTriHexagonalTiling = F4(
 			var size = 20;
 			var hexagon_width = A2(
 				$author$project$Util$sub,
-				A3(
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
-					size,
-					2),
-				A3(
+					2,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$hexagon)),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$hexagon, 30),
-					size,
-					0));
+					0,
+					A2($author$project$Polygon$setRotation, 30, $author$project$Shapes$hexagon)));
 			var next_point = (!A2($elm$core$Basics$modBy, 2, m)) ? A2(
 				$author$project$Util$sub,
 				A2(
 					$author$project$Util$add,
-					A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 10),
-					A3(
+					A2($author$project$Polygon$getPoint, 10, $author$project$Shapes$dodecagon),
+					A2(
 						$author$project$Polygon$getPoint,
-						A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, -60),
-						size,
-						-1)),
+						-1,
+						A2($author$project$Polygon$setRotation, -60, $author$project$Shapes$square))),
 				A2(
 					$author$project$Util$add,
 					hexagon_width,
-					{x: size, y: 0})) : A2(
+					{x: 1, y: 0})) : A2(
 				$author$project$Util$add,
-				A3($author$project$Polygon$getPoint, $author$project$Shapes$dodecagon, size, 6),
-				A3(
+				A2($author$project$Polygon$getPoint, 6, $author$project$Shapes$dodecagon),
+				A2(
 					$author$project$Polygon$getPoint,
-					A2($author$project$Polygon$rotatePoly, $author$project$Shapes$square, 60),
-					size,
-					2));
-			var next_origin = A2($author$project$Util$add, origin, next_point);
+					2,
+					A2($author$project$Polygon$setRotation, 60, $author$project$Shapes$square)));
+			var next_origin = A2(
+				$author$project$Util$add,
+				origin,
+				A2($author$project$Util$mul, size, next_point));
 			return _Utils_ap(
 				A4($author$project$Semiregular$truncTriHexaLine, theme, n, origin, size),
 				A4($author$project$Semiregular$truncatedTriHexagonalTiling, theme, n, m - 1, next_origin));
 		}
 	});
-var $author$project$Main$getTessellation = function (tiling) {
-	switch (tiling.$) {
-		case 'Square':
-			return $author$project$Regular$squareTiling;
-		case 'Triangular':
-			return $author$project$Regular$triangularTiling;
-		case 'Hexagonal':
-			return $author$project$Regular$hexagonalTiling;
-		case 'TruncatedHexagonal':
-			return $author$project$Semiregular$truncatedHexagonalTiling;
-		case 'TriHexagonal':
-			return $author$project$Semiregular$triHexagonalTiling;
-		case 'TruncatedSquare':
-			return $author$project$Semiregular$truncatedSquareTiling;
-		case 'RhombiTriHexagonal':
-			return $author$project$Semiregular$rhombiTriHexagonalTiling;
-		case 'TruncatedTriHexagonal':
-			return $author$project$Semiregular$truncatedTriHexagonalTiling;
-		case 'SnubSquare':
-			return $author$project$Semiregular$snubSquareTiling;
-		case 'SnubTriHexagonal':
-			return $author$project$Semiregular$snubTriHexagonalTiling;
-		case 'ElongatedTriangular':
-			return $author$project$Semiregular$elongatedTriangular;
-		case 'TriakisTriangular':
-			return $author$project$Laves$triakisTriangularTiling;
-		case 'Rhombile':
-			return $author$project$Laves$rhombileTiling;
-		case 'TetrakisSquare':
-			return $author$project$Laves$tetrakisSquareTiling;
-		case 'DisdyakisRhombile':
-			return $author$project$Laves$disdyakisRhombileTiling;
-		case 'DeltoidalTriHexagonal':
-			return $author$project$Laves$deltoidalTriHexagonalTiling;
-		case 'FloretPentagonal':
-			return $author$project$Laves$floretPentagonalTiling;
-		case 'CairoPentagonal':
-			return $author$project$Laves$cairoTiling;
-		case 'PrismaticPentagonal':
-			return $author$project$Laves$prismaticPentagonalTiling;
-		case 'FloretHexagonal':
-			return $author$project$Lab$floretHexaTiling;
-		case 'Pythagorean':
-			return $author$project$Lab$pythagoreanTiling;
-		default:
-			return $author$project$Lab$convexHexaTiling;
-	}
-};
+var $author$project$Main$getTessellation = F2(
+	function (tiling, theme) {
+		switch (tiling.$) {
+			case 'Square':
+				return A4(
+					$author$project$Regular$squareTiling,
+					theme,
+					26,
+					26,
+					{x: -5, y: -5});
+			case 'Triangular':
+				return A4(
+					$author$project$Regular$triangularTiling,
+					theme,
+					20,
+					50,
+					{x: -40, y: -10});
+			case 'Hexagonal':
+				return A4(
+					$author$project$Regular$hexagonalTiling,
+					theme,
+					16,
+					20,
+					{x: -40, y: -20});
+			case 'TruncatedHexagonal':
+				return A4(
+					$author$project$Semiregular$truncatedHexagonalTiling,
+					theme,
+					15,
+					15,
+					{x: 0, y: -15});
+			case 'TriHexagonal':
+				return A4(
+					$author$project$Semiregular$triHexagonalTiling,
+					theme,
+					15,
+					17,
+					{x: -5, y: -15});
+			case 'TruncatedSquare':
+				return A4(
+					$author$project$Semiregular$truncatedSquareTiling,
+					theme,
+					20,
+					18,
+					{x: -20, y: -10});
+			case 'RhombiTriHexagonal':
+				return A4(
+					$author$project$Semiregular$rhombiTriHexagonalTiling,
+					theme,
+					8,
+					25,
+					{x: -10, y: -55});
+			case 'TruncatedTriHexagonal':
+				return A4(
+					$author$project$Semiregular$truncatedTriHexagonalTiling,
+					theme,
+					8,
+					20,
+					{x: 3, y: -67});
+			case 'SnubSquare':
+				return A4(
+					$author$project$Semiregular$snubSquareTiling,
+					theme,
+					11,
+					22,
+					{x: 0, y: 0});
+			case 'SnubTriHexagonal':
+				return A4(
+					$author$project$Semiregular$snubTriHexagonalTiling,
+					theme,
+					5,
+					35,
+					{x: 50, y: -65});
+			case 'ElongatedTriangular':
+				return A4(
+					$author$project$Semiregular$elongatedTriangular,
+					theme,
+					30,
+					30,
+					{x: -18, y: 0});
+			case 'TriakisTriangular':
+				return A4(
+					$author$project$Laves$triakisTriangularTiling,
+					theme,
+					18,
+					18,
+					{x: -55, y: 0});
+			case 'Rhombile':
+				return A4(
+					$author$project$Laves$rhombileTiling,
+					theme,
+					18,
+					19,
+					{x: -55, y: -10});
+			case 'TetrakisSquare':
+				return A4(
+					$author$project$Laves$tetrakisSquareTiling,
+					theme,
+					20,
+					20,
+					{x: 0, y: 0});
+			case 'DisdyakisRhombile':
+				return A4(
+					$author$project$Laves$disdyakisRhombileTiling,
+					theme,
+					15,
+					15,
+					{x: -16, y: 0});
+			case 'DeltoidalTriHexagonal':
+				return A4(
+					$author$project$Laves$deltoidalTriHexagonalTiling,
+					theme,
+					18,
+					20,
+					{x: 0, y: 0});
+			case 'FloretPentagonal':
+				return A4(
+					$author$project$Laves$floretPentagonalTiling,
+					theme,
+					18,
+					16,
+					{x: -340, y: -200});
+			case 'CairoPentagonal':
+				return A4(
+					$author$project$Laves$cairoTiling,
+					theme,
+					15,
+					25,
+					{x: -40, y: 0});
+			case 'PrismaticPentagonal':
+				return A4(
+					$author$project$Laves$prismaticPentagonalTiling,
+					theme,
+					30,
+					15,
+					{x: -30, y: -10});
+			case 'FloretHexagonal':
+				return A4(
+					$author$project$Lab$floretHexaTiling,
+					theme,
+					20,
+					25,
+					{x: -20, y: -10});
+			case 'Pythagorean':
+				return A4(
+					$author$project$Lab$pythagoreanTiling,
+					theme,
+					50,
+					50,
+					{x: -915, y: -813});
+			default:
+				return A4(
+					$author$project$Lab$convexHexaTiling,
+					theme,
+					16,
+					15,
+					{x: -505, y: -205});
+		}
+	});
 var $author$project$ColorTheme$amethystTheme = {
 	getColor: function (color) {
 		switch (color.$) {
@@ -8233,13 +8344,10 @@ var $author$project$Main$view = function (model) {
 								$elm$svg$Svg$Attributes$width('800'),
 								$elm$svg$Svg$Attributes$height('800')
 							]),
-						A5(
+						A2(
 							$author$project$Main$getTessellation,
 							model.selectedTiling,
-							A2($author$project$Main$getTheme, model.selectedTheme, model),
-							60,
-							90,
-							{x: -750, y: -680}))
+							A2($author$project$Main$getTheme, model.selectedTheme, model)))
 					]))
 			]));
 };

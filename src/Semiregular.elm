@@ -529,10 +529,10 @@ elongatedTriangular theme n m origin =
                 30
 
             squareLine =
-                List.range 1 n |> List.concatMap (\i -> renderShape (asShape [ square ]) size { x = origin.x + toFloat i * size, y = origin.y } theme [ Secondary ])
+                List.range 0 n |> List.concatMap (\i -> renderShape (asShape [ square ]) size { x = origin.x + toFloat i * size, y = origin.y } theme [ Secondary ])
 
             triangleLine =
-                List.range 1 n
+                List.range 0 n
                     |> List.concatMap
                         (\i ->
                             renderShape (asShape [ equilateral |> setRotation -60 ]) size { x = origin.x + toFloat i * size, y = origin.y } theme [ Primary ]

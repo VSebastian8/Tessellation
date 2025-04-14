@@ -1,7 +1,5 @@
 module Test exposing (..)
 
--- import Laves exposing (..)
-
 import ColorTheme exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
