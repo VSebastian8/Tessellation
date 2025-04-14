@@ -66,17 +66,17 @@ triakisTriLine theme n origin size =
 
 triakisTriDownShape : Theme -> Point -> Float -> List (Svg msg)
 triakisTriDownShape theme origin size =
-    [ polygonSvg (rotatePoly obtuseIso 30) size theme Secondary origin
-    , polygonSvg (rotatePoly obtuseIso 150) size theme Primary origin
-    , polygonSvg (rotatePoly obtuseIso -90) size theme Ternary origin
+    [ polygonSvg (rotatePoly obtuseIso 30) size origin theme Secondary
+    , polygonSvg (rotatePoly obtuseIso 150) size origin theme Primary
+    , polygonSvg (rotatePoly obtuseIso -90) size origin theme Ternary
     ]
 
 
 triakisTriUpShape : Theme -> Point -> Float -> List (Svg msg)
 triakisTriUpShape theme origin size =
-    [ polygonSvg (rotatePoly obtuseIso 90) size theme Secondary origin
-    , polygonSvg (rotatePoly obtuseIso 210) size theme Ternary origin
-    , polygonSvg (rotatePoly obtuseIso -30) size theme Primary origin
+    [ polygonSvg (rotatePoly obtuseIso 90) size origin theme Secondary
+    , polygonSvg (rotatePoly obtuseIso 210) size origin theme Ternary
+    , polygonSvg (rotatePoly obtuseIso -30) size origin theme Primary
     ]
 
 
@@ -133,9 +133,9 @@ rhombileLine theme n origin size =
 
 rhombileShape : Theme -> Point -> Float -> List (Svg msg)
 rhombileShape theme origin size =
-    [ polygonSvg (rotatePoly rhombus 30) size theme Secondary origin
-    , polygonSvg (rotatePoly rhombus 150) size theme Ternary origin
-    , polygonSvg (rotatePoly rhombus -90) size theme Primary origin
+    [ polygonSvg (rotatePoly rhombus 30) size origin theme Secondary
+    , polygonSvg (rotatePoly rhombus 150) size origin theme Ternary
+    , polygonSvg (rotatePoly rhombus -90) size origin theme Primary
     ]
 
 
@@ -176,10 +176,10 @@ tetrakisSquareLine theme n origin size =
 
 tetrakisSquareShape : Theme -> Point -> Float -> List (Svg msg)
 tetrakisSquareShape theme origin size =
-    [ polygonSvg (rotatePoly isosceles 45) size theme Primary origin
-    , polygonSvg (rotatePoly isosceles 135) size theme Ternary origin
-    , polygonSvg (rotatePoly isosceles -135) size theme Secondary origin
-    , polygonSvg (rotatePoly isosceles -45) size theme Quart origin
+    [ polygonSvg (rotatePoly isosceles 45) size origin theme Primary
+    , polygonSvg (rotatePoly isosceles 135) size origin theme Ternary
+    , polygonSvg (rotatePoly isosceles -135) size origin theme Secondary
+    , polygonSvg (rotatePoly isosceles -45) size origin theme Quart
     ]
 
 
@@ -227,18 +227,18 @@ disdyakisRhombileLine theme n origin size =
 
 disdyakisRhombileShape : Theme -> Point -> Float -> List (Svg msg)
 disdyakisRhombileShape theme origin size =
-    [ polygonSvg (startAt right 1) size theme Secondary origin
-    , polygonSvg (rotatePoly left 30) size theme Primary origin
-    , polygonSvg (rotatePoly (startAt right 1) 60) size theme Secondary origin
-    , polygonSvg (rotatePoly left 90) size theme Primary origin
-    , polygonSvg (rotatePoly (startAt right 1) 120) size theme Secondary origin
-    , polygonSvg (rotatePoly left 150) size theme Primary origin
-    , polygonSvg (rotatePoly (startAt right 1) 180) size theme Secondary origin
-    , polygonSvg (rotatePoly left 210) size theme Primary origin
-    , polygonSvg (rotatePoly (startAt right 1) 240) size theme Secondary origin
-    , polygonSvg (rotatePoly left 270) size theme Primary origin
-    , polygonSvg (rotatePoly (startAt right 1) 300) size theme Secondary origin
-    , polygonSvg (rotatePoly left 330) size theme Primary origin
+    [ polygonSvg (startAt right 1) size origin theme Secondary
+    , polygonSvg (rotatePoly left 30) size origin theme Primary
+    , polygonSvg (rotatePoly (startAt right 1) 60) size origin theme Secondary
+    , polygonSvg (rotatePoly left 90) size origin theme Primary
+    , polygonSvg (rotatePoly (startAt right 1) 120) size origin theme Secondary
+    , polygonSvg (rotatePoly left 150) size origin theme Primary
+    , polygonSvg (rotatePoly (startAt right 1) 180) size origin theme Secondary
+    , polygonSvg (rotatePoly left 210) size origin theme Primary
+    , polygonSvg (rotatePoly (startAt right 1) 240) size origin theme Secondary
+    , polygonSvg (rotatePoly left 270) size origin theme Primary
+    , polygonSvg (rotatePoly (startAt right 1) 300) size origin theme Secondary
+    , polygonSvg (rotatePoly left 330) size origin theme Primary
     ]
 
 
@@ -290,12 +290,12 @@ deltoidalTriHexagonalLine theme n origin size =
 
 deltoidalTriHexagonalShape : Theme -> Color -> Point -> Float -> List (Svg msg)
 deltoidalTriHexagonalShape theme color origin size =
-    [ polygonSvg kite size theme color origin
-    , polygonSvg (rotatePoly kite 60) size theme color origin
-    , polygonSvg (rotatePoly kite 120) size theme color origin
-    , polygonSvg (rotatePoly kite 180) size theme color origin
-    , polygonSvg (rotatePoly kite 240) size theme color origin
-    , polygonSvg (rotatePoly kite 300) size theme color origin
+    [ polygonSvg kite size origin theme color
+    , polygonSvg (rotatePoly kite 60) size origin theme color
+    , polygonSvg (rotatePoly kite 120) size origin theme color
+    , polygonSvg (rotatePoly kite 180) size origin theme color
+    , polygonSvg (rotatePoly kite 240) size origin theme color
+    , polygonSvg (rotatePoly kite 300) size origin theme color
     ]
 
 
@@ -355,12 +355,12 @@ floretPentagonalLine theme n offset origin size =
 
 floretPentagonalShape : Theme -> Color -> Point -> Float -> List (Svg msg)
 floretPentagonalShape theme color origin size =
-    [ polygonSvg floret size theme color origin
-    , polygonSvg (rotatePoly floret 60) size theme color origin
-    , polygonSvg (rotatePoly floret 120) size theme color origin
-    , polygonSvg (rotatePoly floret 180) size theme color origin
-    , polygonSvg (rotatePoly floret 240) size theme color origin
-    , polygonSvg (rotatePoly floret 300) size theme color origin
+    [ polygonSvg floret size origin theme color
+    , polygonSvg (rotatePoly floret 60) size origin theme color
+    , polygonSvg (rotatePoly floret 120) size origin theme color
+    , polygonSvg (rotatePoly floret 180) size origin theme color
+    , polygonSvg (rotatePoly floret 240) size origin theme color
+    , polygonSvg (rotatePoly floret 300) size origin theme color
     ]
 
 
@@ -442,10 +442,10 @@ cairoShape theme origin size =
         tip2 =
             add tip (getPoint cairo size 1)
     in
-    [ polygonSvg (rotatePoly (startAt cairo 1) 30) size theme Primary origin
-    , polygonSvg cairo size theme Secondary tip
-    , polygonSvg (rotatePoly (startAt cairo 1) 120) size theme Secondary tip
-    , polygonSvg (rotatePoly (startAt cairo 3) 60) size theme Primary tip2
+    [ polygonSvg (rotatePoly (startAt cairo 1) 30) size origin theme Primary
+    , polygonSvg cairo size tip theme Secondary
+    , polygonSvg (rotatePoly (startAt cairo 1) 120) size tip theme Secondary
+    , polygonSvg (rotatePoly (startAt cairo 3) 60) size tip2 theme Primary
     ]
 
 
@@ -503,6 +503,6 @@ prismaticPentagonalLine theme n origin size =
 
 prismaticPentagonalShape : Theme -> Point -> Float -> List (Svg msg)
 prismaticPentagonalShape theme origin size =
-    [ polygonSvg prism size theme Primary origin
-    , polygonSvg (rotatePoly (startAt prism 2) 30) size theme Secondary (add origin (getPoint prism size 3))
+    [ polygonSvg prism size origin theme Primary
+    , polygonSvg (rotatePoly (startAt prism 2) 30) size (add origin (getPoint prism size 3)) theme Secondary
     ]

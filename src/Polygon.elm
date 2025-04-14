@@ -10,37 +10,42 @@ type alias Polygon =
     { lengths : List Float
     , angles : List Float
     , rotation : Float
+    , origin : Point
     }
 
 
 startAt : Polygon -> Int -> Polygon
-startAt { lengths, angles, rotation } n =
+startAt { lengths, angles, rotation, origin } n =
     { lengths = List.drop n lengths ++ List.take n lengths
     , angles = List.drop n angles ++ List.take n angles
     , rotation = rotation
+    , origin = origin
     }
 
 
 rotatePoly : Polygon -> Float -> Polygon
-rotatePoly { lengths, angles } a =
+rotatePoly { lengths, angles, origin } a =
     { lengths = lengths
     , angles = angles
     , rotation = a
+    , origin = origin
     }
 
 
 addRotation : Polygon -> Float -> Polygon
-addRotation { lengths, angles, rotation } a =
+addRotation { lengths, angles, rotation, origin } a =
     { lengths = lengths
     , angles = angles
     , rotation = rotation + a
+    , origin = origin
     }
 
 
-polygonPoints : Polygon -> Float -> List Point
-polygonPoints { lengths, angles, rotation } size =
-    List.map2 Tuple.pair (List.map (\l -> l * size) lengths) (rotation + 180 :: angles)
+asPoints : Polygon -> List Point
+asPoints { lengths, angles, rotation, origin } =
+    List.map2 Tuple.pair lengths (rotation + 180 :: angles)
         |> pointSequence { x = 0, y = 0 } 0
+        |> List.map (add origin)
 
 
 pointSequence : Point -> Float -> List ( Float, Float ) -> List Point
@@ -60,16 +65,23 @@ pointSequence point rotation polyList =
             point :: pointSequence next_point next_rotation rest
 
 
-startPoint : List Point -> Point -> List Point
-startPoint points p =
-    points |> List.map (\q -> { x = q.x + p.x, y = q.y + p.y })
+drawAt : Point -> List Point -> List Point
+drawAt origin points =
+    points |> List.map (add origin)
 
 
-polygonSvg : Polygon -> Float -> Theme -> Color -> Point -> Svg msg
-polygonSvg poly size theme color point =
+scaleWith : Float -> List Point -> List Point
+scaleWith size points =
+    points |> List.map (\p -> mul p size)
+
+
+polygonSvg : Polygon -> Float -> Point -> Theme -> Color -> Svg msg
+polygonSvg poly size origin theme color =
     let
         svgPoints =
-            startPoint (polygonPoints poly size) point
+            asPoints poly
+                |> scaleWith size
+                |> drawAt origin
                 |> List.map (\p -> String.fromFloat p.x ++ "," ++ String.fromFloat p.y)
                 |> String.join " "
     in
@@ -89,7 +101,7 @@ getPoint poly size index =
             List.length poly.lengths
     in
     case
-        polygonPoints poly size |> List.drop (modBy n (n + index)) |> List.head
+        asPoints poly |> scaleWith size |> List.drop (modBy n (n + index)) |> List.head
     of
         Nothing ->
             { x = 0, y = 0 }

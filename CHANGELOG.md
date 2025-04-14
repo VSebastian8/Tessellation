@@ -1,5 +1,11 @@
 # Changelog
 
+## Not Yet Implemented
+
+- Optimization: do not draw svgs outside of the rendering window
+- Download button for the svg tiling
+- Get rid of diagonals in floret and pythagorean tilings
+
 ## v0.2.0 - 2025-04-11
 
 - `Laves` tilings.

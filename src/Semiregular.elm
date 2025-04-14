@@ -58,7 +58,11 @@ truncatedHexagonalLine theme n origin =
                 add (add origin first_trig)
                     (getPoint equilateral size 1)
         in
-        [ polygonSvg dodecagon size theme Primary origin, polygonSvg equilateral size theme Secondary (add origin first_trig), polygonSvg (rotatePoly equilateral 60) size theme Secondary (add origin second_trig) ] ++ truncatedHexagonalLine theme (n - 1) next_origin
+        [ polygonSvg dodecagon size origin theme Primary
+        , polygonSvg equilateral size (add origin first_trig) theme Secondary
+        , polygonSvg (rotatePoly equilateral 60) size (add origin second_trig) theme Secondary
+        ]
+            ++ truncatedHexagonalLine theme (n - 1) next_origin
 
 
 {-| Rectification of the hexagon (the original edges vanish)
@@ -111,7 +115,11 @@ triHexagonalLine theme n origin =
                 add (add origin first_trig)
                     (getPoint equilateral size 1)
         in
-        [ polygonSvg hexagon size theme Primary origin, polygonSvg equilateral size theme Secondary (add origin first_trig), polygonSvg (rotatePoly equilateral 60) size theme Secondary (add origin second_trig) ] ++ triHexagonalLine theme (n - 1) next_origin
+        [ polygonSvg hexagon size origin theme Primary
+        , polygonSvg equilateral size (add origin first_trig) theme Secondary
+        , polygonSvg (rotatePoly equilateral 60) size (add origin second_trig) theme Secondary
+        ]
+            ++ triHexagonalLine theme (n - 1) next_origin
 
 
 {-| Truncation of the square tiling
@@ -154,7 +162,10 @@ truncatedSquareLine theme n origin =
                 add (add origin top_square)
                     (getPoint (rotatePoly square 45) size 2)
         in
-        [ polygonSvg octagon size theme Primary origin, polygonSvg (rotatePoly square 45) size theme Secondary (add origin top_square) ] ++ truncatedSquareLine theme (n - 1) next_origin
+        [ polygonSvg octagon size origin theme Primary
+        , polygonSvg (rotatePoly square 45) size (add origin top_square) theme Secondary
+        ]
+            ++ truncatedSquareLine theme (n - 1) next_origin
 
 
 {-| Rectification of the trihexagonal tiling
@@ -227,12 +238,12 @@ rhombiTriHexaShape theme origin size =
         square3 =
             getPoint hexagon size 5
     in
-    [ polygonSvg hexagon size theme Primary origin
-    , polygonSvg (rotatePoly square -30) size theme Ternary (add origin square1)
-    , polygonSvg (rotatePoly equilateral -30) size theme Secondary (add origin trig1)
-    , polygonSvg square size theme Ternary (add origin square2)
-    , polygonSvg (rotatePoly equilateral -90) size theme Secondary (add origin trig2)
-    , polygonSvg (rotatePoly square -60) size theme Ternary (add origin square3)
+    [ polygonSvg hexagon size origin theme Primary
+    , polygonSvg (rotatePoly square -30) size (add origin square1) theme Ternary
+    , polygonSvg (rotatePoly equilateral -30) size (add origin trig1) theme Secondary
+    , polygonSvg square size (add origin square2) theme Ternary
+    , polygonSvg (rotatePoly equilateral -90) size (add origin trig2) theme Secondary
+    , polygonSvg (rotatePoly square -60) size (add origin square3) theme Ternary
     ]
 
 
@@ -306,12 +317,12 @@ truncTriHexaShape theme origin size =
         hex2 =
             getPoint dodecagon size 9
     in
-    [ polygonSvg dodecagon size theme Primary origin
-    , polygonSvg (rotatePoly square 60) size theme Ternary (add origin square1)
-    , polygonSvg square size theme Ternary (add origin square2)
-    , polygonSvg (rotatePoly square -60) size theme Ternary (add origin square3)
-    , polygonSvg (rotatePoly hexagon 30) size theme Secondary (add origin hex1)
-    , polygonSvg (rotatePoly hexagon -30) size theme Secondary (add origin hex2)
+    [ polygonSvg dodecagon size origin theme Primary
+    , polygonSvg (rotatePoly square 60) size (add origin square1) theme Ternary
+    , polygonSvg square size (add origin square2) theme Ternary
+    , polygonSvg (rotatePoly square -60) size (add origin square3) theme Ternary
+    , polygonSvg (rotatePoly hexagon 30) size (add origin hex1) theme Secondary
+    , polygonSvg (rotatePoly hexagon -30) size (add origin hex2) theme Secondary
     ]
 
 
@@ -370,12 +381,12 @@ snubSquareShape theme origin size =
         second =
             add first { x = size, y = 0 }
     in
-    [ polygonSvg (rotatePoly equilateral 90) size theme Primary origin
-    , polygonSvg (rotatePoly square 30) size theme Secondary origin
-    , polygonSvg equilateral size theme Primary first
-    , polygonSvg (rotatePoly equilateral 60) size theme Primary first
-    , polygonSvg (rotatePoly equilateral 30) size theme Primary second
-    , polygonSvg (rotatePoly square -30) size theme Secondary second
+    [ polygonSvg (rotatePoly equilateral 90) size origin theme Primary
+    , polygonSvg (rotatePoly square 30) size origin theme Secondary
+    , polygonSvg equilateral size first theme Primary
+    , polygonSvg (rotatePoly equilateral 60) size first theme Primary
+    , polygonSvg (rotatePoly equilateral 30) size second theme Primary
+    , polygonSvg (rotatePoly square -30) size second theme Secondary
     ]
 
 
@@ -437,15 +448,15 @@ snubTriHexagonalShape theme origin size =
         third =
             add origin (getPoint hexagon size 5)
     in
-    [ polygonSvg hexagon size theme Primary origin
-    , polygonSvg (rotatePoly equilateral 60) size theme Secondary first
-    , polygonSvg equilateral size theme Secondary first
-    , polygonSvg (rotatePoly equilateral -60) size theme Secondary first
-    , polygonSvg equilateral size theme Secondary second
-    , polygonSvg (rotatePoly equilateral -60) size theme Secondary second
-    , polygonSvg (rotatePoly equilateral -120) size theme Secondary second
-    , polygonSvg (rotatePoly equilateral -60) size theme Secondary third
-    , polygonSvg (rotatePoly equilateral -120) size theme Secondary third
+    [ polygonSvg hexagon size origin theme Primary
+    , polygonSvg (rotatePoly equilateral 60) size first theme Secondary
+    , polygonSvg equilateral size first theme Secondary
+    , polygonSvg (rotatePoly equilateral -60) size first theme Secondary
+    , polygonSvg equilateral size second theme Secondary
+    , polygonSvg (rotatePoly equilateral -60) size second theme Secondary
+    , polygonSvg (rotatePoly equilateral -120) size second theme Secondary
+    , polygonSvg (rotatePoly equilateral -60) size third theme Secondary
+    , polygonSvg (rotatePoly equilateral -120) size third theme Secondary
     ]
 
 
@@ -467,14 +478,14 @@ elongatedTriangular theme n m origin =
                 30
 
             squareLine =
-                List.range 1 n |> List.map (\i -> polygonSvg square size theme Secondary { x = origin.x + toFloat i * size, y = origin.y })
+                List.range 1 n |> List.map (\i -> polygonSvg square size { x = origin.x + toFloat i * size, y = origin.y } theme Secondary)
 
             triangleLine =
                 List.range 1 n
                     |> List.concatMap
                         (\i ->
-                            [ polygonSvg (rotatePoly equilateral -60) size theme Primary { x = origin.x + toFloat i * size, y = origin.y }
-                            , polygonSvg equilateral size theme Ternary { x = origin.x + toFloat i * size, y = origin.y }
+                            [ polygonSvg (rotatePoly equilateral -60) size { x = origin.x + toFloat i * size, y = origin.y } theme Primary
+                            , polygonSvg equilateral size { x = origin.x + toFloat i * size, y = origin.y } theme Ternary
                             ]
                         )
 

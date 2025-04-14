@@ -33,7 +33,7 @@ squareTiling theme n m origin =
 
 squareShape : Theme -> Color -> Point -> Float -> Shape msg
 squareShape theme color origin size =
-    { render = [ polygonSvg square size theme color origin ], leftTop = { x = 0, y = 0 }, rightBottom = { x = size, y = size } }
+    { render = [ polygonSvg square size origin theme color ], leftTop = { x = 0, y = 0 }, rightBottom = { x = size, y = size } }
 
 
 {-| Regular Tiling of the plane with the `triangle` shape.
@@ -66,10 +66,10 @@ triangularTiling theme n m origin =
                         (\( point, color ) ->
                             case modBy 2 y of
                                 0 ->
-                                    polygonSvg equilateral size theme color point
+                                    polygonSvg equilateral size point theme color
 
                                 _ ->
-                                    polygonSvg (rotatePoly equilateral 60) size theme color point
+                                    polygonSvg (rotatePoly equilateral 60) size point theme color
                         )
             )
         |> List.concat
@@ -102,6 +102,6 @@ hexagonalTiling theme n m origin =
                             )
                         )
                     |> List.map
-                        (\( point, color ) -> polygonSvg (rotatePoly hexagon 30) size theme color point)
+                        (\( point, color ) -> polygonSvg (rotatePoly hexagon 30) size point theme color)
             )
         |> List.concat

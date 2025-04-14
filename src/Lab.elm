@@ -60,13 +60,13 @@ floretHexaLine theme n origin size =
 
 floretHexaShape : Theme -> Color -> Point -> Float -> List (Svg msg)
 floretHexaShape theme color origin size =
-    [ polygonSvg floret size theme color origin
-    , polygonSvg (rotatePoly floret 60) size theme color origin
-    , polygonSvg (rotatePoly floret 120) size theme color origin
-    , polygonSvg (rotatePoly floret 180) size theme color origin
-    , polygonSvg (rotatePoly floret 240) size theme color origin
-    , polygonSvg (rotatePoly floret 300) size theme color origin
-    , polygonSvg hexagon size theme Quart (add origin (getPoint (rotatePoly floret 60) size 3))
+    [ polygonSvg floret size origin theme color
+    , polygonSvg (rotatePoly floret 60) size origin theme color
+    , polygonSvg (rotatePoly floret 120) size origin theme color
+    , polygonSvg (rotatePoly floret 180) size origin theme color
+    , polygonSvg (rotatePoly floret 240) size origin theme color
+    , polygonSvg (rotatePoly floret 300) size origin theme color
+    , polygonSvg hexagon size (add origin (getPoint (rotatePoly floret 60) size 3)) theme Quart
     ]
 
 
@@ -106,7 +106,7 @@ pythagoreanTiling theme n m origin =
                               )
                             ]
                         )
-                    |> List.map (\( point, size, color ) -> polygonSvg square size theme color point)
+                    |> List.map (\( point, size, color ) -> polygonSvg square size point theme color)
             )
         |> List.concat
 
@@ -163,7 +163,7 @@ convexHexaLine theme n offset origin size =
 
 convexHexaShape : Theme -> Color -> Point -> Float -> List (Svg msg)
 convexHexaShape theme color origin size =
-    [ polygonSvg convexHexa size theme color origin
-    , polygonSvg (addRotation convexHexa 120) size theme color origin
-    , polygonSvg (addRotation convexHexa 240) size theme color origin
+    [ polygonSvg convexHexa size origin theme color
+    , polygonSvg (addRotation convexHexa 120) size origin theme color
+    , polygonSvg (addRotation convexHexa 240) size origin theme color
     ]

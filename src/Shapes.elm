@@ -9,6 +9,7 @@ equilateral =
     { lengths = [ 1, 1, 1 ]
     , angles = [ 60, 60, 60 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -17,6 +18,7 @@ square =
     { lengths = [ 1, 1, 1, 1 ]
     , angles = [ 90, 90, 90, 90 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -25,6 +27,7 @@ hexagon =
     { lengths = [ 1, 1, 1, 1, 1, 1 ]
     , angles = [ 120, 120, 120, 120, 120, 120 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -33,6 +36,7 @@ octagon =
     { lengths = [ 1, 1, 1, 1, 1, 1, 1, 1 ]
     , angles = [ 135, 135, 135, 135, 135, 135, 135, 135 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -41,22 +45,35 @@ dodecagon =
     { lengths = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 ]
     , angles = [ 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150 ]
     , rotation = 30
+    , origin = { x = 0, y = 0 }
     }
 
 
 obtuseIso : Polygon
 obtuseIso =
-    { lengths = [ 1, 2 * cos (degrees 30), 1 ], angles = [ 30, 30, 120 ], rotation = 0 }
+    { lengths = [ 1, 2 * cos (degrees 30), 1 ]
+    , angles = [ 30, 30, 120 ]
+    , rotation = 0
+    , origin = { x = 0, y = 0 }
+    }
 
 
 rhombus : Polygon
 rhombus =
-    { lengths = [ 1, 1, 1, 1 ], angles = [ 60, 120, 60, 120 ], rotation = 0 }
+    { lengths = [ 1, 1, 1, 1 ]
+    , angles = [ 60, 120, 60, 120 ]
+    , rotation = 0
+    , origin = { x = 0, y = 0 }
+    }
 
 
 isosceles : Polygon
 isosceles =
-    { lengths = [ 1, 2 * cos (degrees 45), 1 ], angles = [ 45, 45, 90 ], rotation = 0 }
+    { lengths = [ 1, 2 * cos (degrees 45), 1 ]
+    , angles = [ 45, 45, 90 ]
+    , rotation = 0
+    , origin = { x = 0, y = 0 }
+    }
 
 
 right : Polygon
@@ -64,6 +81,7 @@ right =
     { lengths = [ 1, cos (degrees 30), cos (degrees 60) ]
     , angles = [ 30, 90, 60 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -72,6 +90,7 @@ left =
     { lengths = [ 1, cos (degrees 60), cos (degrees 30) ]
     , angles = [ 60, 90, 30 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -80,6 +99,7 @@ kite =
     { lengths = [ cos (degrees 30), cos (degrees 60), cos (degrees 60), cos (degrees 30) ]
     , angles = [ 90, 120, 90, 60 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -88,6 +108,7 @@ floret =
     { lengths = [ 1 + 2 * cos (degrees 60), 1, 1, 1, 1 + 2 * cos (degrees 60) ]
     , angles = [ 120, 120, 120, 120, 60 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -96,6 +117,7 @@ cairo =
     { lengths = [ sqrt 2 * 2 * cos (degrees 75), 1, 1, 1, 1 ]
     , angles = [ 120, 90, 120, 90, 120 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -104,6 +126,7 @@ prism =
     { lengths = [ 1, 1, 1 / (2 * cos (degrees 30)), 1 / (2 * cos (degrees 30)), 1 ]
     , angles = [ 90, 120, 120, 120, 90 ]
     , rotation = 0
+    , origin = { x = 0, y = 0 }
     }
 
 
@@ -145,4 +168,5 @@ convexHexa =
     { lengths = [ x, y, y, z, z, x ]
     , angles = [ a_angle, 120, b_angle, 120, c_angle, 120 ]
     , rotation = 20
+    , origin = { x = 0, y = 0 }
     }
