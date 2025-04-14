@@ -51,7 +51,7 @@ floretHexaLine theme n origin size =
             next_origin =
                 add origin
                     (add
-                        (mul (getPoint floret size 1) 2)
+                        (mul 2 (getPoint floret size 1))
                         { x = 2 * size, y = 0 }
                     )
         in

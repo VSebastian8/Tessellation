@@ -1,7 +1,7 @@
 module Regular exposing (hexagonalTiling, squareTiling, triangularTiling)
 
 import ColorTheme exposing (..)
-import Polygon exposing (polygonSvg, rotatePoly)
+import Polygon exposing (rotatePoly)
 import Shapes exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
@@ -26,14 +26,15 @@ squareTiling theme n m origin =
             (\y ->
                 List.range 1 n
                     |> List.map (\x -> ( add origin { x = size * toFloat x, y = size * toFloat y }, mix3Color (y + x) ))
-                    |> List.concatMap (\( point, color ) -> renderShape (squareShape theme color point size) point)
+                    |> List.concatMap (\( point, color ) -> renderShape squareShape size point theme [ color ])
             )
         |> List.concat
 
 
-squareShape : Theme -> Color -> Point -> Float -> Shape msg
-squareShape theme color origin size =
-    { render = [ polygonSvg square size origin theme color ], leftTop = { x = 0, y = 0 }, rightBottom = { x = size, y = size } }
+squareShape : Shape
+squareShape =
+    asShape
+        [ square ]
 
 
 {-| Regular Tiling of the plane with the `triangle` shape.
@@ -62,14 +63,14 @@ triangularTiling theme n m origin =
                             , mix4Color y
                             )
                         )
-                    |> List.map
+                    |> List.concatMap
                         (\( point, color ) ->
                             case modBy 2 y of
                                 0 ->
-                                    polygonSvg equilateral size point theme color
+                                    renderShape (asShape [ equilateral ]) size point theme [ color ]
 
                                 _ ->
-                                    polygonSvg (rotatePoly equilateral 60) size point theme color
+                                    renderShape (asShape [ rotatePoly equilateral 60 ]) size point theme [ color ]
                         )
             )
         |> List.concat
@@ -101,7 +102,7 @@ hexagonalTiling theme n m origin =
                             , mix2Color y
                             )
                         )
-                    |> List.map
-                        (\( point, color ) -> polygonSvg (rotatePoly hexagon 30) size point theme color)
+                    |> List.concatMap
+                        (\( point, color ) -> renderShape (asShape [ rotatePoly hexagon 30 ]) size point theme [ color ])
             )
         |> List.concat

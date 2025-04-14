@@ -381,12 +381,11 @@ cairoTiling theme n m origin =
                 20
 
             downSlope =
-                mul
+                mul 2
                     (sub
                         (getPoint cairo size 3)
                         (getPoint cairo size 4)
                     )
-                    2
 
             w =
                 (getPoint cairo size 1).x

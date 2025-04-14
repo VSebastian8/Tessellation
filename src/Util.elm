@@ -1,47 +1,10 @@
 module Util exposing (..)
 
 import ColorTheme exposing (..)
-import Svg exposing (Svg)
 
 
 type alias Point =
     { x : Float, y : Float }
-
-
-type alias Shape msg =
-    { render : List (Svg msg), leftTop : Point, rightBottom : Point }
-
-
-after : Point -> Point -> Bool
-after p q =
-    q.x > p.x || q.y > p.y
-
-
-before : Point -> Point -> Bool
-before p q =
-    q.x < p.x || q.y < p.y
-
-
-renderShape : Shape msg -> Point -> List (Svg msg)
-renderShape { render, leftTop, rightBottom } origin =
-    let
-        left =
-            add origin leftTop
-
-        right =
-            add origin rightBottom
-
-        leftBound =
-            { x = 0, y = 0 }
-
-        rightBound =
-            { x = 250, y = 500 }
-    in
-    if before leftBound right || after rightBound left then
-        []
-
-    else
-        render
 
 
 add : Point -> Point -> Point
@@ -54,8 +17,8 @@ sub p q =
     { x = p.x - q.x, y = p.y - q.y }
 
 
-mul : Point -> Float -> Point
-mul p s =
+mul : Float -> Point -> Point
+mul s p =
     { x = s * p.x, y = s * p.y }
 
 

@@ -1,7 +1,66 @@
 module Shapes exposing (..)
 
+import ColorTheme exposing (..)
 import Polygon exposing (..)
-import Util exposing (tripleOp, zip3)
+import Svg exposing (Svg)
+import Util exposing (..)
+
+
+type alias Shape =
+    { render : List Polygon, topLeft : Point, bottomRight : Point }
+
+
+after : Point -> Point -> Bool
+after p q =
+    q.x > p.x || q.y > p.y
+
+
+before : Point -> Point -> Bool
+before p q =
+    q.x < p.x || q.y < p.y
+
+
+asShape : List Polygon -> Shape
+asShape polygons =
+    let
+        points =
+            polygons |> List.concatMap asPoints
+
+        xmin =
+            List.minimum (points |> List.map (\p -> p.x)) |> Maybe.withDefault 0
+
+        xmax =
+            List.maximum (points |> List.map (\p -> p.x)) |> Maybe.withDefault 0
+
+        ymin =
+            List.minimum (points |> List.map (\p -> p.y)) |> Maybe.withDefault 0
+
+        ymax =
+            List.maximum (points |> List.map (\p -> p.y)) |> Maybe.withDefault 0
+    in
+    { render = polygons, topLeft = { x = xmin, y = ymin }, bottomRight = { x = xmax, y = ymax } }
+
+
+renderShape : Shape -> Float -> Point -> Theme -> List Color -> List (Svg msg)
+renderShape { render, topLeft, bottomRight } size origin theme colors =
+    let
+        leftPoint =
+            topLeft |> mul size |> add origin
+
+        rightPoint =
+            bottomRight |> mul size |> add origin
+
+        leftBound =
+            { x = 0, y = 0 }
+
+        rightBound =
+            { x = 500, y = 500 }
+    in
+    if before leftBound rightPoint || after rightBound leftPoint then
+        []
+
+    else
+        List.map2 (\poly color -> polygonSvg poly size origin theme color) render colors
 
 
 equilateral : Polygon

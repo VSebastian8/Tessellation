@@ -72,7 +72,7 @@ drawAt origin points =
 
 scaleWith : Float -> List Point -> List Point
 scaleWith size points =
-    points |> List.map (\p -> mul p size)
+    points |> List.map (\p -> mul size p)
 
 
 polygonSvg : Polygon -> Float -> Point -> Theme -> Color -> Svg msg
