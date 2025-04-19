@@ -92,6 +92,10 @@ body {
     width: fit-content;
 }
 
+#tilingDownload {
+    display: none;
+}
+
 .theme {
     display: block;
     margin: 10px 0;

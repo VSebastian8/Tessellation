@@ -8406,6 +8406,27 @@ var $author$project$Main$view = function (model) {
 							$author$project$Main$getTessellation,
 							model.selectedTiling,
 							A2($author$project$Main$getTheme, model.selectedTheme, model)))
+					])),
+				A2(
+				$elm$html$Html$div,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$id('tilingDownload')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$svg,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$viewBox('0 0 800 800'),
+								$elm$svg$Svg$Attributes$width('2400'),
+								$elm$svg$Svg$Attributes$height('2400')
+							]),
+						A2(
+							$author$project$Main$getTessellation,
+							model.selectedTiling,
+							A2($author$project$Main$getTheme, model.selectedTheme, model)))
 					]))
 			]));
 };

@@ -249,6 +249,19 @@ view model =
                     )
                 )
             ]
+        , div [ id "tilingDownload" ]
+            [ svg
+                [ viewBox "0 0 800 800"
+                , width "2400"
+                , height "2400"
+                ]
+                (getTessellation model.selectedTiling
+                    (getTheme
+                        model.selectedTheme
+                        model
+                    )
+                )
+            ]
         ]
 
 
