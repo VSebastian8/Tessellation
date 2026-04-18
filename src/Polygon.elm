@@ -100,8 +100,8 @@ scaleWith size points =
     points |> List.map (\p -> mul size p)
 
 
-polygonSvg : Polygon -> Float -> Point -> Theme -> Color -> Svg msg
-polygonSvg poly size origin theme color =
+polygonSvg : Polygon -> Float -> Point -> Theme -> Color -> Float -> Svg msg
+polygonSvg poly size origin theme color w =
     let
         svgPoints =
             asPoints poly
@@ -114,6 +114,21 @@ polygonSvg poly size origin theme color =
         [ points svgPoints
         , fill (theme.getColor color)
         , stroke theme.strokeColor
-        , strokeWidth "2"
+        , strokeWidth (String.fromFloat w)
         ]
         []
+
+
+pointSvg : Point -> Float -> Point -> Float -> Svg msg
+pointSvg p size origin rad =
+    circle [ cx (String.fromFloat (origin.x + p.x * size)), cy (String.fromFloat (origin.y + p.y * size)), r (String.fromFloat rad) ] []
+
+
+translate : Point -> Polygon -> Polygon
+translate point poly =
+    { poly | origin = add poly.origin point }
+
+
+equals : Polygon -> Polygon -> Bool
+equals p1 p2 =
+    p1.lengths == p2.lengths && p1.angles == p2.angles && p1.rotation == p2.rotation

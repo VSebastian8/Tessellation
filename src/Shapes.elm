@@ -60,7 +60,7 @@ renderShape { render, topLeft, bottomRight } size origin theme colors =
         []
 
     else
-        List.map2 (\poly color -> polygonSvg poly size origin theme color) render colors
+        List.map2 (\poly color -> polygonSvg poly size origin theme color 2) render colors
 
 
 equilateral : Polygon

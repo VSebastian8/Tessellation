@@ -69,3 +69,43 @@ tripleOp f ( x, y, z ) =
 zip3 : ( a, a, a ) -> ( b, b, b ) -> ( ( a, b ), ( a, b ), ( a, b ) )
 zip3 ( a1, a2, a3 ) ( b1, b2, b3 ) =
     ( ( a1, b1 ), ( a2, b2 ), ( a3, b3 ) )
+
+
+inside : Point -> ( Point, Point ) -> Bool
+inside p1 ( p2, p3 ) =
+    p1.x >= p2.x && p1.x <= p3.x && p1.y >= p2.y && p1.y <= p3.y
+
+
+distance : Point -> Point -> Float
+distance p1 p2 =
+    let
+        dy =
+            p2.y - p1.y
+
+        dx =
+            p2.x - p1.x
+    in
+    sqrt (dy * dy + dx * dx)
+
+
+rotateAround : Point -> Float -> Point -> Point
+rotateAround origin angle p =
+    let
+        p2 =
+            sub p origin
+
+        cosa =
+            -angle |> degrees |> cos
+
+        sina =
+            -angle |> degrees |> sin
+
+        p3 =
+            { x = p2.x * cosa - p2.y * sina, y = p2.y * cosa + p2.x * sina }
+    in
+    add p3 origin
+
+
+epsilon : Float
+epsilon =
+    0.001

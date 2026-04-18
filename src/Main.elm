@@ -108,6 +108,14 @@ type Msg
     | DownloadSvg
 
 
+currentSvg : Model -> List (Svg msg)
+currentSvg model =
+    getTessellation model.selectedTiling
+        (getTheme
+            model
+        )
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -242,12 +250,7 @@ view model =
                 , width "800"
                 , height "800"
                 ]
-                (getTessellation model.selectedTiling
-                    (getTheme
-                        model.selectedTheme
-                        model
-                    )
-                )
+                (currentSvg model)
             ]
         , div [ id "tilingDownload" ]
             [ svg
@@ -257,7 +260,6 @@ view model =
                 ]
                 (getTessellation model.selectedTiling
                     (getTheme
-                        model.selectedTheme
                         model
                     )
                 )
@@ -339,11 +341,6 @@ colorPicker colorType labelText model =
         ]
 
 
-
---   <label for="favcolor">Select your favorite color:</label>
---   <input type="color" id="favcolor" name="favcolor" value="#ff0000"><br><br>
-
-
 getTessellation : Tiling -> (Theme -> List (Svg msg))
 getTessellation tiling theme =
     case tiling of
@@ -414,9 +411,9 @@ getTessellation tiling theme =
             convexHexaTiling theme 16 15 { x = -505, y = -205 }
 
 
-getTheme : ColorTheme -> Model -> Theme
-getTheme theme model =
-    case theme of
+getTheme : Model -> Theme
+getTheme model =
+    case model.selectedTheme of
         Amethyst ->
             amethystTheme
 
