@@ -1,4 +1,4 @@
-module Regular exposing (hexagonalTiling, squareTiling, triangularTiling)
+module Hardcoded.Regular exposing (hexagonalTiling, squareTiling, triangularTiling)
 
 import ColorTheme exposing (..)
 import Polygon exposing (setRotation)

@@ -7,10 +7,6 @@ import Svg exposing (Svg)
 import Util exposing (..)
 
 
-
--- Rule based procedural tessellation
-
-
 type alias PC =
     { poly : Polygon, col : Color, centre : Point, dist : Float }
 
@@ -26,7 +22,7 @@ type alias Rule =
 
 eq : PC -> PC -> Bool
 eq p1 p2 =
-    equals p1.poly p2.poly && p1.col == p2.col
+    equals p1.poly p2.poly && (p1.col == p2.col)
 
 
 applies : Rule -> PC -> Bool
@@ -54,7 +50,7 @@ renderRule { anchor, additions } at size theme =
                 ]
             )
     )
-        ++ [ polygonSvg anchor.poly size at theme anchor.col 4, pointSvg (add anchor.poly.origin anchor.centre) size at 2 ]
+        ++ [ polygonSvg anchor.poly size at theme anchor.col 4, pointSvg anchor.centre size at 2 ]
 
 
 type alias Tess =
@@ -92,7 +88,7 @@ step tess =
                                 (\rule ->
                                     rule.additions
                                         |> List.map
-                                            (\p2 -> tr p.poly.origin p2)
+                                            (\p2 -> p2 |> tr p.poly.origin |> tr (neg rule.anchor.poly.origin))
                                 )
                 in
                 { tess
@@ -109,3 +105,18 @@ fix t =
 
         _ ->
             fix (step t)
+
+
+squ : PC
+squ =
+    { poly = square, col = Primary, centre = { x = 0.5, y = 0.5 }, dist = 0.5 }
+
+
+eqi : PC
+eqi =
+    { poly = equilateral, col = Primary, centre = { x = 0.5, y = 0.28 }, dist = 0.28 }
+
+
+hex : PC
+hex =
+    { poly = hexagon, col = Primary, centre = { x = 0.5, y = 0.86 }, dist = 0.86 } |> rt { x = 0, y = 0 } 30

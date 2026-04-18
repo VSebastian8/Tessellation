@@ -2,13 +2,13 @@ port module Main exposing (..)
 
 import Browser
 import ColorTheme exposing (..)
+import Hardcoded.Lab exposing (..)
+import Hardcoded.Laves exposing (..)
+import Hardcoded.Regular exposing (..)
+import Hardcoded.Semiregular exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (checked, class, href, id, name, src, style, target, type_, value)
 import Html.Events exposing (onClick, onInput)
-import Lab exposing (..)
-import Laves exposing (..)
-import Regular exposing (..)
-import Semiregular exposing (..)
 import Svg exposing (Svg, svg)
 import Svg.Attributes exposing (height, viewBox, width)
 

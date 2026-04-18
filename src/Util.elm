@@ -22,6 +22,11 @@ mul s p =
     { x = s * p.x, y = s * p.y }
 
 
+neg : Point -> Point
+neg { x, y } =
+    { x = -x, y = -y }
+
+
 mix2Color : Int -> Color
 mix2Color n =
     case modBy 2 n of

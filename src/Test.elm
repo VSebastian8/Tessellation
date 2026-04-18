@@ -1,55 +1,47 @@
-module Test exposing (..)
+module Test exposing (main, testTessellation)
+
+-- import Hardcoded.Lab exposing (..)
+-- import Hardcoded.Laves exposing (..)
+-- import Hardcoded.Regular exposing (..)
+-- import Hardcoded.Semiregular exposing (..)
 
 import ColorTheme exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
-import Lab exposing (..)
-import Laves exposing (..)
 import Polygon exposing (..)
-import Regular exposing (..)
+import RuleBased.Regular exposing (..)
 import Rules exposing (..)
-import Semiregular exposing (..)
 import Shapes exposing (..)
-import Svg exposing (Svg, svg)
+import Svg exposing (svg)
 import Svg.Attributes exposing (height, viewBox, width)
 import Util exposing (..)
 
 
-sq : PC
-sq =
-    { poly = square, col = Primary, centre = { x = 0.5, y = 0.5 }, dist = 0.5 }
+testRule1 : Rule
+testRule1 =
+    { anchor = squ, additions = [ tr { x = 1, y = 0 } { squ | col = Secondary }, tr { x = 0, y = 1 } { eqi | col = Secondary } ] }
 
 
-eqi : PC
-eqi =
-    { poly = equilateral, col = Primary, centre = { x = 0.5, y = 0.28 }, dist = 0.28 }
+testRule2 : Rule
+testRule2 =
+    { anchor = { squ | col = Secondary }, additions = [ tr { x = 1, y = 0 } squ, eqi |> tr { x = 0, y = 1 } ] }
 
 
-squareRule1 : Rule
-squareRule1 =
-    { anchor = sq, additions = [ tr { x = 1, y = 0 } { sq | col = Secondary }, tr { x = 0, y = 1 } { eqi | col = Secondary } ] }
-
-
-squareRule2 : Rule
-squareRule2 =
-    { anchor = { sq | col = Secondary }, additions = [ tr { x = 1, y = 0 } sq, eqi |> tr { x = 0, y = 1 } ] }
-
-
-triangleRule1 : Rule
-triangleRule1 =
+testRule3 : Rule
+testRule3 =
     { anchor = { eqi | col = Secondary }
-    , additions = [ { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60 |> tr { x = 1, y = 0 }, { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60, sq |> tr (equilateral |> getPoint 2) |> tr { x = -0.5, y = 0 } ]
+    , additions = [ { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60 |> tr { x = 1, y = 0 }, { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60, squ |> tr (equilateral |> getPoint 2) |> tr { x = -0.5, y = 0 } ]
     }
 
 
-squareTessellation : Tess
-squareTessellation =
+testTessellation : Tess
+testTessellation =
     { rules =
-        [ squareRule1
-        , squareRule2
-        , triangleRule1
+        [ testRule1
+        , testRule2
+        , testRule3
         ]
-    , open = [ sq ]
+    , open = [ squ ]
     , closed = []
     , bounds = ( { x = -1, y = -1 }, { x = 28, y = 28 } ) -- width / size, height / size
     }
@@ -89,46 +81,5 @@ main =
         , style "margin" "0"
         ]
         (showTess
-            squareTessellation
+            hexagonalTessellation
         )
-
-
-{-| Template Tiling
-
-  - Type:
-  - Symmetry:
-
--}
-templateTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
-templateTiling theme n m origin =
-    if m <= 0 then
-        []
-
-    else
-        let
-            size =
-                30
-
-            next_origin =
-                origin
-        in
-        templateLine theme n origin size ++ templateTiling theme n (m - 1) next_origin
-
-
-templateLine : Theme -> Int -> Point -> Float -> List (Svg msg)
-templateLine theme n origin size =
-    if n <= 0 then
-        []
-
-    else
-        let
-            next_origin =
-                origin
-        in
-        renderShape templateShape size origin theme [ Primary ]
-            ++ templateLine theme (n - 1) next_origin size
-
-
-templateShape : Shape
-templateShape =
-    [] |> asShape

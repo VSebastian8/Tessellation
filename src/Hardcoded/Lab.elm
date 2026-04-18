@@ -1,4 +1,4 @@
-module Lab exposing (convexHexaTiling, floretHexaTiling, pythagoreanTiling)
+module Hardcoded.Lab exposing (convexHexaTiling, floretHexaTiling, pythagoreanTiling, templateTiling)
 
 import ColorTheme exposing (..)
 import List exposing (repeat)
@@ -7,6 +7,47 @@ import Shapes exposing (..)
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Util exposing (..)
+
+
+{-| Template Tiling
+
+  - Type:
+  - Symmetry:
+
+-}
+templateTiling : Theme -> Int -> Int -> Point -> List (Svg msg)
+templateTiling theme n m origin =
+    if m <= 0 then
+        []
+
+    else
+        let
+            size =
+                30
+
+            next_origin =
+                origin
+        in
+        templateLine theme n origin size ++ templateTiling theme n (m - 1) next_origin
+
+
+templateLine : Theme -> Int -> Point -> Float -> List (Svg msg)
+templateLine theme n origin size =
+    if n <= 0 then
+        []
+
+    else
+        let
+            next_origin =
+                origin
+        in
+        renderShape templateShape size origin theme [ Primary ]
+            ++ templateLine theme (n - 1) next_origin size
+
+
+templateShape : Shape
+templateShape =
+    [] |> asShape
 
 
 {-| Pentagonal floret and hexagon tessellation
