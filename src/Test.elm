@@ -19,18 +19,25 @@ import Util exposing (..)
 
 testRule1 : Rule
 testRule1 =
-    { anchor = squ, additions = [ tr { x = 1, y = 0 } { squ | col = Secondary }, tr { x = 0, y = 1 } { eqi | col = Secondary } ] }
+    { anchor = squ
+    , additions = [ tr { x = 1, y = 0 } { squ | col = Secondary }, tr { x = 0, y = 1 } { eqi | col = Secondary } ]
+    , rotatable = False
+    }
 
 
 testRule2 : Rule
 testRule2 =
-    { anchor = { squ | col = Secondary }, additions = [ tr { x = 1, y = 0 } squ, eqi |> tr { x = 0, y = 1 } ] }
+    { anchor = { squ | col = Secondary }
+    , additions = [ tr { x = 1, y = 0 } squ, eqi |> tr { x = 0, y = 1 } ]
+    , rotatable = False
+    }
 
 
 testRule3 : Rule
 testRule3 =
     { anchor = { eqi | col = Secondary }
     , additions = [ { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60 |> tr { x = 1, y = 0 }, { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60, squ |> tr (equilateral |> getPoint 2) |> tr { x = -0.5, y = 0 } ]
+    , rotatable = False
     }
 
 
@@ -81,5 +88,5 @@ main =
         , style "margin" "0"
         ]
         (showTess
-            hexagonalTessellation
+            rotatedTriangularTessellation
         )

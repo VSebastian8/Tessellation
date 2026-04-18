@@ -23,6 +23,7 @@ squareTessellation =
                 [ tr { x = 1, y = 0 } { squ | col = Secondary }
                 , tr { x = 0, y = 1 } { squ | col = Secondary }
                 ]
+            , rotatable = False
             }
 
         squareRule2 =
@@ -31,11 +32,13 @@ squareTessellation =
                 [ tr { x = 1, y = 0 } { squ | col = Ternary }
                 , tr { x = 0, y = 1 } { squ | col = Ternary }
                 ]
+            , rotatable = False
             }
 
         squareRule3 =
             { anchor = { squ | col = Ternary }
             , additions = [ tr { x = 1, y = 0 } squ, tr { x = 0, y = 1 } squ ]
+            , rotatable = False
             }
     in
     { rules =
@@ -65,19 +68,27 @@ triangularTessellation =
                 [ { eqi | col = Quart } |> rt { x = 0, y = 0 } 60 |> tr (equilateral |> getPoint 2)
                 , tr { x = 1, y = 0 } eqi
                 ]
+            , rotatable = False
             }
 
         triRule2 =
             { anchor = eqi
             , additions =
                 [ { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr (equilateral |> getPoint 2) ]
+            , rotatable = False
             }
 
         triRule3 =
-            { anchor = { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr { x = 0.5, y = 0 }, additions = [ { eqi | col = Ternary } |> tr { x = 0.5, y = 0 } ] }
+            { anchor = { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr { x = 0.5, y = 0 }
+            , additions = [ { eqi | col = Ternary } |> tr { x = 0.5, y = 0 } ]
+            , rotatable = False
+            }
 
         triRule4 =
-            { anchor = { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr { x = 0.5, y = 0 }, additions = [ eqi |> tr (equilateral |> setRotation -60 |> getPoint 2) |> tr { x = 0.5, y = 0 } ] }
+            { anchor = { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr { x = 0.5, y = 0 }
+            , additions = [ eqi |> tr (equilateral |> setRotation -60 |> getPoint 2) |> tr { x = 0.5, y = 0 } ]
+            , rotatable = False
+            }
     in
     { rules = [ triRule1, triRule2, triRule3, triRule4 ]
     , open = [ eqi |> tr { x = -0.5, y = 0 } ]
@@ -99,30 +110,121 @@ hexagonalTessellation =
         hexRule1 =
             { anchor = hex
             , additions = [ { hex | col = Secondary } |> tr (hex.poly |> getPoint 2) ]
+            , rotatable = False
             }
 
         hexRule2 =
             { anchor = { hex | col = Secondary }
             , additions = [ { hex | col = Ternary } |> tr (hex.poly |> getPoint 2) ]
+            , rotatable = False
             }
 
         hexRule3 =
             { anchor = { hex | col = Ternary }
             , additions = [ hex |> tr (hex.poly |> getPoint 2) ]
+            , rotatable = False
             }
 
         hexRule4 =
             { anchor = hex |> tr { x = 1, y = 0 }
             , additions = [ { hex | col = Secondary } |> tr (hex.poly |> getPoint 4) |> tr (hex.poly |> getPoint 2 |> neg) |> tr { x = 1, y = 0 } ]
+            , rotatable = False
             }
 
         hexRule5 =
             { anchor = { hex | col = Ternary } |> tr { x = 1, y = 1 }
-            , additions = [ hex |> tr (hex.poly |> getPoint 4) |> tr (hex.poly |> getPoint 2 |> neg) |> tr { x = 1, y = 1 } ]
+            , additions =
+                [ hex |> tr (hex.poly |> getPoint 4) |> tr (hex.poly |> getPoint 2 |> neg) |> tr { x = 1, y = 1 } ]
+            , rotatable = False
             }
     in
     { rules = [ hexRule1, hexRule2, hexRule3, hexRule4, hexRule5 ]
-    , open = [ hex |> tr { x = -0.5, y = -0.5 } ]
+    , open =
+        [ hex |> tr { x = -0.5, y = -0.5 }
+        ]
     , closed = []
     , bounds = ( { x = -2, y = -1 }, { x = 28, y = 28 } )
+    }
+
+
+rotatedSquareTessellation : Tess
+rotatedSquareTessellation =
+    let
+        squareRule1 =
+            { anchor = squ
+            , additions =
+                [ tr { x = 1, y = 0 } { squ | col = Secondary }
+                , tr { x = 0, y = 1 } { squ | col = Secondary }
+                ]
+            , rotatable = True
+            }
+
+        squareRule2 =
+            { anchor = { squ | col = Secondary }
+            , additions =
+                [ tr { x = 1, y = 0 } { squ | col = Ternary }
+                , tr { x = 0, y = 1 } { squ | col = Ternary }
+                ]
+            , rotatable = True
+            }
+
+        squareRule3 =
+            { anchor = { squ | col = Ternary }
+            , additions = [ tr { x = 1, y = 0 } squ, tr { x = 0, y = 1 } squ ]
+            , rotatable = True
+            }
+
+        squareRule4 =
+            { anchor = squ |> rt { x = 0, y = 0 } 45 |> tr { x = 0, y = 1 }
+            , additions = [ squ |> rt { x = 0, y = 0 } 45 |> tr (squ.poly |> setRotation 45 |> getPoint 3) |> tr (squ.poly |> setRotation 45 |> getPoint 1 |> neg) |> tr { x = 0, y = 1 } ]
+            , rotatable = False
+            }
+    in
+    { rules =
+        [ squareRule1
+        , squareRule2
+        , squareRule3
+        , squareRule4
+        ]
+    , open = [ squ |> rt { x = 0, y = 0 } 45 |> tr { x = -1, y = 0 } ]
+    , closed = []
+    , bounds = ( { x = -2, y = -1 }, { x = 28, y = 28 } )
+    }
+
+
+rotatedTriangularTessellation : Tess
+rotatedTriangularTessellation =
+    let
+        triRule1 =
+            { anchor = eqi
+            , additions =
+                [ { eqi | col = Quart } |> rt { x = 0, y = 0 } 60 |> tr (equilateral |> getPoint 2)
+                , tr { x = 1, y = 0 } eqi
+                ]
+            , rotatable = True
+            }
+
+        triRule2 =
+            { anchor = eqi |> tr { x = 1, y = 0 }
+            , additions =
+                [ { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr (equilateral |> getPoint 2) |> tr { x = -1, y = 0 } ]
+            , rotatable = True
+            }
+
+        triRule3 =
+            { anchor = { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr { x = 0.5, y = 0 }
+            , additions = [ { eqi | col = Ternary } |> tr { x = 0.5, y = 0 } ]
+            , rotatable = True
+            }
+
+        triRule4 =
+            { anchor = { eqi | col = Secondary } |> rt { x = 0, y = 0 } -60 |> tr { x = 0.5, y = 0 }
+            , additions = [ eqi |> tr (equilateral |> setRotation -60 |> getPoint 2) |> tr { x = -0.5, y = 0 } ]
+            , rotatable = True
+            }
+    in
+    { rules = [ triRule1, triRule2, triRule3, triRule4 ]
+    , open = [ eqi |> rt { x = 0, y = 0 } 45 |> tr { x = -1, y = 0 } ]
+    , closed = []
+    , bounds = ( { x = -12, y = -3 }, { x = 28, y = 28 } )
     }

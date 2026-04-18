@@ -17,7 +17,7 @@ collides p1 p2 =
 
 
 type alias Rule =
-    { anchor : PC, additions : List PC }
+    { anchor : PC, additions : List PC, rotatable : Bool }
 
 
 eq : PC -> PC -> Bool
@@ -25,9 +25,18 @@ eq p1 p2 =
     equals p1.poly p2.poly && (p1.col == p2.col)
 
 
+eq2 : PC -> PC -> Bool
+eq2 p1 p2 =
+    (p1.poly.lengths == p2.poly.lengths) && (p1.poly.angles == p2.poly.angles) && (p1.col == p2.col)
+
+
 applies : Rule -> PC -> Bool
 applies rule p =
-    eq rule.anchor p
+    if rule.rotatable then
+        eq2 rule.anchor p
+
+    else
+        eq rule.anchor p
 
 
 tr : Point -> PC -> PC
@@ -37,7 +46,7 @@ tr p pc =
 
 rt : Point -> Float -> PC -> PC
 rt origin angle pc =
-    { pc | poly = pc.poly |> setRotation angle |> setOrigin (rotateAround origin angle pc.poly.origin), centre = pc.centre |> rotateAround origin angle }
+    { pc | poly = pc.poly |> setRotation (angle + pc.poly.rotation) |> setOrigin (rotateAround origin angle pc.poly.origin), centre = pc.centre |> rotateAround origin angle }
 
 
 renderRule : Rule -> Point -> Float -> Theme -> List (Svg msg)
@@ -88,7 +97,15 @@ step tess =
                                 (\rule ->
                                     rule.additions
                                         |> List.map
-                                            (\p2 -> p2 |> tr p.poly.origin |> tr (neg rule.anchor.poly.origin))
+                                            (\p2 ->
+                                                p2
+                                                    |> rt rule.anchor.poly.origin
+                                                        (p.poly.rotation
+                                                            - rule.anchor.poly.rotation
+                                                        )
+                                                    |> tr p.poly.origin
+                                                    |> tr (neg rule.anchor.poly.origin)
+                                            )
                                 )
                 in
                 { tess
