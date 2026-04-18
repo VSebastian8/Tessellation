@@ -49,6 +49,15 @@ rt origin angle pc =
     { pc | poly = pc.poly |> setRotation (angle + pc.poly.rotation) |> setOrigin (rotateAround origin angle pc.poly.origin), centre = pc.centre |> rotateAround origin angle }
 
 
+sz : Float -> PC -> PC
+sz size pc =
+    let
+        p =
+            pc.poly
+    in
+    { pc | poly = { p | lengths = List.map (\l -> l * size) p.lengths }, centre = mul size pc.centre, dist = pc.dist * size }
+
+
 renderRule : Rule -> Point -> Float -> Theme -> List (Svg msg)
 renderRule { anchor, additions } at size theme =
     (additions

@@ -9,6 +9,7 @@ import ColorTheme exposing (..)
 import Html exposing (Html, div)
 import Html.Attributes exposing (style)
 import Polygon exposing (..)
+import RuleBased.Isogonal exposing (..)
 import RuleBased.Regular exposing (..)
 import Rules exposing (..)
 import Shapes exposing (..)
@@ -88,5 +89,5 @@ main =
         , style "margin" "0"
         ]
         (showTess
-            rotatedTriangularTessellation
+            triangularRowsTessellation
         )
