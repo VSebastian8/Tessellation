@@ -22,6 +22,16 @@ mul s p =
     { x = s * p.x, y = s * p.y }
 
 
+mulx : Float -> Point -> Point
+mulx s p =
+    { x = s * p.x, y = p.y }
+
+
+muly : Float -> Point -> Point
+muly s p =
+    { x = p.x, y = s * p.y }
+
+
 neg : Point -> Point
 neg { x, y } =
     { x = -x, y = -y }

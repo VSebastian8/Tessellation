@@ -23,6 +23,7 @@ testRule1 =
     { anchor = squ
     , additions = [ tr { x = 1, y = 0 } { squ | col = Secondary }, tr { x = 0, y = 1 } { eqi | col = Secondary } ]
     , rotatable = False
+    , size = 30
     }
 
 
@@ -31,6 +32,7 @@ testRule2 =
     { anchor = { squ | col = Secondary }
     , additions = [ tr { x = 1, y = 0 } squ, eqi |> tr { x = 0, y = 1 } ]
     , rotatable = False
+    , size = 30
     }
 
 
@@ -39,6 +41,7 @@ testRule3 =
     { anchor = { eqi | col = Secondary }
     , additions = [ { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60 |> tr { x = 1, y = 0 }, { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60, squ |> tr (equilateral |> getPoint 2) |> tr { x = -0.5, y = 0 } ]
     , rotatable = False
+    , size = 30
     }
 
 
@@ -52,6 +55,7 @@ testTessellation =
     , open = [ squ ]
     , closed = []
     , bounds = ( { x = -1, y = -1 }, { x = 28, y = 28 } ) -- width / size, height / size
+    , size = 30
     }
 
 
@@ -68,14 +72,14 @@ showTess tess =
             , height "800"
             , style "margin-bottom" "-5px"
             ]
-            (renderTess (fix tess) 30 forestTheme)
+            (renderTess (fix tess) forestTheme)
         ]
     , svg
         [ viewBox "0 0 200 800"
         , width "400"
         , height "800"
         ]
-        (tess.rules |> List.indexedMap (\i r -> renderRule r { x = 100, y = 50 + 100 * toFloat i } 30 forestTheme) |> List.concat)
+        (tess.rules |> List.indexedMap (\i r -> renderRule r { x = 100, y = 60 + (100 * toFloat i) } forestTheme) |> List.concat)
     ]
 
 
@@ -89,5 +93,5 @@ main =
         , style "margin" "0"
         ]
         (showTess
-            triangularRowsTessellation
+            hexthagoreanTessellation
         )

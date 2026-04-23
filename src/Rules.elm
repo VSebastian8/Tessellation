@@ -17,7 +17,7 @@ collides p1 p2 =
 
 
 type alias Rule =
-    { anchor : PC, additions : List PC, rotatable : Bool }
+    { anchor : PC, additions : List PC, rotatable : Bool, size : Float }
 
 
 eq : PC -> PC -> Bool
@@ -58,8 +58,20 @@ sz size pc =
     { pc | poly = { p | lengths = List.map (\l -> l * size) p.lengths }, centre = mul size pc.centre, dist = pc.dist * size }
 
 
-renderRule : Rule -> Point -> Float -> Theme -> List (Svg msg)
-renderRule { anchor, additions } at size theme =
+pt : Float -> PC -> Point
+pt alfa pc =
+    let
+        nextP =
+            getPoint (floor alfa) pc.poly
+
+        prevP =
+            getPoint (ceiling alfa) pc.poly
+    in
+    add nextP (mul (toFloat (ceiling alfa) - alfa) (sub prevP nextP))
+
+
+renderRule : Rule -> Point -> Theme -> List (Svg msg)
+renderRule { anchor, additions, size } at theme =
     (additions
         |> List.concatMap
             (\addition ->
@@ -76,11 +88,12 @@ type alias Tess =
     , open : List PC
     , closed : List PC
     , bounds : ( Point, Point )
+    , size : Float
     }
 
 
-renderTess : Tess -> Float -> Theme -> List (Svg msg)
-renderTess { closed } size theme =
+renderTess : Tess -> Theme -> List (Svg msg)
+renderTess { closed, size } theme =
     closed |> List.map (\p -> polygonSvg p.poly size { x = 0, y = 0 } theme p.col 2)
 
 
@@ -146,3 +159,8 @@ eqi =
 hex : PC
 hex =
     { poly = hexagon, col = Primary, centre = { x = 0.5, y = 0.86 }, dist = 0.86 } |> rt { x = 0, y = 0 } 30
+
+
+hexv : PC
+hexv =
+    { poly = hexagon, col = Primary, centre = { x = 0.5, y = 0.86 }, dist = 0.86 }
