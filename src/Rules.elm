@@ -1,9 +1,12 @@
 module Rules exposing (..)
 
 import ColorTheme exposing (..)
+import Html exposing (Html)
 import Polygon exposing (..)
 import Shapes exposing (..)
-import Svg exposing (Svg)
+import String exposing (fromFloat)
+import Svg exposing (Svg, svg)
+import Svg.Attributes exposing (height, viewBox, width)
 import Util exposing (..)
 
 
@@ -17,7 +20,7 @@ collides p1 p2 =
 
 
 type alias Rule =
-    { anchor : PC, additions : List PC, rotatable : Bool, size : Float }
+    { anchor : PC, additions : List PC, rotatable : Bool, bounds : ( Point, Point ) }
 
 
 eq : PC -> PC -> Bool
@@ -49,13 +52,18 @@ rt origin angle pc =
     { pc | poly = pc.poly |> setRotation (angle + pc.poly.rotation) |> setOrigin (rotateAround origin angle pc.poly.origin), centre = pc.centre |> rotateAround origin angle }
 
 
+rto : Float -> PC -> PC
+rto =
+    rt { x = 0, y = 0 }
+
+
 sz : Float -> PC -> PC
 sz size pc =
     let
         p =
             pc.poly
     in
-    { pc | poly = { p | lengths = List.map (\l -> l * size) p.lengths }, centre = mul size pc.centre, dist = pc.dist * size }
+    { pc | poly = { p | lengths = List.map (\l -> l * size) p.lengths }, centre = mul size (sub pc.centre pc.poly.origin) |> add pc.poly.origin, dist = pc.dist * size }
 
 
 pt : Float -> PC -> Point
@@ -70,24 +78,39 @@ pt alfa pc =
     add nextP (mul (toFloat (ceiling alfa) - alfa) (sub prevP nextP))
 
 
-renderRule : Rule -> Point -> Theme -> List (Svg msg)
-renderRule { anchor, additions, size } at theme =
-    (additions
-        |> List.concatMap
-            (\addition ->
-                [ polygonSvg addition.poly size at theme addition.col 2
-                , pointSvg addition.centre size at 2
-                ]
-            )
-    )
-        ++ [ polygonSvg anchor.poly size at theme anchor.col 4, pointSvg anchor.centre size at 2 ]
+renderRule : Rule -> Theme -> Html msg
+renderRule { anchor, additions, bounds } theme =
+    let
+        ( tl1, br1 ) =
+            bounds
+
+        tl =
+            sub tl1 { x = 0.4, y = 0.4 }
+
+        br =
+            add br1 { x = 0.8, y = 0.8 }
+    in
+    svg
+        [ viewBox (fromFloat tl.x ++ " " ++ fromFloat tl.y ++ " " ++ fromFloat br.x ++ " " ++ fromFloat br.y)
+        , width "200"
+        , height "200"
+        ]
+        ((additions
+            |> List.concatMap
+                (\addition ->
+                    [ polygonSvg addition.poly 1 { x = 0, y = 0 } theme addition.col 0.04
+                    , pointSvg addition.centre 1 { x = 0, y = 0 } 0.04
+                    ]
+                )
+         )
+            ++ [ polygonSvg anchor.poly 1 { x = 0, y = 0 } theme anchor.col 0.08, pointSvg anchor.centre 1 { x = 0, y = 0 } 0.04 ]
+        )
 
 
 type alias Tess =
     { rules : List Rule
     , open : List PC
     , closed : List PC
-    , bounds : ( Point, Point )
     , size : Float
     }
 
@@ -97,15 +120,15 @@ renderTess { closed, size } theme =
     closed |> List.map (\p -> polygonSvg p.poly size { x = 0, y = 0 } theme p.col 2)
 
 
-step : Tess -> Tess
-step tess =
+step : Tess -> ( Point, Point ) -> Tess
+step tess bounds =
     case tess.open of
         [] ->
             tess
 
         -- Pick the first open polygon, check its validity and apply all rules to it
         p :: rest ->
-            if not (inside p.poly.origin tess.bounds) || List.any (collides p) tess.closed then
+            if not (inside p.poly.origin bounds) || List.any (collides p) tess.closed then
                 { tess
                     | open = rest
                 }
@@ -136,14 +159,14 @@ step tess =
                 }
 
 
-fix : Tess -> Tess
-fix t =
-    case t.open of
+fix : Tess -> ( Point, Point ) -> Tess
+fix tess bounds =
+    case tess.open of
         [] ->
-            { t | closed = List.reverse t.closed }
+            { tess | closed = List.reverse tess.closed }
 
         _ ->
-            fix (step t)
+            fix (step tess bounds) bounds
 
 
 squ : PC

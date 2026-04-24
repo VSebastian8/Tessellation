@@ -1,9 +1,4 @@
-module Test exposing (main, testTessellation)
-
--- import Hardcoded.Lab exposing (..)
--- import Hardcoded.Laves exposing (..)
--- import Hardcoded.Regular exposing (..)
--- import Hardcoded.Semiregular exposing (..)
+module Test exposing (main)
 
 import ColorTheme exposing (..)
 import Html exposing (Html, div)
@@ -13,73 +8,46 @@ import RuleBased.Isogonal exposing (..)
 import RuleBased.Regular exposing (..)
 import Rules exposing (..)
 import Shapes exposing (..)
+import String exposing (fromFloat)
 import Svg exposing (svg)
 import Svg.Attributes exposing (height, viewBox, width)
 import Util exposing (..)
 
 
-testRule1 : Rule
-testRule1 =
-    { anchor = squ
-    , additions = [ tr { x = 1, y = 0 } { squ | col = Secondary }, tr { x = 0, y = 1 } { eqi | col = Secondary } ]
-    , rotatable = False
-    , size = 30
-    }
-
-
-testRule2 : Rule
-testRule2 =
-    { anchor = { squ | col = Secondary }
-    , additions = [ tr { x = 1, y = 0 } squ, eqi |> tr { x = 0, y = 1 } ]
-    , rotatable = False
-    , size = 30
-    }
-
-
-testRule3 : Rule
-testRule3 =
-    { anchor = { eqi | col = Secondary }
-    , additions = [ { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60 |> tr { x = 1, y = 0 }, { eqi | col = Ternary } |> rt { x = 0, y = 0 } -60, squ |> tr (equilateral |> getPoint 2) |> tr { x = -0.5, y = 0 } ]
-    , rotatable = False
-    , size = 30
-    }
-
-
-testTessellation : Tess
-testTessellation =
-    { rules =
-        [ testRule1
-        , testRule2
-        , testRule3
-        ]
-    , open = [ squ ]
-    , closed = []
-    , bounds = ( { x = -1, y = -1 }, { x = 28, y = 28 } ) -- width / size, height / size
-    , size = 30
-    }
-
-
 showTess : Tess -> List (Html msg)
 showTess tess =
+    let
+        w =
+            1200
+
+        h =
+            800
+    in
     [ div
         [ style "border" "solid 5px "
         , style "padding-bottom" "0"
         , style "height" "fit-content"
         ]
         [ svg
-            [ viewBox "0 0 800 800"
-            , width "800"
-            , height "800"
+            [ viewBox ("0 0 " ++ fromFloat w ++ " " ++ fromFloat h)
+            , width (fromFloat w)
+            , height (fromFloat h)
             , style "margin-bottom" "-5px"
             ]
-            (renderTess (fix tess) forestTheme)
+            (renderTess (fix tess ( { x = -3, y = -3 }, { x = w / tess.size + 2, y = h / tess.size + 2 } )) forestTheme)
         ]
-    , svg
-        [ viewBox "0 0 200 800"
-        , width "400"
-        , height "800"
+    , div
+        [ style "display" "flex"
+        , style "flex-direction" "column"
+        , style "align-items" "center"
+        , style "justify-content" "center"
+        , style "padding" "0"
+        , style "margin-left" "50px"
+        , style "height" "800px" -- , style "background-color" "blue"
         ]
-        (tess.rules |> List.indexedMap (\i r -> renderRule r { x = 100, y = 60 + (100 * toFloat i) } forestTheme) |> List.concat)
+        (tess.rules
+            |> List.map (\r -> renderRule r forestTheme)
+        )
     ]
 
 
@@ -93,5 +61,5 @@ main =
         , style "margin" "0"
         ]
         (showTess
-            hexthagoreanTessellation
+            hexaStarTessellation
         )
