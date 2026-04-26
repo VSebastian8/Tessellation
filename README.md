@@ -1,6 +1,6 @@
 # Tiling the Plane
 
-This project contains various svg tessellations (or tilings) implemented in Elm
+This project contains various procedural svg tessellations (or tilings) implemented in Elm
 
 Website deployed [here](https://vsebastian8.github.io/Tessellation/)
 

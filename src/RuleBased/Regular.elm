@@ -7,6 +7,16 @@ import Shapes exposing (..)
 import Util exposing (..)
 
 
+regularTesselations : List ( String, Tess )
+regularTesselations =
+    [ ( "Square", squareTessellation )
+    , ( "Rotated Square", rotatedSquareTessellation )
+    , ( "Triangular", triangularTessellation )
+    , ( "Rotated Triangular", rotatedTriangularTessellation )
+    , ( "Hexagonal", hexagonalTessellation )
+    ]
+
+
 {-| Regular Tiling of the plane with the `square` shape.
 
   - Type: regular

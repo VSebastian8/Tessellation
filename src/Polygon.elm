@@ -113,7 +113,7 @@ polygonSvg poly size origin theme color w =
     polygon
         [ points svgPoints
         , fill (theme.getColor color)
-        , stroke theme.strokeColor
+        , stroke (theme.getColor Stroke)
         , strokeWidth (String.fromFloat w)
         ]
         []

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.0 - 2026-04-26
+
+- `Rule-base` procedural tesselation system.
+- Improved `frontend`.
+
 ## v0.3.0 - 2025-04-14
 
 - `Optimizations`: do not draw svgs outside of the rendering window and minimize rows and columns for each tiling.

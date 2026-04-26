@@ -7,6 +7,17 @@ import Shapes exposing (..)
 import Util exposing (..)
 
 
+isogonalTesselations : List ( String, Tess )
+isogonalTesselations =
+    [ ( "Square Rows", squareRowsTessellation )
+    , ( "Triangular Rows", triangularRowsTessellation )
+    , ( "Pythagorean", pythagoreanTessellation )
+    , ( "Trithagorean", trithagoreanTessellation )
+    , ( "Hexa Star", hexaStarTessellation )
+    , ( "Hexa Gyra", hexaGyraTessellation )
+    ]
+
+
 squareRowsTessellation : Tess
 squareRowsTessellation =
     let

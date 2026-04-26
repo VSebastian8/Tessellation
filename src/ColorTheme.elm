@@ -6,16 +6,16 @@ type Color
     | Secondary
     | Ternary
     | Quart
+    | Stroke
 
 
 type alias Theme =
-    { strokeColor : String, getColor : Color -> String }
+    { getColor : Color -> String }
 
 
 amethystTheme : Theme
 amethystTheme =
-    { strokeColor = "black"
-    , getColor =
+    { getColor =
         \color ->
             case color of
                 Primary ->
@@ -29,13 +29,15 @@ amethystTheme =
 
                 Quart ->
                     "#E9CDF6"
+
+                Stroke ->
+                    "black"
     }
 
 
 aquaTheme : Theme
 aquaTheme =
-    { strokeColor = "#006A71"
-    , getColor =
+    { getColor =
         \color ->
             case color of
                 Primary ->
@@ -49,13 +51,15 @@ aquaTheme =
 
                 Quart ->
                     "#006A71"
+
+                Stroke ->
+                    "#006A71"
     }
 
 
 honeyTheme : Theme
 honeyTheme =
-    { strokeColor = "#CE7C00"
-    , getColor =
+    { getColor =
         \color ->
             case color of
                 Primary ->
@@ -69,13 +73,15 @@ honeyTheme =
 
                 Quart ->
                     "#CE7C00"
+
+                Stroke ->
+                    "#CE7C00"
     }
 
 
 forestTheme : Theme
 forestTheme =
-    { strokeColor = "#3E3F5B"
-    , getColor =
+    { getColor =
         \color ->
             case color of
                 Primary ->
@@ -88,5 +94,8 @@ forestTheme =
                     "#F6F1DE"
 
                 Quart ->
+                    "#3E3F5B"
+
+                Stroke ->
                     "#3E3F5B"
     }
